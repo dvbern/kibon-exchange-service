@@ -1,0 +1,146 @@
+package ch.dvbern.kibon.verfuegung.model;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import javax.annotation.Nonnull;
+
+import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import com.fasterxml.jackson.databind.JsonNode;
+
+public class ClientVerfuegungDTO {
+
+	@Nonnull
+	private final Long id;
+
+	@Nonnull
+	private final LocalDateTime availableSince;
+
+	@Nonnull
+	private final String refnr;
+
+	@Nonnull
+	private final String institutionId;
+
+	@Nonnull
+	private final LocalDate von;
+
+	@Nonnull
+	private final LocalDate bis;
+
+	@Nonnull
+	private final Integer version;
+
+	@Nonnull
+	private final LocalDateTime verfuegtAm;
+
+	@Nonnull
+	private final BetreuungsangebotTyp betreuungsArt;
+
+	@Nonnull
+	private final JsonNode kind;
+
+	@Nonnull
+	private final JsonNode gesuchsteller;
+
+	@Nonnull
+	private final JsonNode zeitabschnitte;
+
+	@Nonnull
+	private final JsonNode ignorierteZeitabschnitte;
+
+	public ClientVerfuegungDTO(
+		@Nonnull Long id,
+		@Nonnull LocalDateTime availableSince,
+		@Nonnull String refnr,
+		@Nonnull String institutionId,
+		@Nonnull LocalDate von,
+		@Nonnull LocalDate bis,
+		@Nonnull Integer version,
+		@Nonnull LocalDateTime verfuegtAm,
+		@Nonnull BetreuungsangebotTyp betreuungsArt,
+		@Nonnull JsonNode kind,
+		@Nonnull JsonNode gesuchsteller,
+		@Nonnull JsonNode zeitabschnitte,
+		@Nonnull JsonNode ignorierteZeitabschnitte
+	) {
+		this.id = id;
+		this.availableSince = availableSince;
+		this.refnr = refnr;
+		this.institutionId = institutionId;
+		this.von = von;
+		this.bis = bis;
+		this.version = version;
+		this.verfuegtAm = verfuegtAm;
+		this.betreuungsArt = betreuungsArt;
+		this.kind = kind;
+		this.gesuchsteller = gesuchsteller;
+		this.zeitabschnitte = zeitabschnitte;
+		this.ignorierteZeitabschnitte = ignorierteZeitabschnitte;
+	}
+
+	@Nonnull
+	public Long getId() {
+		return id;
+	}
+
+	@Nonnull
+	public LocalDateTime getAvailableSince() {
+		return availableSince;
+	}
+
+	@Nonnull
+	public String getRefnr() {
+		return refnr;
+	}
+
+	@Nonnull
+	public String getInstitutionId() {
+		return institutionId;
+	}
+
+	@Nonnull
+	public LocalDate getVon() {
+		return von;
+	}
+
+	@Nonnull
+	public LocalDate getBis() {
+		return bis;
+	}
+
+	@Nonnull
+	public Integer getVersion() {
+		return version;
+	}
+
+	@Nonnull
+	public LocalDateTime getVerfuegtAm() {
+		return verfuegtAm;
+	}
+
+	@Nonnull
+	public BetreuungsangebotTyp getBetreuungsArt() {
+		return betreuungsArt;
+	}
+
+	@Nonnull
+	public JsonNode getKind() {
+		return kind;
+	}
+
+	@Nonnull
+	public JsonNode getGesuchsteller() {
+		return gesuchsteller;
+	}
+
+	@Nonnull
+	public JsonNode getZeitabschnitte() {
+		return zeitabschnitte;
+	}
+
+	@Nonnull
+	public JsonNode getIgnorierteZeitabschnitte() {
+		return ignorierteZeitabschnitte;
+	}
+}
