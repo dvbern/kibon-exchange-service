@@ -1,18 +1,15 @@
 package ch.dvbern.kibon.verfuegung.service;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
-import javax.persistence.criteria.ParameterExpression;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
@@ -23,6 +20,7 @@ import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung_;
+import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ApplicationScoped
@@ -34,12 +32,6 @@ public class VerfuegungService {
 	@Inject
 	ObjectMapper mapper;
 
-	@PostConstruct
-	public void init() throws IOException {
-		// strange, but if I don't perform deserialisation manually, vladmihalcea's ObjectMapperWrapper throws a NPE.
-		mapper.readTree("{}");
-	}
-
 	@Transactional(TxType.MANDATORY)
 	public void verfuegungCreated(@Nonnull VerfuegungEventDTO dto) {
 		Verfuegung verfuegung = mapper.convertValue(dto, Verfuegung.class);
@@ -48,7 +40,7 @@ public class VerfuegungService {
 	}
 
 	@Transactional(TxType.MANDATORY)
-	public List<ClientVerfuegungDTO> getAllForClient(@Nonnull String clientId) {
+	public List<ClientVerfuegungDTO> getAllForClient(@Nonnull ClientVerfuegungFilter filter) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<ClientVerfuegungDTO> query = cb.createQuery(ClientVerfuegungDTO.class);
 		Root<ClientVerfuegung> root = query.from(ClientVerfuegung.class);
@@ -71,15 +63,15 @@ public class VerfuegungService {
 			verfuegung.get(Verfuegung_.ignorierteZeitabschnitte)
 		));
 
-		ParameterExpression<String> clientParam = cb.parameter(String.class, "clientId");
-		Predicate clientPredicate = cb.equal(root.get(ClientVerfuegung_.clientId), clientParam);
+		filter.setPredicate(query, root, cb);
 
-		query
-			.where(clientPredicate)
-			.orderBy(cb.asc(root.get(ClientVerfuegung_.since)), cb.asc(root.get(ClientVerfuegung_.id)));
+		query.orderBy(cb.asc(root.get(ClientVerfuegung_.since)), cb.asc(root.get(ClientVerfuegung_.id)));
 
-		List<ClientVerfuegungDTO> resultList = em.createQuery(query)
-			.setParameter(clientParam, clientId)
+		TypedQuery<ClientVerfuegungDTO> q = em.createQuery(query);
+
+		filter.setParameters(q);
+
+		List<ClientVerfuegungDTO> resultList = q
 			.getResultList();
 
 		return resultList;
