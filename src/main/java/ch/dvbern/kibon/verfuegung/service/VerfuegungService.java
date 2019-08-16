@@ -17,7 +17,6 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
-import ch.dvbern.kibon.exchange.commons.util.ObjectMapperUtil;
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
@@ -43,22 +42,7 @@ public class VerfuegungService {
 
 	@Transactional(TxType.MANDATORY)
 	public void verfuegungCreated(@Nonnull VerfuegungEventDTO dto) {
-		Verfuegung verfuegung = new Verfuegung();
-
-		verfuegung.setRefnr(dto.getRefnr());
-		verfuegung.setInstitutionId(dto.getInstitutionId());
-		verfuegung.setVon(dto.getVon());
-		verfuegung.setBis(dto.getBis());
-		verfuegung.setVersion(dto.getVersion());
-		verfuegung.setVerfuegtAm(dto.getVerfuegtAm());
-		verfuegung.setBetreuungsArt(dto.getBetreuungsArt());
-
-		verfuegung.setKind(ObjectMapperUtil.MAPPER.valueToTree(dto.getKind()));
-		verfuegung.setGesuchsteller(ObjectMapperUtil.MAPPER.valueToTree(dto.getGesuchsteller()));
-		verfuegung.setZeitabschnitte(ObjectMapperUtil.MAPPER.valueToTree(dto.getZeitabschnitte()));
-		verfuegung.setIgnorierteZeitabschnitte(ObjectMapperUtil.MAPPER.valueToTree(dto.getIgnorierteZeitabschnitte()));
-
-		// evtl. vorhande Verfügung mit selber Refnr aber kleinerer Version auf "deleted" setzten
+		Verfuegung verfuegung = mapper.convertValue(dto, Verfuegung.class);
 
 		em.persist(verfuegung);
 	}
