@@ -1,8 +1,10 @@
 package ch.dvbern.kibon.verfuegung.model;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,7 +21,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Immutable;
 
-@Table(indexes = @Index(name = "client_verfuegung_idx1", columnList = "clientid, since, id"))
+@Table(indexes = @Index(name = "clientverfuegung_idx1", columnList = "clientid, since, id"))
 @Entity
 @Immutable
 public class ClientVerfuegung {
@@ -46,6 +48,30 @@ public class ClientVerfuegung {
 	@Nonnull
 	@Column(nullable = false, updatable = false)
 	private @NotNull LocalDateTime since = LocalDateTime.now();
+
+	@Override
+	public boolean equals(@Nullable Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (!(o instanceof ClientVerfuegung)) {
+			return false;
+		}
+
+		ClientVerfuegung that = (ClientVerfuegung) o;
+
+		return getId() != -1L &&
+			getId().equals(that.getId()) &&
+			getClientId().equals(that.getClientId()) &&
+			getInstitutionId().equals(that.getInstitutionId()) &&
+			getVerfuegung().equals(that.getVerfuegung());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getClientId(), getInstitutionId());
+	}
 
 	@Nonnull
 	public Long getId() {

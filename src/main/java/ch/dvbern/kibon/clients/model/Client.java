@@ -1,8 +1,10 @@
 package ch.dvbern.kibon.clients.model;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -38,6 +40,29 @@ public class Client {
 	@Nonnull
 	@Column(nullable = false, updatable = false)
 	private @NotNull LocalDateTime grantedSince = LocalDateTime.MIN;
+
+	@Override
+	public boolean equals(@Nullable Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (!(o instanceof Client)) {
+			return false;
+		}
+
+		Client client = (Client) o;
+
+		return getId() != -1L &&
+			getId().equals(client.getId()) &&
+			getClientId().equals(client.getClientId()) &&
+			getInstitutionId().equals(client.getInstitutionId());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getClientId(), getInstitutionId());
+	}
 
 	@Nonnull
 	public Long getId() {

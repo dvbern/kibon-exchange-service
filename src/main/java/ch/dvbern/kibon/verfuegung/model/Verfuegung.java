@@ -2,6 +2,7 @@ package ch.dvbern.kibon.verfuegung.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -14,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -47,8 +49,9 @@ public class Verfuegung {
 	@Column(nullable = false, updatable = false)
 	private @NotNull LocalDate bis = LocalDate.MIN;
 
+	@Nonnull
 	@Column(nullable = false, updatable = false)
-	private int version = 0;
+	private @Min(0) Integer version = -1;
 
 	@Nonnull
 	@Column(nullable = false, updatable = false)
@@ -78,6 +81,41 @@ public class Verfuegung {
 	@Type(type = "jsonb-node")
 	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
 	private @NotNull JsonNode ignorierteZeitabschnitte = null;
+
+	@Override
+	public boolean equals(@Nullable Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (!(o instanceof Verfuegung)) {
+			return false;
+		}
+
+		Verfuegung that = (Verfuegung) o;
+
+		return getId() != -1L &&
+			getId().equals(that.getId()) &&
+			getVersion() == that.getVersion() &&
+			getRefnr().equals(that.getRefnr()) &&
+			getInstitutionId().equals(that.getInstitutionId()) &&
+			getVon().equals(that.getVon()) &&
+			getBis().equals(that.getBis()) &&
+			getVerfuegtAm().equals(that.getVerfuegtAm()) &&
+			getBetreuungsArt() == that.getBetreuungsArt();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(
+			getRefnr(),
+			getInstitutionId(),
+			getVon(),
+			getBis(),
+			getVersion(),
+			getVerfuegtAm(),
+			getBetreuungsArt());
+	}
 
 	@Nonnull
 	public Long getId() {
@@ -124,11 +162,12 @@ public class Verfuegung {
 		this.bis = bis;
 	}
 
-	public int getVersion() {
+	@Nonnull
+	public Integer getVersion() {
 		return version;
 	}
 
-	public void setVersion(int version) {
+	public void setVersion(@Nonnull Integer version) {
 		this.version = version;
 	}
 

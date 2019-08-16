@@ -1,6 +1,7 @@
 package ch.dvbern.kibon.messagelog.model;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
@@ -21,8 +22,7 @@ public class ConsumedMessage {
     @Column(nullable = false)
     private @NotNull Instant timeOfReceiving;
 
-    @SuppressWarnings("unused")
-	ConsumedMessage() {
+	public ConsumedMessage() {
     	eventId = UUID.randomUUID();
     	timeOfReceiving = Instant.now();
     }
@@ -31,6 +31,26 @@ public class ConsumedMessage {
         this.eventId = eventId;
         this.timeOfReceiving = timeOfReceiving;
     }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (!(o instanceof ConsumedMessage)) {
+			return false;
+		}
+
+		ConsumedMessage that = (ConsumedMessage) o;
+
+		return getEventId().equals(that.getEventId());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getEventId());
+	}
 
 	@Nonnull
 	public UUID getEventId() {
