@@ -5,7 +5,6 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
 import ch.dvbern.kibon.messagelog.MessageLog;
@@ -24,7 +23,6 @@ public class VerfuegungEventHandler {
 	@Inject
 	MessageLog log;
 
-	@Transactional
 	public void onVerfuegungEvent(
 		@Nonnull String key,
 		@Nonnull UUID eventId,
