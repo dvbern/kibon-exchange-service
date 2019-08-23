@@ -1,5 +1,7 @@
 package ch.dvbern.kibon.institution.model;
 
+import java.util.Objects;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Embedded;
@@ -25,6 +27,30 @@ public class Institution {
 	@Embedded
 	@Nonnull
 	private @NotNull @Valid Adresse adresse = new Adresse();
+
+	@Override
+	public boolean equals(@Nullable Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (!(o instanceof Institution)) {
+			return false;
+		}
+
+		Institution that = (Institution) o;
+
+		return !getId().isEmpty() &&
+			getId().equals(that.getId()) &&
+			getName().equals(that.getName()) &&
+			Objects.equals(getTraegerschaft(), that.getTraegerschaft()) &&
+			getAdresse().equals(that.getAdresse());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getName(), getTraegerschaft(), getAdresse());
+	}
 
 	@Nonnull
 	public String getId() {

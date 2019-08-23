@@ -24,7 +24,6 @@ import ch.dvbern.kibon.institution.model.Adresse;
 import ch.dvbern.kibon.institution.model.Adresse_;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.Institution_;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ApplicationScoped
 public class InstitutionService {
@@ -33,28 +32,18 @@ public class InstitutionService {
 	EntityManager em;
 
 	@Inject
-	ObjectMapper mapper;
+	InstitutionConverter converter;
 
 	@Transactional(TxType.MANDATORY)
 	public void institutionChanged(@Nonnull InstitutionEventDTO dto) {
 
 		Institution institution = em.find(Institution.class, dto.getId());
 		if (institution == null) {
-			Institution newInstitution = mapper.convertValue(dto, Institution.class);
+			Institution newInstitution = converter.create(dto);
 
 			em.persist(newInstitution);
 		} else {
-			// update
-			institution.setName(dto.getName());
-			institution.setTraegerschaft(dto.getTraegerschaft());
-
-			Adresse adresse = institution.getAdresse();
-			adresse.setStrasse(dto.getAdresse().getStrasse());
-			adresse.setHausnummer(dto.getAdresse().getHausnummer());
-			adresse.setAdresszusatz(dto.getAdresse().getAdresszusatz());
-			adresse.setOrt(dto.getAdresse().getOrt());
-			adresse.setPlz(dto.getAdresse().getPlz());
-			adresse.setLand(dto.getAdresse().getLand());
+			converter.update(institution, dto);
 
 			em.merge(institution);
 		}

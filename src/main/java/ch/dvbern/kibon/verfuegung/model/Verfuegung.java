@@ -96,7 +96,7 @@ public class Verfuegung {
 
 		return getId() != -1L &&
 			getId().equals(that.getId()) &&
-			getVersion() == that.getVersion() &&
+			getVersion().equals(that.getVersion()) &&
 			getRefnr().equals(that.getRefnr()) &&
 			getInstitutionId().equals(that.getInstitutionId()) &&
 			getVon().equals(that.getVon()) &&
