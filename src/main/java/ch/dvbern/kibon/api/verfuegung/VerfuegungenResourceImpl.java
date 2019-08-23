@@ -1,6 +1,7 @@
 package ch.dvbern.kibon.api.verfuegung;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -16,9 +17,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import ch.dvbern.kibon.exchange.api.institution.model.InstitutionDTO;
 import ch.dvbern.kibon.exchange.api.verfuegung.VerfuegungenResource;
 import ch.dvbern.kibon.exchange.api.verfuegung.model.ws.VerfuegungDTO;
 import ch.dvbern.kibon.exchange.api.verfuegung.model.ws.VerfuegungenDTO;
+import ch.dvbern.kibon.institution.service.InstitutionService;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import ch.dvbern.kibon.verfuegung.service.VerfuegungService;
@@ -33,6 +36,9 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 
 	@Inject
 	VerfuegungService verfuegungenService;
+
+	@Inject
+	InstitutionService institutionService;
 
 	@SuppressWarnings("CdiInjectionPointsInspection")
 	@Inject
@@ -49,17 +55,25 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 
 		// "filter" parameter is ignored at the moment. Added to API to make adding restrictions easily
 
-		ClientVerfuegungFilter queryFilter = new ClientVerfuegungFilter("CSE", afterId, limit);
+		ClientVerfuegungFilter queryFilter = new ClientVerfuegungFilter("kitAdmin", afterId, limit);
 
 		VerfuegungenDTO verfuegungenDTO = new VerfuegungenDTO();
 
 		List<ClientVerfuegungDTO> dtos = verfuegungenService.getAllForClient(queryFilter);
 
-		List<VerfuegungDTO> collect = dtos.stream()
+		List<VerfuegungDTO> verfuegungen = dtos.stream()
 			.map(this::convert)
 			.collect(Collectors.toList());
 
-		verfuegungenDTO.setVerfuegungen(collect);
+		verfuegungenDTO.setVerfuegungen(verfuegungen);
+
+		Set<String> institutionIds = verfuegungen.stream()
+			.map(VerfuegungDTO::getInstitutionId)
+			.collect(Collectors.toSet());
+
+		List<InstitutionDTO> institutionDTOs = institutionService.get(institutionIds);
+
+		verfuegungenDTO.setInstitutionen(institutionDTOs);
 
 		return verfuegungenDTO;
 	}

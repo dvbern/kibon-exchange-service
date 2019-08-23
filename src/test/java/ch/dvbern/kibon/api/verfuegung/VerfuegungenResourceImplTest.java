@@ -1,5 +1,7 @@
 package ch.dvbern.kibon.api.verfuegung;
 
+import javax.ws.rs.core.Response.Status;
+
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
@@ -24,7 +26,7 @@ class VerfuegungenResourceImplTest {
 			.get("v1/verfuegungen")
 			.then()
 			.assertThat()
-			.statusCode(200)
+			.statusCode(Status.OK.getStatusCode())
 			.body(isJsonStringMatching(jsonObject()
 				.where("verfuegungen", is(jsonArray()))
 				.where("institutionen", is(jsonArray()))
@@ -40,7 +42,7 @@ class VerfuegungenResourceImplTest {
 			.get("v1/verfuegungen?after_id=10")
 			.then()
 			.assertThat()
-			.statusCode(200)
+			.statusCode(Status.OK.getStatusCode())
 			.body(isJsonStringMatching(jsonObject()
 				.where("verfuegungen", is(jsonArray()))
 				.where("institutionen", is(jsonArray()))
@@ -56,7 +58,7 @@ class VerfuegungenResourceImplTest {
 			.get("v1/verfuegungen?limit=1")
 			.then()
 			.assertThat()
-			.statusCode(200)
+			.statusCode(Status.OK.getStatusCode())
 			.body(isJsonStringMatching(jsonObject()
 				.where("verfuegungen", is(jsonArray(hasSize(lessThanOrEqualTo(1)))))
 				.where("institutionen", is(jsonArray(hasSize(lessThanOrEqualTo(1)))))
@@ -72,6 +74,6 @@ class VerfuegungenResourceImplTest {
 			.get("v1/verfuegungen?limit=-1")
 			.then()
 			.assertThat()
-			.statusCode(500);
+			.statusCode(Status.BAD_REQUEST.getStatusCode());
 	}
 }

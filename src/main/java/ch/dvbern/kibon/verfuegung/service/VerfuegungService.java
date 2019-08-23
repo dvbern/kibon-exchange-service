@@ -71,8 +71,7 @@ public class VerfuegungService {
 
 		filter.setParameters(q);
 
-		List<ClientVerfuegungDTO> resultList = q
-			.getResultList();
+		List<ClientVerfuegungDTO> resultList = q.getResultList();
 
 		return resultList;
 	}
