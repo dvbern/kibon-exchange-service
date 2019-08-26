@@ -77,7 +77,6 @@ class VerfuegungenResourceImplTest {
 			.get("v1/verfuegungen?limit=-1")
 			.then()
 			.assertThat()
-//			.statusCode(Status.BAD_REQUEST.getStatusCode());
-			.statusCode(500);
+			.statusCode(Status.BAD_REQUEST.getStatusCode());
 	}
 }
