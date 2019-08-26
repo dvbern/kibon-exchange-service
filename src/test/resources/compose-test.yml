@@ -8,8 +8,6 @@ services:
       "sh", "-c",
       "bin/zookeeper-server-start.sh config/zookeeper.properties"
     ]
-    ports:
-      - "2181:2181"
     environment:
       LOG_DIR: /tmp/logs
 
@@ -21,8 +19,6 @@ services:
     ]
     depends_on:
       - zookeeper
-    ports:
-      - "9092:9092"
     environment:
       LOG_DIR: "/tmp/logs"
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
@@ -31,8 +27,6 @@ services:
 
   db:
     image: healthcheck/postgres:alpine
-    ports:
-     - "25432:5432"
     environment:
      TZ: "Europe/Zurich"
      POSTGRES_USER: kibonExchange
