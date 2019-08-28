@@ -11,6 +11,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import io.vertx.reactivex.ext.auth.User;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
@@ -32,12 +33,16 @@ public class GreetingResource {
 	}
 
 	@GET
-	@PermitAll // PermitAll geht nicht: ohne access token wird 403 zurück gegeben
+	@PermitAll
 	@Produces(MediaType.TEXT_PLAIN)
 	public String hello() {
-		Set<String> roles = keycloakSecurityContext.getToken().getRealmAccess().getRoles();
+		try {
+			Set<String> roles = keycloakSecurityContext.getToken().getRealmAccess().getRoles();
 
-		return "hello\n" + roles;
+			return "hello\n" + roles;
+		} catch (Exception e) {
+			return "hello with " + e.getMessage() + '\n';
+		}
 	}
 
 	// funktioniert mit einem Direct Access Grant
