@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.constraints.Min;
@@ -28,11 +29,17 @@ import ch.dvbern.kibon.verfuegung.service.VerfuegungService;
 import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jboss.resteasy.annotations.cache.NoCache;
+import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.representations.AccessToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("/v1/verfuegungen")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class VerfuegungenResourceImpl implements VerfuegungenResource {
+
+	private static final Logger LOG = LoggerFactory.getLogger(VerfuegungenResourceImpl.class);
 
 	@Inject
 	VerfuegungService verfuegungenService;
@@ -44,14 +51,28 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 	@Inject
 	ObjectMapper objectMapper;
 
+	@Inject
+	KeycloakSecurityContext keycloakSecurityContext;
+
+	@GET
 	@Transactional
 	@NoCache
 	@Nonnull
 	@Override
+	@RolesAllowed("user")
 	public VerfuegungenDTO getAll(
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Min(0) @QueryParam("limit") @Nullable Integer limit,
 		@QueryParam("$filter") @Nullable String filter) {
+
+		AccessToken token = keycloakSecurityContext.getToken();
+		String userName = token.getPreferredUsername();
+		String clientId = token.getIssuedFor();
+		LOG.info(
+			"Verfuegungen accessed by {} with clientId {} and roles {}",
+			userName,
+			clientId,
+			token.getRealmAccess().getRoles());
 
 		// "filter" parameter is ignored at the moment. Added to API to make adding restrictions easily
 
