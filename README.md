@@ -30,3 +30,14 @@ When changing the ports, don't forget to update `src/main/resources/application.
 | quarkus.keycloak.auth-server-url | http://localhost:8180/auth | Keycloak Server |
 | quarkus.datasource.url | jdbc:postgresql://localhost:15432/kibon-exchange | Postgres Database |
 | kafka.bootstrap.servers | localhost:9092 | Kafka Server |
+| quarkus.http.port |8380| Application Port, e.g. http://localhost:8380/v1/verfuegungen |
+
+# Debugging the Quarkus Application
+Quarkus allows remote debugging on default Port 5005. When another application like a WildFly is already running in
+debug mode, this port is typically already in use. In that case, Quarkus logs "Port 5005 in use, not starting in debug 
+mode".
+
+The Port can be changed by adding the debug property, e.g.:
+`./mvnw compile quarkus:dev -Ddebug=5006 -Dquarkus.profile=dev-with-data -Dhibernate.types.print.banner=false`
+
+The debug with IntelliJ simply add a new `Remote` configuration an attach to the JVM with the debug port.
