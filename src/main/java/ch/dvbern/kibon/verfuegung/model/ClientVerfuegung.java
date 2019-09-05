@@ -1,12 +1,10 @@
 package ch.dvbern.kibon.verfuegung.model;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
@@ -15,15 +13,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import ch.dvbern.kibon.clients.model.ClientId;
+import ch.dvbern.kibon.clients.model.Client;
 import org.hibernate.annotations.Immutable;
 
-@Table(indexes = @Index(name = "clientverfuegung_idx1", columnList = "clientname, since, id"))
+@Table(indexes = @Index(name = "clientverfuegung_idx1", columnList = "client_clientname, active, since, id"))
 @Entity
 @Immutable
 public class ClientVerfuegung {
@@ -35,8 +33,13 @@ public class ClientVerfuegung {
 	private @NotNull Long id = -1L;
 
 	@Nonnull
-	@Embedded
-	private @NotNull @Valid ClientId clientId = new ClientId();
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumns(foreignKey = @ForeignKey(name = "client_fk"),
+		value = {
+			@JoinColumn(nullable = false, updatable = false),
+			@JoinColumn(nullable = false, updatable = false)
+		})
+	private @NotNull Client client = new Client();
 
 	@Nonnull
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -46,6 +49,10 @@ public class ClientVerfuegung {
 	@Nonnull
 	@Column(nullable = false, updatable = false)
 	private @NotNull LocalDateTime since = LocalDateTime.now();
+
+	@Nonnull
+	@Column(nullable = false, updatable = true)
+	private @NotNull Boolean active = true;
 
 	@Override
 	public boolean equals(@Nullable Object o) {
@@ -60,14 +67,12 @@ public class ClientVerfuegung {
 		ClientVerfuegung that = (ClientVerfuegung) o;
 
 		return getId() != -1L &&
-			getId().equals(that.getId()) &&
-			getClientId().equals(that.getClientId()) &&
-			getVerfuegung().equals(that.getVerfuegung());
+			getId().equals(that.getId());
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getClientId());
+		return 31;
 	}
 
 	@Nonnull
@@ -80,12 +85,12 @@ public class ClientVerfuegung {
 	}
 
 	@Nonnull
-	public ClientId getClientId() {
-		return clientId;
+	public Client getClient() {
+		return client;
 	}
 
-	public void setClientId(@Nonnull ClientId clientId) {
-		this.clientId = clientId;
+	public void setClient(@Nonnull Client client) {
+		this.client = client;
 	}
 
 	@Nonnull
@@ -104,5 +109,14 @@ public class ClientVerfuegung {
 
 	public void setSince(@Nonnull LocalDateTime since) {
 		this.since = since;
+	}
+
+	@Nonnull
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(@Nonnull Boolean active) {
+		this.active = active;
 	}
 }

@@ -37,19 +37,22 @@ CREATE TABLE verfuegung (
 );
 
 CREATE TABLE clientverfuegung (
-	id            BIGSERIAL    NOT NULL
+	id                   BIGSERIAL    NOT NULL
 		CONSTRAINT clientverfuegung_pkey
 			PRIMARY KEY,
-	clientname    VARCHAR(255) NOT NULL,
-	institutionid VARCHAR(255) NOT NULL,
-	since         TIMESTAMP    NOT NULL,
-	verfuegung_id BIGINT       NOT NULL
+	active               BOOLEAN      NOT NULL,
+	since                TIMESTAMP    NOT NULL,
+	client_clientname    VARCHAR(255) NOT NULL,
+	client_institutionid VARCHAR(255) NOT NULL,
+	verfuegung_id        BIGINT       NOT NULL
 		CONSTRAINT verfuegung_fk
-			REFERENCES verfuegung
+			REFERENCES verfuegung,
+	CONSTRAINT client_fk
+		FOREIGN KEY (client_clientname, client_institutionid) REFERENCES client
 );
 
 CREATE INDEX clientverfuegung_idx1
-	ON clientverfuegung(clientname, since, id);
+	ON clientverfuegung(client_clientname, active, since, id);
 
 CREATE INDEX verfuegung_idx1
 	ON verfuegung(institutionid, verfuegtam);

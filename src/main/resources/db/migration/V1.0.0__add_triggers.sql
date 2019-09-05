@@ -36,8 +36,8 @@ CREATE FUNCTION verfuegung_insert() RETURNS TRIGGER
 AS
 $$
 BEGIN
-	INSERT INTO clientverfuegung (id, clientname, institutionid, verfuegung_id, since)
-		(SELECT nextval('clientverfuegung_id_seq'), c.clientname, c.institutionid, new.id,
+	INSERT INTO clientverfuegung (id, active, client_clientname, client_institutionid, verfuegung_id, since)
+		(SELECT nextval('clientverfuegung_id_seq'), c.active, c.clientname, c.institutionid, new.id,
 				greatest(c.grantedsince, new.verfuegtam)
 		 FROM client c
 		 WHERE c.institutionid = new.institutionid);
@@ -60,8 +60,8 @@ CREATE FUNCTION client_insert() RETURNS TRIGGER
 AS
 $$
 BEGIN
-	INSERT INTO clientverfuegung (id, clientname, institutionid, verfuegung_id, since)
-		(SELECT nextval('clientverfuegung_id_seq'), new.clientname, new.institutionid, v.id,
+	INSERT INTO clientverfuegung (id, active, client_clientname, client_institutionid, verfuegung_id, since)
+		(SELECT nextval('clientverfuegung_id_seq'), new.active, new.clientname, new.institutionid, v.id,
 				greatest(new.grantedsince, v.verfuegtam)
 		 FROM verfuegung v
 		 WHERE v.institutionid = new.institutionid
@@ -77,10 +77,32 @@ CREATE TRIGGER client_insert
 EXECUTE PROCEDURE client_insert();
 -- endregion
 
+-- region toggle active flag
+
+CREATE FUNCTION client_active_toggle() RETURNS TRIGGER
+	SECURITY DEFINER
+	LANGUAGE plpgsql
+AS
+$$
+BEGIN
+	UPDATE clientverfuegung
+	SET active = new.active
+	WHERE client_clientname = new.clientname AND client_institutionid = new.institutionid;
+	RETURN new;
+END;
+$$;
+
+CREATE TRIGGER client_active_toggle
+	AFTER UPDATE
+	ON client
+	FOR EACH ROW
+EXECUTE PROCEDURE client_active_toggle();
+-- endregion
+
 -- region populate clientverfuegung
--- the import.sql files are imported before FlyWay, thus insert manually into clientverfuegung
-INSERT INTO clientverfuegung (id, clientname, institutionid, verfuegung_id, since)
-	(SELECT nextval('clientverfuegung_id_seq'), c.clientname, c.institutionid, v.id,
+-- the import-dev.sql files are imported before FlyWay, thus insert manually into clientverfuegung
+INSERT INTO clientverfuegung (id, active, client_clientname, client_institutionid, verfuegung_id, since)
+	(SELECT nextval('clientverfuegung_id_seq'), c.active, c.clientname, c.institutionid, v.id,
 			greatest(c.grantedsince, v.verfuegtam)
 	 FROM client c
 		  INNER JOIN verfuegung v ON c.institutionid = v.institutionid
