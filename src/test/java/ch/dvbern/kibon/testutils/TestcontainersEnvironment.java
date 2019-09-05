@@ -1,4 +1,4 @@
-package ch.dvbern.kibon;
+package ch.dvbern.kibon.testutils;
 
 import java.io.File;
 import java.util.HashMap;

@@ -2,7 +2,7 @@ package ch.dvbern.kibon.api.verfuegung;
 
 import javax.ws.rs.core.Response.Status;
 
-import ch.dvbern.kibon.TestcontainersEnvironment;
+import ch.dvbern.kibon.testutils.TestcontainersEnvironment;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;

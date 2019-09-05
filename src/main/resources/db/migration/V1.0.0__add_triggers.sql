@@ -36,8 +36,8 @@ CREATE FUNCTION verfuegung_insert() RETURNS TRIGGER
 AS
 $$
 BEGIN
-	INSERT INTO clientverfuegung (id, clientid, institutionid, verfuegung_id, since)
-		(SELECT nextval('clientverfuegung_id_seq'), c.clientid, c.institutionid, new.id,
+	INSERT INTO clientverfuegung (id, clientname, institutionid, verfuegung_id, since)
+		(SELECT nextval('clientverfuegung_id_seq'), c.clientname, c.institutionid, new.id,
 				greatest(c.grantedsince, new.verfuegtam)
 		 FROM client c
 		 WHERE c.institutionid = new.institutionid);
@@ -60,8 +60,8 @@ CREATE FUNCTION client_insert() RETURNS TRIGGER
 AS
 $$
 BEGIN
-	INSERT INTO clientverfuegung (id, clientid, institutionid, verfuegung_id, since)
-		(SELECT nextval('clientverfuegung_id_seq'), new.clientid, new.institutionid, v.id,
+	INSERT INTO clientverfuegung (id, clientname, institutionid, verfuegung_id, since)
+		(SELECT nextval('clientverfuegung_id_seq'), new.clientname, new.institutionid, v.id,
 				greatest(new.grantedsince, v.verfuegtam)
 		 FROM verfuegung v
 		 WHERE v.institutionid = new.institutionid
@@ -79,8 +79,8 @@ EXECUTE PROCEDURE client_insert();
 
 -- region populate clientverfuegung
 -- the import.sql files are imported before FlyWay, thus insert manually into clientverfuegung
-INSERT INTO clientverfuegung (id, clientid, institutionid, verfuegung_id, since)
-	(SELECT nextval('clientverfuegung_id_seq'), c.clientid, c.institutionid, v.id,
+INSERT INTO clientverfuegung (id, clientname, institutionid, verfuegung_id, since)
+	(SELECT nextval('clientverfuegung_id_seq'), c.clientname, c.institutionid, v.id,
 			greatest(c.grantedsince, v.verfuegtam)
 	 FROM client c
 		  INNER JOIN verfuegung v ON c.institutionid = v.institutionid

@@ -1,4 +1,4 @@
-package ch.dvbern.kibon.verfuegung.facade;
+package ch.dvbern.kibon.clients.facade;
 
 import java.util.concurrent.CompletionStage;
 
@@ -7,21 +7,22 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import ch.dvbern.kibon.exchange.commons.institutionclient.InstitutionClientEventDTO;
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
 import ch.dvbern.kibon.kafka.MessageProcessingUtil;
 import io.smallrye.reactive.messaging.kafka.KafkaMessage;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
 @ApplicationScoped
-public class VerfuegungKafkaEventConsumer {
+public class ClientKafkaEventConsumer {
 
 	@Inject
-	VerfuegungEventHandler verfuegungEventHandler;
+	ClientEventHandler clientEventHandler;
 
 	@Transactional
-	@Incoming("VerfuegungEvents")
+	@Incoming("InstitutionClientEvents")
 	public CompletionStage<Void> onMessage(@Nonnull KafkaMessage<String, byte[]> message) {
 
-		return MessageProcessingUtil.process(message, VerfuegungEventDTO.class, verfuegungEventHandler);
+		return MessageProcessingUtil.process(message, InstitutionClientEventDTO.class, clientEventHandler);
 	}
 }

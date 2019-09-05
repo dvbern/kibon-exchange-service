@@ -1,7 +1,7 @@
-INSERT INTO client (clientid, grantedsince, institutionid)
-VALUES ('kitAdmin', now(), '1'),
-	   ('kitAdmin', now() - INTERVAL '3 days', '2'),
-	   ('CSE', now() - INTERVAL '3 days', '1');
+INSERT INTO client (clientname, grantedsince, institutionid, active)
+VALUES ('kitAdmin', now(), '1', true),
+	   ('kitAdmin', now() - INTERVAL '3 days', '2', true),
+	   ('CSE', now() - INTERVAL '3 days', '1', true);
 
 INSERT INTO institution (id, adresszusatz, hausnummer, land, ort, plz, strasse, name, traegerschaft)
 VALUES ('1', NULL, '21', 'CH', 'Bern', '3006', 'Nussbaumstrasse', 'DV Kids', 'DV Bern AG'),

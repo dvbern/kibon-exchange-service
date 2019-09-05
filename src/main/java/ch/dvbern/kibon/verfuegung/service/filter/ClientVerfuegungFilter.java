@@ -24,11 +24,11 @@ public class ClientVerfuegungFilter {
 	private final List<Restriction<ClientVerfuegung, ClientVerfuegungDTO>> restrictions = new ArrayList<>();
 
 	public ClientVerfuegungFilter(
-		@Nonnull String clientId,
+		@Nonnull String clientName,
 		@Nullable Long afterId,
 		@Nullable Integer limit) {
 
-		restrictions.add(new ClientIdFilter(clientId));
+		restrictions.add(new ClientNameFilter(clientName));
 		restrictions.add(new AfterIdFilter(afterId));
 
 		this.limit = limit;

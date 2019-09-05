@@ -10,33 +10,34 @@ import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import ch.dvbern.kibon.clients.model.ClientId_;
 import ch.dvbern.kibon.persistence.Restriction;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 
-public class ClientIdFilter implements Restriction<ClientVerfuegung, ClientVerfuegungDTO> {
+public class ClientNameFilter implements Restriction<ClientVerfuegung, ClientVerfuegungDTO> {
 
 	@Nonnull
-	private final String clientId;
+	private final String clientName;
 
 	@Nullable
 	private ParameterExpression<String> clientParam;
 
-	public ClientIdFilter(@Nonnull String clientId) {
-		this.clientId = clientId;
+	public ClientNameFilter(@Nonnull String clientName) {
+		this.clientName = clientName;
 	}
 
 	@Nonnull
 	@Override
 	public Optional<Predicate> getPredicate(@Nonnull Root<ClientVerfuegung> root, @Nonnull CriteriaBuilder cb) {
-		clientParam = cb.parameter(String.class, "clientId");
+		clientParam = cb.parameter(String.class, "clientName");
 
-		return Optional.of(cb.equal(root.get(ClientVerfuegung_.clientId), clientParam));
+		return Optional.of(cb.equal(root.get(ClientVerfuegung_.clientId).get(ClientId_.clientName), clientParam));
 	}
 
 	@Override
 	public void setParameter(@Nonnull TypedQuery<ClientVerfuegungDTO> query) {
-		query.setParameter(clientParam, clientId);
+		query.setParameter(clientParam, clientName);
 	}
 }

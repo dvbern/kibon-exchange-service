@@ -2,44 +2,41 @@ package ch.dvbern.kibon.clients.model;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-@Table(
-	uniqueConstraints = @UniqueConstraint(name = "client_uc1", columnNames = { "clientId", "institutionId" }),
-	indexes = @Index(name = "client_idx1", columnList = "clientId, institutionId, grantedSince")
-)
+@Table(indexes = @Index(name = "client_idx1", columnList = "clientname, institutionId, grantedSince"))
 @Entity
 public class Client {
 
 	@Nonnull
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(updatable = false, nullable = false)
-	private @NotNull Long id = -1L;
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotEmpty String clientId = "";
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotEmpty String institutionId = "";
+	@EmbeddedId
+	private @NotNull @Valid ClientId id = new ClientId();
 
 	@Nonnull
 	@Column(nullable = false, updatable = false)
 	private @NotNull LocalDateTime grantedSince = LocalDateTime.MIN;
+
+	@Nonnull
+	@Column(nullable = false, updatable = true)
+	private @NotNull Boolean active = true;
+
+	public Client() {
+	}
+
+	public Client(@Nonnull ClientId id, @Nonnull LocalDateTime grantedSince) {
+		this.id = id;
+		this.grantedSince = grantedSince;
+	}
 
 	@Override
 	public boolean equals(@Nullable Object o) {
@@ -53,42 +50,31 @@ public class Client {
 
 		Client client = (Client) o;
 
-		return getId() != -1L &&
-			getId().equals(client.getId()) &&
-			getClientId().equals(client.getClientId()) &&
-			getInstitutionId().equals(client.getInstitutionId());
+		return getId().equals(client.getId());
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getClientId(), getInstitutionId());
+		return Objects.hash(getId());
+	}
+
+	@Override
+	@Nonnull
+	public String toString() {
+		return new StringJoiner(", ", Client.class.getSimpleName() + '[', "]")
+			.add("id=" + id)
+			.add("grantedSince=" + grantedSince)
+			.add("active=" + active)
+			.toString();
 	}
 
 	@Nonnull
-	public Long getId() {
+	public ClientId getId() {
 		return id;
 	}
 
-	public void setId(@Nonnull Long id) {
+	public void setId(@Nonnull ClientId id) {
 		this.id = id;
-	}
-
-	@Nonnull
-	public String getClientId() {
-		return clientId;
-	}
-
-	public void setClientId(@Nonnull String clientId) {
-		this.clientId = clientId;
-	}
-
-	@Nonnull
-	public String getInstitutionId() {
-		return institutionId;
-	}
-
-	public void setInstitutionId(@Nonnull String institutionId) {
-		this.institutionId = institutionId;
 	}
 
 	@Nonnull
@@ -98,5 +84,14 @@ public class Client {
 
 	public void setGrantedSince(@Nonnull LocalDateTime grantedSince) {
 		this.grantedSince = grantedSince;
+	}
+
+	@Nonnull
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(@Nonnull Boolean active) {
+		this.active = active;
 	}
 }

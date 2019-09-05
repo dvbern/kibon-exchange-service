@@ -6,6 +6,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
@@ -16,12 +17,13 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.clients.model.ClientId;
 import org.hibernate.annotations.Immutable;
 
-@Table(indexes = @Index(name = "clientverfuegung_idx1", columnList = "clientid, since, id"))
+@Table(indexes = @Index(name = "clientverfuegung_idx1", columnList = "clientname, since, id"))
 @Entity
 @Immutable
 public class ClientVerfuegung {
@@ -33,12 +35,8 @@ public class ClientVerfuegung {
 	private @NotNull Long id = -1L;
 
 	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotEmpty String clientId = "";
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotEmpty String institutionId = "";
+	@Embedded
+	private @NotNull @Valid ClientId clientId = new ClientId();
 
 	@Nonnull
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -64,13 +62,12 @@ public class ClientVerfuegung {
 		return getId() != -1L &&
 			getId().equals(that.getId()) &&
 			getClientId().equals(that.getClientId()) &&
-			getInstitutionId().equals(that.getInstitutionId()) &&
 			getVerfuegung().equals(that.getVerfuegung());
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getClientId(), getInstitutionId());
+		return Objects.hash(getClientId());
 	}
 
 	@Nonnull
@@ -83,21 +80,12 @@ public class ClientVerfuegung {
 	}
 
 	@Nonnull
-	public String getClientId() {
+	public ClientId getClientId() {
 		return clientId;
 	}
 
-	public void setClientId(@Nonnull String clientId) {
+	public void setClientId(@Nonnull ClientId clientId) {
 		this.clientId = clientId;
-	}
-
-	@Nonnull
-	public String getInstitutionId() {
-		return institutionId;
-	}
-
-	public void setInstitutionId(@Nonnull String institutionId) {
-		this.institutionId = institutionId;
 	}
 
 	@Nonnull

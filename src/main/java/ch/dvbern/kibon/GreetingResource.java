@@ -11,7 +11,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import io.vertx.reactivex.ext.auth.User;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;

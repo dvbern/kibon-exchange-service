@@ -22,9 +22,6 @@ public class InstitutionKafkaEventConsumer {
 	@Incoming("InstitutionEvents")
 	public CompletionStage<Void> onMessage(@Nonnull KafkaMessage<String, byte[]> message) {
 
-		return MessageProcessingUtil.process(
-			message,
-			InstitutionEventDTO.class,
-			institutionEventHandler::onInstitutionEvent);
+		return MessageProcessingUtil.process(message, InstitutionEventDTO.class, institutionEventHandler);
 	}
 }

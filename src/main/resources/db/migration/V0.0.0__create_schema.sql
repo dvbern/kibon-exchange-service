@@ -1,15 +1,14 @@
 CREATE TABLE client (
-	id            BIGSERIAL    NOT NULL
-		CONSTRAINT client_pkey PRIMARY KEY,
-	clientid      VARCHAR(255) NOT NULL,
-	grantedsince  TIMESTAMP    NOT NULL,
+	clientname    VARCHAR(255) NOT NULL,
 	institutionid VARCHAR(255) NOT NULL,
-	CONSTRAINT client_uc1
-		UNIQUE (clientid, institutionid)
+	active        BOOLEAN      NOT NULL,
+	grantedsince  TIMESTAMP    NOT NULL,
+	CONSTRAINT client_pkey
+		PRIMARY KEY (clientname, institutionid)
 );
 
 CREATE INDEX client_idx1
-	ON client(clientid, institutionid, grantedsince);
+	ON client(clientname, institutionid, grantedsince);
 
 CREATE TABLE consumedmessage (
 	eventid         UUID      NOT NULL
@@ -41,7 +40,7 @@ CREATE TABLE clientverfuegung (
 	id            BIGSERIAL    NOT NULL
 		CONSTRAINT clientverfuegung_pkey
 			PRIMARY KEY,
-	clientid      VARCHAR(255) NOT NULL,
+	clientname    VARCHAR(255) NOT NULL,
 	institutionid VARCHAR(255) NOT NULL,
 	since         TIMESTAMP    NOT NULL,
 	verfuegung_id BIGINT       NOT NULL
@@ -50,7 +49,7 @@ CREATE TABLE clientverfuegung (
 );
 
 CREATE INDEX clientverfuegung_idx1
-	ON clientverfuegung(clientid, since, id);
+	ON clientverfuegung(clientname, since, id);
 
 CREATE INDEX verfuegung_idx1
 	ON verfuegung(institutionid, verfuegtam);

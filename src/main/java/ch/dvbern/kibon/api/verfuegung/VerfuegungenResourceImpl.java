@@ -69,16 +69,17 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 
 //		AccessToken token = keycloakSecurityContext.getToken();
 //		String userName = token.getPreferredUsername();
-//		String clientId = token.getIssuedFor();
+//		String clientName = token.getIssuedFor();
 //		LOG.info(
-//			"Verfuegungen accessed by {} with clientId {} and roles {}",
+//			"Verfuegungen accessed by {} with clientName {} and roles {}",
 //			userName,
-//			clientId,
+//			clientName,
 //			token.getRealmAccess().getRoles());
 
 		// "filter" parameter is ignored at the moment. Added to API to make adding restrictions easily
 
-		ClientVerfuegungFilter queryFilter = new ClientVerfuegungFilter("kitAdmin", afterId, limit);
+		String clientName = "kitAdmin";
+		ClientVerfuegungFilter queryFilter = new ClientVerfuegungFilter(clientName, afterId, limit);
 
 		VerfuegungenDTO verfuegungenDTO = new VerfuegungenDTO();
 
