@@ -21,19 +21,19 @@ CREATE TABLE verfuegung (
 	id                       BIGSERIAL    NOT NULL
 		CONSTRAINT verfuegung_pkey
 			PRIMARY KEY,
-	betreuungsart            VARCHAR(255) NOT NULL,
-	bis                      DATE         NOT NULL,
-	gesuchsteller            JSONB        NOT NULL,
-	ignoriertezeitabschnitte JSONB        NOT NULL,
-	institutionid            VARCHAR(255) NOT NULL,
-	kind                     JSONB        NOT NULL,
 	refnr                    VARCHAR(255) NOT NULL,
-	verfuegtam               TIMESTAMP    NOT NULL,
+	institutionid            VARCHAR(255) NOT NULL,
+	von                      DATE         NOT NULL,
+	bis                      DATE         NOT NULL,
 	version                  INTEGER      NOT NULL
 		CONSTRAINT verfuegung_version_check
 			CHECK (version >= 0),
-	von                      DATE         NOT NULL,
-	zeitabschnitte           JSONB        NOT NULL
+	verfuegtam               TIMESTAMP    NOT NULL,
+	betreuungsart            VARCHAR(255) NOT NULL,
+	kind                     JSONB        NOT NULL,
+	gesuchsteller            JSONB        NOT NULL,
+	zeitabschnitte           JSONB        NOT NULL,
+	ignoriertezeitabschnitte JSONB        NOT NULL
 );
 
 CREATE TABLE clientverfuegung (
@@ -58,12 +58,12 @@ CREATE TABLE institution (
 	id            VARCHAR(255) NOT NULL
 		CONSTRAINT institution_pkey
 			PRIMARY KEY,
-	adresszusatz  VARCHAR(255),
-	hausnummer    VARCHAR(255),
-	land          VARCHAR(255),
-	ort           VARCHAR(255) NOT NULL,
-	plz           VARCHAR(255) NOT NULL,
-	strasse       VARCHAR(255) NOT NULL,
 	name          VARCHAR(255),
-	traegerschaft VARCHAR(255)
+	traegerschaft VARCHAR(255),
+	strasse       VARCHAR(255) NOT NULL,
+	hausnummer    VARCHAR(255),
+	adresszusatz  VARCHAR(255),
+	plz           VARCHAR(255) NOT NULL,
+	ort           VARCHAR(255) NOT NULL,
+	land          VARCHAR(255)
 );

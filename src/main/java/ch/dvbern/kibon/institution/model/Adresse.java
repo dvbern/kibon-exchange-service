@@ -22,10 +22,10 @@ public class Adresse {
 	private String adresszusatz = null;
 
 	@Nonnull
-	private @NotNull String ort = "";
+	private @NotNull String plz = "";
 
 	@Nonnull
-	private @NotNull String plz = "";
+	private @NotNull String ort = "";
 
 	@Nonnull
 	private @NotEmpty String land = "";
@@ -45,14 +45,14 @@ public class Adresse {
 		return getStrasse().equals(adresse.getStrasse()) &&
 			Objects.equals(getHausnummer(), adresse.getHausnummer()) &&
 			Objects.equals(getAdresszusatz(), adresse.getAdresszusatz()) &&
-			getOrt().equals(adresse.getOrt()) &&
 			getPlz().equals(adresse.getPlz()) &&
+			getOrt().equals(adresse.getOrt()) &&
 			getLand().equals(adresse.getLand());
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getStrasse(), getHausnummer(), getAdresszusatz(), getOrt(), getPlz(), getLand());
+		return Objects.hash(getStrasse(), getHausnummer(), getAdresszusatz(), getPlz(), getOrt(), getLand());
 	}
 
 	@Override
@@ -62,8 +62,8 @@ public class Adresse {
 			.add("strasse='" + strasse + '\'')
 			.add("hausnummer='" + hausnummer + '\'')
 			.add("adresszusatz='" + adresszusatz + '\'')
-			.add("ort='" + ort + '\'')
 			.add("plz='" + plz + '\'')
+			.add("ort='" + ort + '\'')
 			.add("land='" + land + '\'')
 			.toString();
 	}
@@ -96,21 +96,21 @@ public class Adresse {
 	}
 
 	@Nonnull
-	public String getOrt() {
-		return ort;
-	}
-
-	public void setOrt(@Nonnull String ort) {
-		this.ort = ort;
-	}
-
-	@Nonnull
 	public String getPlz() {
 		return plz;
 	}
 
 	public void setPlz(@Nonnull String plz) {
 		this.plz = plz;
+	}
+
+	@Nonnull
+	public String getOrt() {
+		return ort;
+	}
+
+	public void setOrt(@Nonnull String ort) {
+		this.ort = ort;
 	}
 
 	@Nonnull
