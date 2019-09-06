@@ -1,11 +1,39 @@
+-- region account for FlyWay migrations
+
+/*
+ since hibernate recreates the schema (drop-and-create) after the FlyWay migrations are executed,
+ every modification of the entity schema in FlyWay must be reapplied.
+ The procedures are stored in the database schema, but triggers are table specific and must be reacreated.
+*/
+
+CREATE TRIGGER verfuegung_insert
+	AFTER INSERT
+	ON verfuegung
+	FOR EACH ROW
+EXECUTE PROCEDURE verfuegung_insert();
+
+CREATE TRIGGER client_insert
+	AFTER INSERT
+	ON client
+	FOR EACH ROW
+EXECUTE PROCEDURE client_insert();
+
+CREATE TRIGGER client_active_toggle
+	AFTER UPDATE
+	ON client
+	FOR EACH ROW
+EXECUTE PROCEDURE client_active_toggle();
+-- endregion
+
 INSERT INTO client (clientname, grantedsince, institutionid, active)
-VALUES ('kitAdmin', now(), '1', true),
-	   ('kitAdmin', now() - INTERVAL '3 days', '2', true),
-	   ('CSE', now() - INTERVAL '3 days', '1', true);
+VALUES ('kitAdmin', now(), '1', TRUE),
+	   ('kitAdmin', now() - INTERVAL '3 days', '2', TRUE),
+	   ('KiD', now() - INTERVAL '5 days', '2', FALSE),
+	   ('CSE', now() - INTERVAL '3 days', '1', TRUE);
 
 INSERT INTO institution (id, adresszusatz, hausnummer, land, ort, plz, strasse, name, traegerschaft)
 VALUES ('1', NULL, '21', 'CH', 'Bern', '3006', 'Nussbaumstrasse', 'DV Kids', 'DV Bern AG'),
-	   ('2', NULL, '21', 'CH', 'Bern', '3022', 'Nussbaumstrasse', 'DV Juniors', 'DV Bern');
+	   ('2', NULL, '21', 'CH', 'Bern', '3022', 'Nussbaumstrasse', 'DV Juniors', 'DV Bern AG');
 
 INSERT INTO verfuegung (betreuungsart, bis, gesuchsteller, ignoriertezeitabschnitte, institutionid,
 						kind, refnr, verfuegtam, version, von, zeitabschnitte)

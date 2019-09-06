@@ -98,14 +98,3 @@ CREATE TRIGGER client_active_toggle
 	FOR EACH ROW
 EXECUTE PROCEDURE client_active_toggle();
 -- endregion
-
--- region populate clientverfuegung
--- the import-dev.sql files are imported before FlyWay, thus insert manually into clientverfuegung
-INSERT INTO clientverfuegung (id, active, client_clientname, client_institutionid, verfuegung_id, since)
-	(SELECT nextval('clientverfuegung_id_seq'), c.active, c.clientname, c.institutionid, v.id,
-			greatest(c.grantedsince, v.verfuegtam)
-	 FROM client c
-		  INNER JOIN verfuegung v ON c.institutionid = v.institutionid
-	 ORDER BY greatest(c.grantedsince, v.verfuegtam), v.id);
-
--- endregion
