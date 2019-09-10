@@ -29,6 +29,7 @@ public class VerfuegungService {
 	@Inject
 	EntityManager em;
 
+	@SuppressWarnings("CdiInjectionPointsInspection")
 	@Inject
 	ObjectMapper mapper;
 
@@ -72,18 +73,6 @@ public class VerfuegungService {
 		filter.setParameters(q);
 
 		List<ClientVerfuegungDTO> resultList = q.getResultList();
-
-		return resultList;
-	}
-
-	@Transactional(TxType.MANDATORY)
-	public List<Verfuegung> getAll() {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Verfuegung> query = cb.createQuery(Verfuegung.class);
-		query.from(Verfuegung.class);
-
-		List<Verfuegung> resultList = em.createQuery(query)
-			.getResultList();
 
 		return resultList;
 	}

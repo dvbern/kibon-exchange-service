@@ -16,7 +16,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import ch.dvbern.kibon.exchange.api.institution.model.InstitutionDTO;
 import ch.dvbern.kibon.exchange.api.verfuegung.VerfuegungenResource;
@@ -24,7 +23,6 @@ import ch.dvbern.kibon.exchange.api.verfuegung.model.ws.VerfuegungDTO;
 import ch.dvbern.kibon.exchange.api.verfuegung.model.ws.VerfuegungenDTO;
 import ch.dvbern.kibon.institution.service.InstitutionService;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
-import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import ch.dvbern.kibon.verfuegung.service.VerfuegungService;
 import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -97,17 +95,6 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 		verfuegungenDTO.setInstitutionen(institutionDTOs);
 
 		return verfuegungenDTO;
-	}
-
-	@Path("/other")
-	@Transactional
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@NoCache
-	public Response getVerfuegungen() {
-		List<Verfuegung> all = verfuegungenService.getAll();
-
-		return Response.ok(all).build();
 	}
 
 	@Nonnull
