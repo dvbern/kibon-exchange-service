@@ -1,5 +1,7 @@
 package ch.dvbern.kibon.institution.service;
 
+import java.util.Collections;
+
 import javax.persistence.EntityManager;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
@@ -21,6 +23,9 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 
 @ExtendWith(EasyMockExtension.class)
 class InstitutionServiceTest {
@@ -67,9 +72,18 @@ class InstitutionServiceTest {
 
 		expect(em.merge(eq(existingInstitution))).andReturn(existingInstitution);
 
-		replay(em, service.converter);
+		replay(em, converter);
 
 		service.institutionChanged(dto);
+
+		verify(em, converter);
+	}
+
+	@Test
+	public void testGet_shouldReturnEmptyForEmptyInput() {
+		replay(em, converter);
+
+		assertThat(service.get(Collections.emptySet()), is(empty()));
 
 		verify(em, converter);
 	}

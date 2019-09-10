@@ -10,11 +10,15 @@ import org.junit.jupiter.api.Test;
 
 import static com.spotify.hamcrest.jackson.JsonMatchers.isJsonStringMatching;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonInt;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.not;
 
 @QuarkusTestResource(TestcontainersEnvironment.class)
 @QuarkusTest
@@ -24,6 +28,7 @@ class VerfuegungenResourceImplTest {
 	public void
 	testGetAllEndpoint() {
 		given()
+			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
 			.when()
 			.get("v1/verfuegungen")
@@ -31,8 +36,8 @@ class VerfuegungenResourceImplTest {
 			.assertThat()
 			.statusCode(Status.OK.getStatusCode())
 			.body(isJsonStringMatching(jsonObject()
-				.where("verfuegungen", is(jsonArray()))
-				.where("institutionen", is(jsonArray()))
+				.where("verfuegungen", is(jsonArray(is(not(empty())))))
+				.where("institutionen", is(jsonArray(is(not(empty())))))
 			));
 	}
 
@@ -40,15 +45,18 @@ class VerfuegungenResourceImplTest {
 	public void
 	testGetAllEndpointWithAfterIdParam() {
 		given()
+			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
 			.when()
-			.get("v1/verfuegungen?after_id=10")
+			.get("v1/verfuegungen?after_id=100")
 			.then()
 			.assertThat()
 			.statusCode(Status.OK.getStatusCode())
 			.body(isJsonStringMatching(jsonObject()
-				.where("verfuegungen", is(jsonArray()))
-				.where("institutionen", is(jsonArray()))
+				.where("verfuegungen", is(jsonArray(everyItem(jsonObject()
+					.where("id", is(jsonInt(greaterThan(100))))))
+				))
+				.where("institutionen", is(jsonArray(is(not(empty())))))
 			));
 	}
 
@@ -56,6 +64,7 @@ class VerfuegungenResourceImplTest {
 	public void
 	testGetAllEndpointWithLimit() {
 		given()
+			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
 			.when()
 			.get("v1/verfuegungen?limit=1")
@@ -63,8 +72,8 @@ class VerfuegungenResourceImplTest {
 			.assertThat()
 			.statusCode(Status.OK.getStatusCode())
 			.body(isJsonStringMatching(jsonObject()
-				.where("verfuegungen", is(jsonArray(hasSize(lessThanOrEqualTo(1)))))
-				.where("institutionen", is(jsonArray(hasSize(lessThanOrEqualTo(1)))))
+				.where("verfuegungen", is(jsonArray(hasSize(1))))
+				.where("institutionen", is(jsonArray(hasSize(1))))
 			));
 	}
 
@@ -72,6 +81,7 @@ class VerfuegungenResourceImplTest {
 	public void
 	testGetAllEndpointLimitMustBeNonnegative() {
 		given()
+			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
 			.when()
 			.get("v1/verfuegungen?limit=-1")

@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -60,25 +59,23 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 	@NoCache
 	@Nonnull
 	@Override
-	@PermitAll
-//	@RolesAllowed("user")
+	@RolesAllowed("user")
 	public VerfuegungenDTO getAll(
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Min(0) @QueryParam("limit") @Nullable Integer limit,
 		@QueryParam("$filter") @Nullable String filter) {
 
-//		AccessToken token = keycloakSecurityContext.getToken();
-//		String userName = token.getPreferredUsername();
-//		String clientName = token.getIssuedFor();
-//		LOG.info(
-//			"Verfuegungen accessed by {} with clientName {} and roles {}",
-//			userName,
-//			clientName,
-//			token.getRealmAccess().getRoles());
+		AccessToken token = keycloakSecurityContext.getToken();
+		String userName = token.getPreferredUsername();
+		String clientName = token.getIssuedFor();
+		LOG.info(
+			"Verfuegungen accessed by '{}' with clientName '{}' and roles '{}'",
+			userName,
+			clientName,
+			token.getRealmAccess().getRoles());
 
 		// "filter" parameter is ignored at the moment. Added to API to make adding restrictions easily
 
-		String clientName = "kitAdmin";
 		ClientVerfuegungFilter queryFilter = new ClientVerfuegungFilter(clientName, afterId, limit);
 
 		VerfuegungenDTO verfuegungenDTO = new VerfuegungenDTO();

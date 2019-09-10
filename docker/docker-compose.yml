@@ -8,6 +8,8 @@ services:
       "sh", "-c",
       "bin/zookeeper-server-start.sh config/zookeeper.properties"
     ]
+    ports:
+      - "2181:2181"
     environment:
       TZ: "Europe/Zurich"
       LOG_DIR: /tmp/logs
@@ -20,6 +22,8 @@ services:
     ]
     depends_on:
       - zookeeper
+    ports:
+      - "9092:9092"
     environment:
       TZ: "Europe/Zurich"
       LOG_DIR: "/tmp/logs"
@@ -29,18 +33,28 @@ services:
 
   db:
     image: healthcheck/postgres:alpine
+    ports:
+      - "15432:5432"
     environment:
-     TZ: "Europe/Zurich"
-     POSTGRES_USER: kibonExchange
-     POSTGRES_PASSWORD: kibonExchange
-     POSTGRES_DB: kibon-exchange
+      TZ: "Europe/Zurich"
+      POSTGRES_USER: kibonExchange
+      POSTGRES_PASSWORD: kibonExchange
+      POSTGRES_DB: kibon-exchange
 
   keycloak:
     image: quay.io/keycloak/keycloak:7.0.0
+    ports:
+      - "8180:8080"
+      - "8543:8443"
     volumes:
-      - ./kibon_realm.json:/tmp/kibon_realm.json
+      - ./keycloak/kibon_realm.json:/tmp/kibon_realm.json
+      - ./keycloak/set-secrets.sh:/opt/jboss/startup-scripts/set-secrets.sh
     environment:
       TZ: "Europe/Zurich"
       KEYCLOAK_USER: "admin"
       KEYCLOAK_PASSWORD: "admin"
-      KEYCLOAK_IMPORT: "/tmp/kibon_realm.json"
+      # we map the realm configuration to /tmp/kibon_realm.json, but set-secrets.sh adds the secrets in
+      # /opt/jboss/kibon_realm.json, because otherwise we modifiy the input file, e.g. the file on the localhost
+      KEYCLOAK_IMPORT: "/opt/jboss/kibon_realm.json"
+      KITADMIN_SECRET: "657d6aef-bdc3-40e9-9992-024810d2b24b"
+      KIBON_EXCHANGE_SERVICE_SECRET: "4cf4f780-3856-46ee-850d-f07789675a33"

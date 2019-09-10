@@ -7,7 +7,7 @@ There are several services which must before the Quarkus application is started:
 Postgres, Kafka and eventually Keycloak.
 
 Postgres and Kafka can be started with through
- `docker-compose -f kafka/docker-compose.yml up -d`
+ `docker-compose -f docker/docker-compose.yml up -d`
 
 Make sure that three services start: `kibon-exchange_zookeeper_1`, `kibon-exchange_kafka_1`, 
 and `kibon-exchange_db_1`. Sometimes Kafka fails at startup.
