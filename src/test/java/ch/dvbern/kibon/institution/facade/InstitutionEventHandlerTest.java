@@ -26,7 +26,7 @@ class InstitutionEventHandlerTest extends EventHandlerTest<InstitutionEventDTO> 
 	public void testHandleInstitutionChangedEvent() {
 		InstitutionEventDTO dto = new InstitutionEventDTO();
 
-		institutionService.institutionChanged(dto);
+		institutionService.onInstitutionChanged(dto);
 		expectLastCall();
 
 		expectEventProcessing("InstitutionChanged", dto);

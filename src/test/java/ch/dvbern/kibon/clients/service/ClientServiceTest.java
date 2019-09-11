@@ -44,7 +44,7 @@ class ClientServiceTest {
 	private EntityManager em;
 
 	@Test
-	public void testClientAdded_shouldIgnoreActiveClient() {
+	public void testOnClientAdded_shouldIgnoreActiveClient() {
 		InstitutionClientEventDTO dto = createDTO();
 
 		Client existingClient = toClient(dto);
@@ -53,13 +53,13 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.clientAdded(dto, LocalDateTime.now());
+		service.onClientAdded(dto, LocalDateTime.now());
 
 		verify(em);
 	}
 
 	@Test
-	public void testClientAdded_shouldAddNewClient() {
+	public void testOnClientAdded_shouldAddNewClient() {
 		InstitutionClientEventDTO dto = createDTO();
 
 		expect(em.find(Client.class, toClientId(dto)))
@@ -71,13 +71,13 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.clientAdded(dto, expectedClient.getGrantedSince());
+		service.onClientAdded(dto, expectedClient.getGrantedSince());
 
 		verify(em);
 	}
 
 	@Test
-	public void testClientAdded_shouldSetGrantedSinceFromEventTime() {
+	public void testOnClientAdded_shouldSetGrantedSinceFromEventTime() {
 		InstitutionClientEventDTO dto = createDTO();
 
 		expect(em.find(Client.class, toClientId(dto)))
@@ -92,13 +92,13 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.clientAdded(dto, eventTime);
+		service.onClientAdded(dto, eventTime);
 
 		verify(em);
 	}
 
 	@Test
-	public void testClientAdded_shouldReactivateInactiveClient() {
+	public void testOnClientAdded_shouldReactivateInactiveClient() {
 		InstitutionClientEventDTO dto = createDTO();
 		LocalDateTime grantedSince = LocalDateTime.now().minusHours(5);
 
@@ -116,13 +116,13 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.clientAdded(dto, LocalDateTime.now());
+		service.onClientAdded(dto, LocalDateTime.now());
 
 		verify(em);
 	}
 
 	@Test
-	public void testClientRemoved_shouldIgnoreUnknownClient() {
+	public void testOnClientRemoved_shouldIgnoreUnknownClient() {
 		InstitutionClientEventDTO dto = createDTO();
 
 		expect(em.find(Client.class, toClientId(dto)))
@@ -130,13 +130,13 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.clientRemoved(dto);
+		service.onClientRemoved(dto);
 
 		verify(em);
 	}
 
 	@Test
-	public void testClientRemoved_shouldDeactivateActiveClient() {
+	public void testOnClientRemoved_shouldDeactivateActiveClient() {
 		InstitutionClientEventDTO dto = createDTO();
 
 		Client inactiveClient = toClient(dto);
@@ -151,13 +151,13 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.clientRemoved(dto);
+		service.onClientRemoved(dto);
 
 		verify(em);
 	}
 
 	@Test
-	public void testClientRemoved_shouldIgnoreInactiveClient() {
+	public void testOnClientRemoved_shouldIgnoreInactiveClient() {
 		InstitutionClientEventDTO dto = createDTO();
 
 		Client inactiveClient = toClient(dto);
@@ -167,7 +167,7 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.clientRemoved(dto);
+		service.onClientRemoved(dto);
 
 		verify(em);
 	}

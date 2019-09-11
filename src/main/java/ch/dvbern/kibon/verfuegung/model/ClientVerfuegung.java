@@ -21,6 +21,12 @@ import javax.validation.constraints.NotNull;
 import ch.dvbern.kibon.clients.model.Client;
 import org.hibernate.annotations.Immutable;
 
+/**
+ * <p>This table Contains an entry for every combination of a verfuegung and a client.</p>
+ * <p>It is meant for fast {@link Verfuegung} lookup. As such, we have an active flag to avoid having to join with the
+ * {@link Client} table. Furher we get the client keycloak name and the institution for filtering from the linked Client
+ * entries, again allowing filtering without any joins.</p>
+ */
 @Table(indexes = @Index(name = "clientverfuegung_idx1", columnList = "client_clientname, active, since, id"))
 @Entity
 @Immutable

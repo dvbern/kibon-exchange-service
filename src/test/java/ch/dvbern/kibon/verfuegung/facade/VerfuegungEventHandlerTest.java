@@ -26,7 +26,7 @@ class VerfuegungEventHandlerTest extends EventHandlerTest<VerfuegungEventDTO> {
 	public void testHandleVerfuegungVerfuegtEvent() {
 		VerfuegungEventDTO dto = new VerfuegungEventDTO();
 
-		verfuegungService.verfuegungCreated(dto);
+		verfuegungService.onVerfuegungCreated(dto);
 		expectLastCall();
 
 		expectEventProcessing("VerfuegungVerfuegt", dto);

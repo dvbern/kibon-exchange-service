@@ -42,7 +42,7 @@ class InstitutionServiceTest {
 	private InstitutionConverter converter;
 
 	@Test
-	public void testInstitutionChanged_persistNew() {
+	public void testOnInstitutionChanged_persistNew() {
 		InstitutionEventDTO dto = createInstitutionEvent();
 
 		expect(em.find(Institution.class, dto.getId())).andReturn(null);
@@ -55,13 +55,13 @@ class InstitutionServiceTest {
 
 		replay(em, converter);
 
-		service.institutionChanged(dto);
+		service.onInstitutionChanged(dto);
 
 		verify(em, converter);
 	}
 
 	@Test
-	public void testInstitutionChanged_mergeExisting() {
+	public void testOnInstitutionChanged_mergeExisting() {
 		InstitutionEventDTO dto = createInstitutionEvent();
 
 		Institution existingInstitution = fromDTO(dto);
@@ -74,7 +74,7 @@ class InstitutionServiceTest {
 
 		replay(em, converter);
 
-		service.institutionChanged(dto);
+		service.onInstitutionChanged(dto);
 
 		verify(em, converter);
 	}

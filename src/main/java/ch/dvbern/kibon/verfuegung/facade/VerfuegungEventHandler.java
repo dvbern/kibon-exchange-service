@@ -9,9 +9,12 @@ import javax.inject.Inject;
 
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
 import ch.dvbern.kibon.kafka.BaseEventHandler;
+import ch.dvbern.kibon.kafka.EventType;
 import ch.dvbern.kibon.verfuegung.service.VerfuegungService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static ch.dvbern.kibon.kafka.EventType.VERFUEGUNG_VERFUEGT;
 
 @ApplicationScoped
 public class VerfuegungEventHandler extends BaseEventHandler<VerfuegungEventDTO> {
@@ -25,13 +28,13 @@ public class VerfuegungEventHandler extends BaseEventHandler<VerfuegungEventDTO>
 	protected void processEvent(
 		@Nonnull UUID eventId,
 		@Nonnull LocalDateTime eventTime,
-		@Nonnull String eventType,
+		@Nonnull EventType eventType,
 		@Nonnull VerfuegungEventDTO dto) {
 
-		if (eventType.equals("VerfuegungVerfuegt")) {
-			verfuegungService.verfuegungCreated(dto);
+		if (VERFUEGUNG_VERFUEGT == eventType) {
+			verfuegungService.onVerfuegungCreated(dto);
 		} else {
-			LOG.warn("Unknown event type '{}' with id '{}'", eventType, eventId);
+			LOG.warn("Unimplemented event type '{}' with id '{}'", eventType, eventId);
 		}
 	}
 }

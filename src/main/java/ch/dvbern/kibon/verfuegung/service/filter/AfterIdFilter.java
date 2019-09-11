@@ -15,6 +15,9 @@ import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 
+/**
+ * Utility class for filtering criteria queries to only deliver entries with an ID > the specified one.
+ */
 public class AfterIdFilter implements Restriction<ClientVerfuegung, ClientVerfuegungDTO> {
 
 	@Nullable

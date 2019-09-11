@@ -10,6 +10,21 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotEmpty;
 
+import ch.dvbern.kibon.institution.model.Institution;
+import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
+import ch.dvbern.kibon.verfuegung.model.Verfuegung;
+
+/**
+ * <p>A {@link Client}s primary key.</p>
+ *
+ * <p>clientName is the name used by keycloak. As such, having a generated numeric PK insrtead
+ * would not provide much benefit, because we have to look up / filter users by name anyways.</p>
+ *
+ * <p>The institution is part of the PK because of performance reasons.
+ * We aim for fast searching even when filtering by institution.
+ * As such, we want to avoid having to join to the {@link Institution} table just to be able to access/filter by
+ * institution.</p>
+ */
 @Embeddable
 public class ClientId implements Serializable {
 
@@ -19,6 +34,9 @@ public class ClientId implements Serializable {
 	@Column(nullable = false, updatable = false)
 	private @NotEmpty String clientName = "";
 
+	/**
+	 * No FK because we cannot guarantee, that the institution will be created in kibon-exchange before the client.
+	 */
 	@Nonnull
 	@Column(nullable = false, updatable = false)
 	private @NotEmpty String institutionId = "";

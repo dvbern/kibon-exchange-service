@@ -18,6 +18,9 @@ import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 
+/**
+ * Utility class for filtering criteria queries to only deliver {@link ClientVerfuegung}en with a specific client name.
+ */
 public class ClientNameFilter implements Restriction<ClientVerfuegung, ClientVerfuegungDTO> {
 
 	@Nonnull

@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import javax.annotation.Nonnull;
 
-import ch.dvbern.kibon.messagelog.MessageLog;
+import ch.dvbern.kibon.consumedmessage.ConsumedMessageService;
 import org.junit.jupiter.api.Test;
 
 import static org.easymock.EasyMock.expect;
@@ -25,7 +25,7 @@ class BaseEventHandlerTest {
 			protected void processEvent(
 				@Nonnull UUID eventId,
 				@Nonnull LocalDateTime eventTime,
-				@Nonnull String eventType,
+				@Nonnull EventType eventType,
 				@Nonnull String dto) {
 				if (throwOnProcessEvent) {
 					throw new IllegalStateException("processEvent was called");
@@ -33,7 +33,7 @@ class BaseEventHandlerTest {
 			}
 		};
 
-		handler.log = strictMock(MessageLog.class);
+		handler.consumedMessageService = strictMock(ConsumedMessageService.class);
 
 		return handler;
 	}
@@ -42,27 +42,27 @@ class BaseEventHandlerTest {
 	public void testIgnoreProcessedEvent() {
 		BaseEventHandler<String> handler = createHandler(true);
 
-		expect(handler.log.alreadyProcessed(EVENT_ID)).andReturn(true);
+		expect(handler.consumedMessageService.alreadyProcessed(EVENT_ID)).andReturn(true);
 		// no calls on processEvent expected
-		replay(handler.log);
+		replay(handler.consumedMessageService);
 
 		handler.onEvent("foo", EVENT_ID, LocalDateTime.now(), "foo", "bar");
 
-		verify(handler.log);
+		verify(handler.consumedMessageService);
 	}
 
 	@Test
 	public void testProcessNewEvent() {
 		BaseEventHandler<String> handler = createHandler(false);
 
-		expect(handler.log.alreadyProcessed(EVENT_ID)).andReturn(false);
-		handler.log.processed(EVENT_ID);
+		expect(handler.consumedMessageService.alreadyProcessed(EVENT_ID)).andReturn(false);
+		handler.consumedMessageService.processed(EVENT_ID);
 		expectLastCall();
 
-		replay(handler.log);
+		replay(handler.consumedMessageService);
 
 		handler.onEvent("foo", EVENT_ID, LocalDateTime.now(), "foo", "bar");
 
-		verify(handler.log);
+		verify(handler.consumedMessageService);
 	}
 }

@@ -6,7 +6,7 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import ch.dvbern.kibon.messagelog.MessageLog;
+import ch.dvbern.kibon.consumedmessage.ConsumedMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +15,7 @@ public abstract class BaseEventHandler<T> {
 	private static final Logger LOG = LoggerFactory.getLogger(BaseEventHandler.class);
 
 	@Inject
-	MessageLog log;
+	ConsumedMessageService consumedMessageService;
 
 	public void onEvent(
 		@Nonnull String key,
@@ -24,7 +24,7 @@ public abstract class BaseEventHandler<T> {
 		@Nonnull String eventType,
 		@Nonnull T dto) {
 
-		if (log.alreadyProcessed(eventId)) {
+		if (consumedMessageService.alreadyProcessed(eventId)) {
 			LOG.info("Event with UUID '{}' was already retrieved, ignoring it", eventId);
 			return;
 		}
@@ -32,14 +32,18 @@ public abstract class BaseEventHandler<T> {
 		LOG.info("Received '{}' event -- key: '{}', event id: '{}', event type: '{}'",
 			dto.getClass().getSimpleName(), key, eventId, eventType);
 
-		processEvent(eventId, eventTime, eventType, dto);
+		try {
+			processEvent(eventId, eventTime, EventType.valueOf(eventType), dto);
+		} catch (IllegalArgumentException e) {
+			LOG.warn("Unknown event type '{}' with id '{}'", eventType, eventId);
+		}
 
-		log.processed(eventId);
+		consumedMessageService.processed(eventId);
 	}
 
 	protected abstract void processEvent(
 		@Nonnull UUID eventId,
 		@Nonnull LocalDateTime eventTime,
-		@Nonnull String eventType,
+		@Nonnull EventType eventType,
 		@Nonnull T dto);
 }

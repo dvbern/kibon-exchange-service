@@ -13,6 +13,9 @@ import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 
+/**
+ * Utility class for filtering criteria queries to only deliver {@link ClientVerfuegung}en that are active.
+ */
 public class ClientActiveFilter implements Restriction<ClientVerfuegung, ClientVerfuegungDTO> {
 
 	@Nonnull

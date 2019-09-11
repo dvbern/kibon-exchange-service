@@ -47,7 +47,7 @@ class VerfuegungServiceTest {
 		.thenComparing(Verfuegung::getIgnorierteZeitabschnitte, nullsLast(Comparator.comparing(JsonNode::isArray)));
 
 	@Test
-	public void testVerfuegungCreated() {
+	public void testOnVerfuegungCreated() {
 		VerfuegungService service = new VerfuegungService();
 
 		service.mapper = ObjectMapperUtil.MAPPER;
@@ -63,7 +63,7 @@ class VerfuegungServiceTest {
 
 		replay(em);
 
-		service.verfuegungCreated(dto);
+		service.onVerfuegungCreated(dto);
 
 		verify(em);
 	}

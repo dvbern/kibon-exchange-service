@@ -1,7 +1,5 @@
 package ch.dvbern.kibon.clients.facade;
 
-import java.time.LocalDateTime;
-
 import javax.annotation.Nonnull;
 
 import ch.dvbern.kibon.clients.service.ClientService;
@@ -30,7 +28,7 @@ class ClientEventHandlerTest extends EventHandlerTest<InstitutionClientEventDTO>
 	public void testHandleClientAddedEvent() {
 		InstitutionClientEventDTO dto = expectedDTO();
 
-		clientService.clientAdded(eq(dto), anyObject());
+		clientService.onClientAdded(eq(dto), anyObject());
 		expectLastCall();
 
 		expectEventProcessing("ClientAdded", dto);
@@ -40,7 +38,7 @@ class ClientEventHandlerTest extends EventHandlerTest<InstitutionClientEventDTO>
 	public void testHandleClientRemovedEvent() {
 		InstitutionClientEventDTO dto = expectedDTO();
 
-		clientService.clientRemoved(dto);
+		clientService.onClientRemoved(dto);
 		expectLastCall();
 
 		expectEventProcessing("ClientRemoved", dto);

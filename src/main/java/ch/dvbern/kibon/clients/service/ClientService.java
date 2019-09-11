@@ -16,6 +16,9 @@ import ch.dvbern.kibon.exchange.commons.institutionclient.InstitutionClientEvent
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Service responsible for {@link Client} handling.
+ */
 @ApplicationScoped
 public class ClientService {
 
@@ -29,8 +32,12 @@ public class ClientService {
 		return new ClientId(dto.getClientName(), dto.getInstitutionId());
 	}
 
+	/**
+	 * Stores the client in response to the clientAdded event.<br>
+	 * If the client is already stored, it is not stored again but set to active in case it was inactive.
+	 */
 	@Transactional(TxType.MANDATORY)
-	public void clientAdded(@Nonnull InstitutionClientEventDTO dto, @Nonnull LocalDateTime eventTime) {
+	public void onClientAdded(@Nonnull InstitutionClientEventDTO dto, @Nonnull LocalDateTime eventTime) {
 		Optional<Client> existingClient = find(toClientId(dto));
 
 		if (existingClient.isPresent()) {
@@ -50,8 +57,11 @@ public class ClientService {
 		}
 	}
 
+	/**
+	 * Sets a client to inactive in response to a clientRemoved event.
+	 */
 	@Transactional(TxType.MANDATORY)
-	public void clientRemoved(@Nonnull InstitutionClientEventDTO dto) {
+	public void onClientRemoved(@Nonnull InstitutionClientEventDTO dto) {
 		Optional<Client> existingClient = find(toClientId(dto));
 
 		if (existingClient.isPresent()) {

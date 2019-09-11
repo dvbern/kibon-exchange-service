@@ -10,8 +10,11 @@ import javax.inject.Inject;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.institution.service.InstitutionService;
 import ch.dvbern.kibon.kafka.BaseEventHandler;
+import ch.dvbern.kibon.kafka.EventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static ch.dvbern.kibon.kafka.EventType.INSTITUTION_CHANGED;
 
 @ApplicationScoped
 public class InstitutionEventHandler extends BaseEventHandler<InstitutionEventDTO> {
@@ -25,13 +28,13 @@ public class InstitutionEventHandler extends BaseEventHandler<InstitutionEventDT
 	protected void processEvent(
 		@Nonnull UUID eventId,
 		@Nonnull LocalDateTime eventTime,
-		@Nonnull String eventType,
+		@Nonnull EventType eventType,
 		@Nonnull InstitutionEventDTO dto) {
 
-		if (eventType.equals("InstitutionChanged")) {
-			institutionService.institutionChanged(dto);
+		if (INSTITUTION_CHANGED == eventType) {
+			institutionService.onInstitutionChanged(dto);
 		} else {
-			LOG.warn("Unknown event type '{}' with id '{}'", eventType, eventId);
+			LOG.warn("Unimplemented event type '{}' with id '{}'", eventType, eventId);
 		}
 	}
 }

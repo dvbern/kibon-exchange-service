@@ -10,8 +10,12 @@ import javax.inject.Inject;
 import ch.dvbern.kibon.clients.service.ClientService;
 import ch.dvbern.kibon.exchange.commons.institutionclient.InstitutionClientEventDTO;
 import ch.dvbern.kibon.kafka.BaseEventHandler;
+import ch.dvbern.kibon.kafka.EventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static ch.dvbern.kibon.kafka.EventType.CLIENT_ADDED;
+import static ch.dvbern.kibon.kafka.EventType.CLIENT_REMOVED;
 
 @ApplicationScoped
 public class ClientEventHandler extends BaseEventHandler<InstitutionClientEventDTO> {
@@ -25,7 +29,7 @@ public class ClientEventHandler extends BaseEventHandler<InstitutionClientEventD
 	protected void processEvent(
 		@Nonnull UUID eventId,
 		@Nonnull LocalDateTime eventTime,
-		@Nonnull String eventType,
+		@Nonnull EventType eventType,
 		@Nonnull InstitutionClientEventDTO dto) {
 
 		if (!dto.getClientType().equals("EXCHANGE_SERVICE_USER")) {
@@ -35,12 +39,12 @@ public class ClientEventHandler extends BaseEventHandler<InstitutionClientEventD
 			return;
 		}
 
-		if (eventType.equals("ClientAdded")) {
-			clientService.clientAdded(dto, eventTime);
-		} else if (eventType.equals("ClientRemoved")) {
-			clientService.clientRemoved(dto);
+		if (CLIENT_ADDED == eventType) {
+			clientService.onClientAdded(dto, eventTime);
+		} else if (CLIENT_REMOVED == eventType) {
+			clientService.onClientRemoved(dto);
 		} else {
-			LOG.warn("Unknown event type '{}' with id '{}'", eventType, eventId);
+			LOG.warn("Unimplemented event type '{}' with id '{}'", eventType, eventId);
 		}
 	}
 }

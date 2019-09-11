@@ -1,4 +1,4 @@
-package ch.dvbern.kibon.messagelog;
+package ch.dvbern.kibon.consumedmessage;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -10,14 +10,14 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
-import ch.dvbern.kibon.messagelog.model.ConsumedMessage;
+import ch.dvbern.kibon.consumedmessage.model.ConsumedMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class MessageLog {
+public class ConsumedMessageService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MessageLog.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ConsumedMessageService.class);
 
 	@Inject
 	EntityManager em;

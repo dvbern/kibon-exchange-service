@@ -1,4 +1,4 @@
-package ch.dvbern.kibon.messagelog.model;
+package ch.dvbern.kibon.consumedmessage.model;
 
 import java.time.Instant;
 import java.util.Objects;

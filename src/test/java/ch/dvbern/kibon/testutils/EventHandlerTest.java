@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import javax.annotation.Nonnull;
 
+import ch.dvbern.kibon.consumedmessage.ConsumedMessageService;
 import ch.dvbern.kibon.kafka.BaseEventHandler;
-import ch.dvbern.kibon.messagelog.MessageLog;
 import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
 import org.easymock.MockType;
@@ -23,7 +23,7 @@ public abstract class EventHandlerTest<T> extends EasyMockSupport {
 
 	@SuppressWarnings({ "unused", "InstanceVariableMayNotBeInitialized" })
 	@Mock(type = MockType.STRICT)
-	private MessageLog messageLog;
+	private ConsumedMessageService messageLog;
 
 	/**
 	 * Basic test expectations for a new event that should be processed.

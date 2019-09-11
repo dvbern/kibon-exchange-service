@@ -23,6 +23,10 @@ import ch.dvbern.kibon.verfuegung.model.Verfuegung_;
 import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Service responsible for {@link Verfuegung} handling.<br>
+ * Uses the {@link ClientVerfuegung} table for speedy filtering/searching.
+ */
 @ApplicationScoped
 public class VerfuegungService {
 
@@ -33,13 +37,19 @@ public class VerfuegungService {
 	@Inject
 	ObjectMapper mapper;
 
+	/**
+	 * Stores the verfuegung in response to the verfuegungCreated event.
+	 */
 	@Transactional(TxType.MANDATORY)
-	public void verfuegungCreated(@Nonnull VerfuegungEventDTO dto) {
+	public void onVerfuegungCreated(@Nonnull VerfuegungEventDTO dto) {
 		Verfuegung verfuegung = mapper.convertValue(dto, Verfuegung.class);
 
 		em.persist(verfuegung);
 	}
 
+	/**
+	 * Delivers all {@link ClientVerfuegungDTO} for the given filter.
+	 */
 	@Transactional(TxType.MANDATORY)
 	public List<ClientVerfuegungDTO> getAllForClient(@Nonnull ClientVerfuegungFilter filter) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();

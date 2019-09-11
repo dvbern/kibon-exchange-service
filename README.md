@@ -3,10 +3,10 @@
 ## Development Environement Setup
 
 ### Prepare the Environment
-There are several services which must before the Quarkus application is started:
+There are several services which must be running before the Quarkus application is started:
 Postgres, Kafka and eventually Keycloak.
 
-Postgres and Kafka can be started with through
+Postgres and Kafka can be started with
  `docker-compose -f docker/docker-compose.yml up -d`
 
 Make sure that three services start: `kibon-exchange_zookeeper_1`, `kibon-exchange_kafka_1`, 
@@ -40,7 +40,7 @@ To start with a specific profile run with the `quarkus.profile` parameter, e.g.:
 ### Port Configuration
 The PostgreSQL database runs on 15432 to avoid conflicts with native installations.
 Kafka and Zookeeper run on the standard ports 9092, respectively 2181.
-All these prots can be changed in docker-compose.yml
+All these ports can be changed in docker-compose.yml
 
 When changing the ports, don't forget to update `src/main/resources/application.properties`.
 

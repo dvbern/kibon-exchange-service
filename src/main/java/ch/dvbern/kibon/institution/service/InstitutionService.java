@@ -25,6 +25,9 @@ import ch.dvbern.kibon.institution.model.Adresse_;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.Institution_;
 
+/**
+ * Service responsible for {@link Institution} handling.
+ */
 @ApplicationScoped
 public class InstitutionService {
 
@@ -34,8 +37,11 @@ public class InstitutionService {
 	@Inject
 	InstitutionConverter converter;
 
+	/**
+	 * Stores an institution or updates an existing one, in response to an institutionChanged event.
+	 */
 	@Transactional(TxType.MANDATORY)
-	public void institutionChanged(@Nonnull InstitutionEventDTO dto) {
+	public void onInstitutionChanged(@Nonnull InstitutionEventDTO dto) {
 
 		Institution institution = em.find(Institution.class, dto.getId());
 		if (institution == null) {
