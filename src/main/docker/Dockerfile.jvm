@@ -7,16 +7,21 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.jvm -t quarkus/getting-started-jvm .
+# docker build -f src/main/docker/Dockerfile.jvm -t kibon-exchange/service .
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 quarkus/getting-started-jvm
+# docker run -i --rm -p 8080:8080 kibon-exchange/service
 #
 ###
+# TODO use internal oraclejdk8 image?
 FROM fabric8/java-alpine-openjdk8-jre
-ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Dhibernate.types.print.banner=false"
 ENV AB_ENABLED=jmx_exporter
+
+RUN apk update \
+    && apk add openssl ca-certificates tzdata nss
+
 COPY target/lib/* /deployments/lib/
 COPY target/*-runner.jar /deployments/app.jar
 ENTRYPOINT [ "/deployments/run-java.sh" ]

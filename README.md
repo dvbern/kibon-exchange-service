@@ -60,3 +60,22 @@ The Port can be changed by adding the debug property, e.g.:
 `./mvnw compile quarkus:dev -Ddebug=5006 -Dquarkus.profile=dev-with-data -Dhibernate.types.print.banner=false`
 
 The debug with IntelliJ simply add a new `Remote` configuration an attach to the JVM with the debug port.
+
+# Preparing for Production
+
+The docker/docker-compose.yml file is intended for local development, 
+where quarkus is diractly started through maven.
+
+In production, an nginx-based proxy is set in front of the quarkus application and keycloak. 
+`https://my-domain/auth` is proxied to keycloak while `https://my-domain/api/` is proxied to quarkus.
+
+The proxy docker image can be built by executing 
+`docker-compose -f docker/docker-compose.prod.yml --project-directory docker build`
+
+At the moment the quarkus application has only been tested in JVM mode. 
+To create the docker image call `create-docker-image.sh`.
+
+To start a production-like environment, create the certificates for nginx and the quarkus application using 
+`docker/create-certs.sh`. See `docker/docker-compse.prod.yml` for the required paths in the volumes directive.
+Update `docker/.env` as desired.
+Finally, run `docker-compose -f docker/docker-compose.prod.yml --project-directory docker up`

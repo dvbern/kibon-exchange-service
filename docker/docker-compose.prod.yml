@@ -1,0 +1,92 @@
+version: '2'
+
+services:
+
+  zookeeper:
+    image: strimzi/kafka:latest-kafka-2.3.0
+    networks:
+      - kibon_exchange_backbone
+    command: [
+      "sh", "-c",
+      "bin/zookeeper-server-start.sh config/zookeeper.properties"
+    ]
+    ports:
+      - "2181:2181"
+    environment:
+      TZ: "Europe/Zurich"
+      LOG_DIR: /tmp/logs
+
+  kafka:
+    image: strimzi/kafka:latest-kafka-2.3.0
+    networks:
+      - kibon_exchange_backbone
+    command: [
+      "sh", "-c",
+      "bin/kafka-server-start.sh config/server.properties --override listeners=$${KAFKA_LISTENERS} --override advertised.listeners=$${KAFKA_ADVERTISED_LISTENERS} --override zookeeper.connect=$${KAFKA_ZOOKEEPER_CONNECT}"
+    ]
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      TZ: "Europe/Zurich"
+      LOG_DIR: "/tmp/logs"
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${KAFKA_ADDR}:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:7.0.0
+    networks:
+      - kibon_exchange_backbone
+    volumes:
+      - ./keycloak/kibon_realm.json:/tmp/kibon_realm.json:ro
+      - ./keycloak/set-secrets.sh:/opt/jboss/startup-scripts/set-secrets.sh:ro
+    environment:
+      TZ: "Europe/Zurich"
+      KEYCLOAK_USER: ${KEYCLOAK_USER}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+      DB_VENDOR: "postgres"
+      DB_ADDR: ${DB_ADDR}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: "keycloak"
+      DB_USER: ${KEYCLOAK_DB_USER}
+      DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      PROXY_ADDRESS_FORWARDING: "true"
+      KEYCLOAK_ALWAYS_HTTPS: "true"
+      KEYCLOAK_IMPORT: "/opt/jboss/kibon_realm.json"
+      KITADMIN_SECRET: ${KITADMIN_SECRET}
+      KIBON_EXCHANGE_SERVICE_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
+
+  service:
+    image: kibon-exchange/service
+    networks:
+      - kibon_exchange_backbone
+    depends_on:
+      - kafka
+      - keycloak
+    volumes:
+      - ./service/certs/key.pem:/key.pem:ro
+      - ./service/certs/cert.pem:/cert.pem:ro
+    environment:
+      TZ: "Europe/Zurich"
+      KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_ADDR}:9092"
+      QUARKUS_DATASOURCE_URL: "jdbc:postgresql://${DB_ADDR}:${DB_PORT}/kibon-exchange"
+      QUARKUS_DATASOURCE_PASSWORD: ${QUARKUS_DATASOURCE_PASSWORD}
+      QUARKUS_KEYCLOAK_AUTH_SERVER_URL: "https://keycloak:8443/auth"
+      QUARKUS_KEYCLOAK_CREDENTIALS_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
+
+  nginx:
+    build: ./nginx
+    networks:
+      - kibon_exchange_backbone
+    depends_on:
+      - service
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx/certs/localhost/key.pem:/etc/nginx/certs/key.pem:ro
+      - ./nginx/certs/localhost/cert.pem:/etc/nginx/certs/cert.pem:ro
+
+networks:
+  kibon_exchange_backbone:
