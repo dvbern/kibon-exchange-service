@@ -33,7 +33,7 @@ public abstract class BaseEventHandler<T> {
 			dto.getClass().getSimpleName(), key, eventId, eventType);
 
 		try {
-			processEvent(eventId, eventTime, EventType.valueOf(eventType), dto);
+			processEvent(eventId, eventTime, EventType.of(eventType), dto);
 		} catch (IllegalArgumentException e) {
 			LOG.warn("Unknown event type '{}' with id '{}'", eventType, eventId);
 		}
