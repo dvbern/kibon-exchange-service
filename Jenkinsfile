@@ -102,12 +102,13 @@ if (params.performRelease) {
 
 			// in develop and master branches attempt to deploy the artifacts, otherwise only run to the verify phase.
 			def branchSpecificGoal = {
+				def masterGoal = "deploy docker:build docker:push"
 				if (branch.startsWith(masterBranchName)) {
-					return "deploy docker:build"
+					return masterGoal
 				}
 
 				if (branch.startsWith(developBranchName)) {
-					return "deploy docker:build -Ddocker.tag.latest-snapshot"
+					return masterGoal + " -Ddocker.tag.latest-snapshot"
 				}
 
 				return "verify"
