@@ -9,7 +9,7 @@ client_body_timeout 300s;
 # See https://securityheaders.com/
 set $cspDefault "default-src 'self'";
 set $cspScript  "script-src 'self' piwik.dvbern.ch";
-set $cspStyle   "style-src 'self'";
+set $cspStyle   "style-src 'self' 'unsafe-inline'";
 set $cspFont    "font-src 'self' data:";
 set $cspImg     "img-src 'self' piwik.dvbern.ch * data: blob:";
 set $connectSrc "connect-src 'self' sentry.dvbern.ch";
@@ -52,7 +52,7 @@ location / {
         proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
 
         # KeyCloak contains unsafe inline scripts, we allow them only for this location
-        add_header Content-Security-Policy "$cspDefault; style-src 'self' 'unsafe-inline'; $cspFont; $cspImg; script-src 'self' 'unsafe-eval' 'unsafe-inline'" always;
+        add_header Content-Security-Policy "$cspDefault; $cspStyle; $cspFont; $cspImg; script-src 'self' 'unsafe-eval' 'unsafe-inline'" always;
         break;
    }
 
