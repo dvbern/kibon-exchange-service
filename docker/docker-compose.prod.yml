@@ -22,7 +22,11 @@ services:
       - kibon_exchange_backbone
     command: [
       "sh", "-c",
-      "bin/kafka-server-start.sh config/server.properties --override listeners=$${KAFKA_LISTENERS} --override advertised.listeners=$${KAFKA_ADVERTISED_LISTENERS} --override zookeeper.connect=$${KAFKA_ZOOKEEPER_CONNECT}"
+      "bin/kafka-server-start.sh config/server.properties \
+        --override listeners=$${KAFKA_LISTENERS} \
+        --override advertised.listeners=$${KAFKA_ADVERTISED_LISTENERS} \
+        --override zookeeper.connect=$${KAFKA_ZOOKEEPER_CONNECT} \
+        --override log.retention.hours=-1"
     ]
     depends_on:
       - zookeeper
@@ -31,6 +35,8 @@ services:
     environment:
       TZ: "Europe/Zurich"
       LOG_DIR: "/tmp/logs"
+      # could add another listener to allow docker-internal network connection.
+      # see also https://rmoff.net/2018/08/02/kafka-listeners-explained/
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${KAFKA_ADDR}:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
