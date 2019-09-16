@@ -73,7 +73,7 @@ The proxy docker image can be built by executing
 `docker-compose -f docker/docker-compose.prod.yml --project-directory docker build`
 
 At the moment the quarkus application has only been tested in JVM mode. 
-To create the docker image call `create-docker-image.sh`.
+To create the docker images for exchange-service and the nginx-proxy run `./mvwn install docker:build`.
 
 To start a production-like environment, create the certificates for nginx and the quarkus application using 
 `docker/create-certs.sh`. See `docker/docker-compse.prod.yml` for the required paths in the volumes directive.

@@ -65,7 +65,7 @@ services:
       KIBON_EXCHANGE_SERVICE_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
 
   service:
-    image: kibon-exchange/service
+    image: docker.dvbern.ch/kibon/exchange-service:${VERSION}
     networks:
       - kibon_exchange_backbone
     depends_on:
@@ -83,7 +83,7 @@ services:
       QUARKUS_KEYCLOAK_CREDENTIALS_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
 
   nginx:
-    build: ./nginx
+    image: docker.dvbern.ch/kibon/exchange-nginx:${VERSION}
     networks:
       - kibon_exchange_backbone
     depends_on:

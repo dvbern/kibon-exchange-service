@@ -25,6 +25,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <docker.tag.latest>latest</docker.tag.latest>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -42,10 +43,10 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy</artifactId>
         </dependency>
-            <dependency>
-              <groupId>io.quarkus</groupId>
-              <artifactId>quarkus-keycloak</artifactId>
-            </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-keycloak</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy-jackson</artifactId>
@@ -80,12 +81,12 @@
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
             <artifactId>kibon-exchange-api-commons</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0-rc1</version>
         </dependency>
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
             <artifactId>kibon-exchange-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0-rc1</version>
         </dependency>
         <dependency>
             <groupId>com.vladmihalcea</groupId>
@@ -213,6 +214,42 @@
                         <version>5.4.4.Final</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.31.0</version>
+                <configuration>
+                    <imagePullPolicy>always</imagePullPolicy>
+                    <skipPush>true</skipPush>
+                    <verbose>false</verbose>
+                    <images>
+                        <image>
+                            <name>docker.dvbern.ch/kibon/exchange-service:${project.version}</name>
+                            <alias>exchange-service</alias>
+                            <build>
+                                <contextDir>${project.basedir}</contextDir>
+                                <dockerFile>${project.basedir}/docker/service/Dockerfile</dockerFile>
+                                <tags>
+                                    <tag>${docker.tag.latest}</tag>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                            </build>
+                        </image>
+
+                        <image>
+                            <name>docker.dvbern.ch/kibon/exchange-nginx:${project.version}</name>
+                            <alias>exchange-nginx</alias>
+                            <build>
+                                <dockerFile>${project.basedir}/docker/nginx/Dockerfile</dockerFile>
+                                <tags>
+                                    <tag>${docker.tag.latest}</tag>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
             </plugin>
         </plugins>
     </build>
