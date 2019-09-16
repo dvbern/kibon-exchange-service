@@ -11,6 +11,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Used to keep track of received events.
+ */
 @Entity
 public class ConsumedMessage {
 

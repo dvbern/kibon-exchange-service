@@ -20,7 +20,7 @@ public interface Restriction<X, Y> {
 	Optional<Predicate> getPredicate(@Nonnull Root<X> root, @Nonnull CriteriaBuilder cb);
 
 	/**
-	 * Sets the parameter onto the query.
+	 * Sets the parameter onto the query (if necessary).
 	 */
 	void setParameter(@Nonnull TypedQuery<Y> query);
 }

@@ -24,7 +24,7 @@
  Zu beachten ist, dass die Trigger synchron arbeiten und deshalb eine Auswirkung haben auf die Verarbeitung von client
  und verfuegung inserts. Es kann z.B. einige Sekunden dauern einen client hinzuzufügen, wenn wir bereits viele
  Verfügungen dieser Institution gespeichert haben.
- Man kann das aber bei Bedarf weiter optimieren und statt direkt in die client_verfuegugne Tabelle zu schreiben nur
+ Man kann das aber bei Bedarf weiter optimieren und statt direkt in die client_verfuegungen Tabelle zu schreiben nur
  ein NOTIFY absetzen: https://stackoverflow.com/a/29447328
  */
 

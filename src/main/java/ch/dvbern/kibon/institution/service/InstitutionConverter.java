@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ApplicationScoped
 public class InstitutionConverter {
 
+	@SuppressWarnings("CdiInjectionPointsInspection")
 	@Inject
 	ObjectMapper mapper;
 
