@@ -221,7 +221,7 @@
                 <version>0.31.0</version>
                 <configuration>
                     <imagePullPolicy>always</imagePullPolicy>
-                    <skipPush>true</skipPush>
+                    <skipPush>false</skipPush>
                     <verbose>false</verbose>
                     <images>
                         <image>
