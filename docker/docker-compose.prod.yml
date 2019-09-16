@@ -91,8 +91,8 @@ services:
     ports:
       - "443:443"
     volumes:
-      - ./nginx/certs/localhost/key.pem:/etc/nginx/certs/key.pem:ro
-      - ./nginx/certs/localhost/cert.pem:/etc/nginx/certs/cert.pem:ro
+      - ./nginx/certs/key.pem:/etc/nginx/certs/key.pem:ro
+      - ./nginx/certs/cert.pem:/etc/nginx/certs/cert.pem:ro
 
 networks:
   kibon_exchange_backbone:

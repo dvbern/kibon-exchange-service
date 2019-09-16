@@ -108,7 +108,7 @@ if (params.performRelease) {
 				}
 
 				if (branch.startsWith(developBranchName)) {
-					return masterGoal + " -Ddocker.tag.latest-snapshot"
+					return masterGoal + " -Ddocker.tag.latest=latest-snapshot"
 				}
 
 				return "verify"
