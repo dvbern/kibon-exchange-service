@@ -99,6 +99,7 @@ public class Verfuegung {
 	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
 	private @NotNull JsonNode ignorierteZeitabschnitte = null;
 
+	@SuppressWarnings("checkstyle:CyclomaticComplexity")
 	@Override
 	public boolean equals(@Nullable Object o) {
 		if (this == o) {

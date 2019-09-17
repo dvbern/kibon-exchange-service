@@ -32,6 +32,7 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 @ApplicationScoped
 public class VerfuegungKafkaEventConsumer {
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	VerfuegungEventHandler verfuegungEventHandler;
 

@@ -28,8 +28,6 @@ import javax.persistence.Embeddable;
 import javax.validation.constraints.NotEmpty;
 
 import ch.dvbern.kibon.institution.model.Institution;
-import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
-import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 
 /**
  * <p>A {@link Client}s primary key.</p>

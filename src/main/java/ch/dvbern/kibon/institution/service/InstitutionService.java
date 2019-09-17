@@ -48,9 +48,11 @@ import ch.dvbern.kibon.institution.model.Institution_;
 @ApplicationScoped
 public class InstitutionService {
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	EntityManager em;
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	InstitutionConverter converter;
 

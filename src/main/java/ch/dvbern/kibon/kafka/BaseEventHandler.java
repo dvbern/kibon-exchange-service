@@ -31,6 +31,7 @@ public abstract class BaseEventHandler<T> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BaseEventHandler.class);
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	ConsumedMessageService consumedMessageService;
 

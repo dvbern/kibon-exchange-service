@@ -39,6 +39,7 @@ public class ClientEventHandler extends BaseEventHandler<InstitutionClientEventD
 
 	private static final Logger LOG = LoggerFactory.getLogger(ClientEventHandler.class);
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	ClientService clientService;
 

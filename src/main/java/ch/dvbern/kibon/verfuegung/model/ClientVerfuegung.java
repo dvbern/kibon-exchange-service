@@ -49,6 +49,11 @@ import org.hibernate.annotations.Immutable;
 @Immutable
 public class ClientVerfuegung {
 
+	// The hashcode should always return the same value, regardless of entity state transitions.
+	// Since equals only includes the auto-generated 'id', we must provide a constant value.
+	// See https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+	private static final int HASH_CODE = 31;
+
 	@Nonnull
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -95,7 +100,7 @@ public class ClientVerfuegung {
 
 	@Override
 	public int hashCode() {
-		return 31;
+		return HASH_CODE;
 	}
 
 	@Nonnull

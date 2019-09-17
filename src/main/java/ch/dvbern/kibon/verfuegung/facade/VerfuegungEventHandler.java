@@ -38,6 +38,7 @@ public class VerfuegungEventHandler extends BaseEventHandler<VerfuegungEventDTO>
 
 	private static final Logger LOG = LoggerFactory.getLogger(VerfuegungEventHandler.class);
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	VerfuegungService verfuegungService;
 

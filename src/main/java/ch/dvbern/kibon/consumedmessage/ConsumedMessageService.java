@@ -36,6 +36,7 @@ public class ConsumedMessageService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ConsumedMessageService.class);
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	EntityManager em;
 

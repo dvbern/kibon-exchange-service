@@ -47,10 +47,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ApplicationScoped
 public class VerfuegungService {
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	EntityManager em;
 
-	@SuppressWarnings("CdiInjectionPointsInspection")
+	@SuppressWarnings({"CdiInjectionPointsInspection", "checkstyle:VisibilityModifier"})
 	@Inject
 	ObjectMapper mapper;
 

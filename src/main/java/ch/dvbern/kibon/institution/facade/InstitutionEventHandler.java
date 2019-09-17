@@ -38,6 +38,7 @@ public class InstitutionEventHandler extends BaseEventHandler<InstitutionEventDT
 
 	private static final Logger LOG = LoggerFactory.getLogger(InstitutionEventHandler.class);
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	InstitutionService institutionService;
 

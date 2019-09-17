@@ -56,16 +56,19 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(VerfuegungenResourceImpl.class);
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	VerfuegungService verfuegungenService;
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	InstitutionService institutionService;
 
-	@SuppressWarnings("CdiInjectionPointsInspection")
+	@SuppressWarnings({ "CdiInjectionPointsInspection", "checkstyle:VisibilityModifier" })
 	@Inject
 	ObjectMapper objectMapper;
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	KeycloakSecurityContext keycloakSecurityContext;
 

@@ -41,6 +41,7 @@ public final class MessageProcessingUtil {
 		// util
 	}
 
+	@SuppressWarnings("PMD.AvoidCatchingThrowable")
 	@Nonnull
 	public static <T, H extends BaseEventHandler<T>> CompletionStage<Void> process(
 		@Nonnull KafkaMessage<String, byte[]> message,

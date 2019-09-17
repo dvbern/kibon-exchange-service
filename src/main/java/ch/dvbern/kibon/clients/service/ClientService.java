@@ -41,6 +41,7 @@ public class ClientService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ClientService.class);
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	EntityManager em;
 
