@@ -4,6 +4,8 @@ services:
 
   zookeeper:
     image: strimzi/kafka:latest-kafka-2.3.0
+    # make sure to match the UID:GID of the host (due to volume binding)
+    user: "1000:1000"
     networks:
       - kibon_exchange_backbone
     command: [
@@ -12,12 +14,16 @@ services:
     ]
     ports:
       - "2181:2181"
+    volumes:
+      - ./zookeeper/logs:/tmp/logs
     environment:
       TZ: "Europe/Zurich"
       LOG_DIR: /tmp/logs
 
   kafka:
     image: strimzi/kafka:latest-kafka-2.3.0
+    # make sure to match the UID:GID of the host (due to volume binding)
+    user: "1000:1000"
     networks:
       - kibon_exchange_backbone
     command: [
@@ -32,6 +38,8 @@ services:
       - zookeeper
     ports:
       - "9092:9092"
+    volumes:
+      - ./kafka/logs:/tmp/logs
     environment:
       TZ: "Europe/Zurich"
       LOG_DIR: "/tmp/logs"
@@ -59,12 +67,15 @@ services:
       DB_USER: ${KEYCLOAK_DB_USER}
       DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
       PROXY_ADDRESS_FORWARDING: "true"
-      KEYCLOAK_ALWAYS_HTTPS: "true"
+      # should be enabled on productive systems
+      #      KEYCLOAK_ALWAYS_HTTPS: "true"
       KEYCLOAK_IMPORT: "/opt/jboss/kibon_realm.json"
       KITADMIN_SECRET: ${KITADMIN_SECRET}
       KIBON_EXCHANGE_SERVICE_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
 
   service:
+    # activated, because the service crashes at boot when keycloak is not available https://github.com/quarkusio/quarkus/issues/4619
+    restart: on-failure
     image: docker.dvbern.ch/kibon/exchange-service:${VERSION}
     networks:
       - kibon_exchange_backbone
@@ -79,8 +90,9 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_ADDR}:9092"
       QUARKUS_DATASOURCE_URL: "jdbc:postgresql://${DB_ADDR}:${DB_PORT}/kibon-exchange"
       QUARKUS_DATASOURCE_PASSWORD: ${QUARKUS_DATASOURCE_PASSWORD}
-      QUARKUS_KEYCLOAK_AUTH_SERVER_URL: "https://keycloak:8443/auth"
-      QUARKUS_KEYCLOAK_CREDENTIALS_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
+      # this requires a trusted certificate: change to public URL passing through netscaler
+      QUARKUS_OIDC_AUTH_SERVER_URL: "http://keycloak:8080/auth/realms/kibon"
+      QUARKUS_OIDC_CREDENTIALS_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
 
   nginx:
     image: docker.dvbern.ch/kibon/exchange-nginx:${VERSION}
