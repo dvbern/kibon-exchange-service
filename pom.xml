@@ -1,44 +1,23 @@
 <?xml version="1.0"?>
-<!--
-  ~ Copyright (C) 2019 DV Bern AG, Switzerland
-  ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU Affero General Public License as
-  ~ published by the Free Software Foundation, either version 3 of the
-  ~ License, or (at your option) any later version.
-  ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU Affero General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU Affero General Public License
-  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  -->
-
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
-    <parent>
-        <artifactId>parent</artifactId>
-        <groupId>ch.dvbern.oss.maven</groupId>
-        <version>1.2.1</version>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <parent>
+        <groupId>ch.dvbern.oss.maven</groupId>
+        <artifactId>parent</artifactId>
+        <version>2.0.0</version>
+    </parent>
     <groupId>ch.dvbern.kibon</groupId>
-
     <artifactId>kibon-exchange-service</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-
     <properties>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <surefire-plugin.version>2.22.0</surefire-plugin.version>
-        <quarkus.version>0.21.2</quarkus.version>
-        <hamcrest.version>2.1</hamcrest.version>
+        <quarkus.version>0.26.1</quarkus.version>
+        <hamcrest.version>2.2</hamcrest.version>
         <spotify.hamcrest.version>1.1.4</spotify.hamcrest.version>
-        <testcontainers.version>1.12.0</testcontainers.version>
+        <testcontainers.version>1.12.3</testcontainers.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -46,6 +25,18 @@
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>2.9.10</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.9.10.1</version>
+            </dependency>
             <dependency>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-bom</artifactId>
@@ -62,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-keycloak</artifactId>
+            <artifactId>quarkus-oidc</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -178,6 +169,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-authz-client</artifactId>
+            <version>7.0.0</version>
             <scope>test</scope>
         </dependency>
         <!-- endregion -->
@@ -225,10 +217,10 @@
                 <executions>
                     <execution>
                         <id>process</id>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>process</goal>
                         </goals>
-                        <phase>generate-sources</phase>
                         <configuration>
                             <processors>
                                 <processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
@@ -240,7 +232,7 @@
                     <dependency>
                         <groupId>org.hibernate</groupId>
                         <artifactId>hibernate-jpamodelgen</artifactId>
-                        <version>5.4.4.Final</version>
+                        <version>5.4.7.Final</version>
                     </dependency>
                 </dependencies>
             </plugin>

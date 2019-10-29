@@ -43,9 +43,8 @@ import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.service.VerfuegungService;
 import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.annotations.cache.NoCache;
-import org.keycloak.KeycloakSecurityContext;
-import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +67,9 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 	@Inject
 	ObjectMapper objectMapper;
 
-	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@SuppressWarnings({ "checkstyle:VisibilityModifier", "CdiInjectionPointsInspection" })
 	@Inject
-	KeycloakSecurityContext keycloakSecurityContext;
+	JsonWebToken jsonWebToken;
 
 	@GET
 	@Transactional
@@ -83,14 +82,18 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 		@Min(0) @QueryParam("limit") @Nullable Integer limit,
 		@QueryParam("$filter") @Nullable String filter) {
 
-		AccessToken token = keycloakSecurityContext.getToken();
-		String userName = token.getPreferredUsername();
-		String clientName = token.getIssuedFor();
+		String clientName = jsonWebToken.getClaim("clientId");
+		// jsonWebToken.getGroups() is an empty object and does not read from realm_access property.
+		Object realmAccess = jsonWebToken.getClaim("realm_access");
+		String userName = jsonWebToken.getName();
+
+		LOG.info("clientId {}, afterId {}, limit {}", clientName, afterId, limit);
+
 		LOG.info(
-			"Verfuegungen accessed by '{}' with clientName '{}' and roles '{}'",
+			"Verfuegungen accessed by '{}' with clientName '{}' and realm_access '{}'",
 			userName,
 			clientName,
-			token.getRealmAccess().getRoles());
+			realmAccess);
 
 		// "filter" parameter is ignored at the moment. Added to API to make adding restrictions easily
 
