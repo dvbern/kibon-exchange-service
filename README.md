@@ -18,16 +18,18 @@ Quarkus runs best from a terminal:
 `./mvnw compile quarkus:dev -Dhibernate.types.print.banner=false`
 
 This will start Quarkus in Hot Replace mode, migrate the FlyWay schema and then execut the 
-statements in `src/main/resources/import-dev.sql`.
+statements in `src/main/resources/import-dev.sql`. Unfortunately, it looks like the execution order is not consistent
+(maybe both started asynchronously?). Combining both, import scritps and FlyWay migrations is not properly supported
+and may result in random crashes.
 
 There are a couple of other profiles defined in application.propperties.
  All of them have their pros and cons:
 
 | Profile | Pros | Cons |
 | --- | --- | --- |
-| dev | entity changes are applied directly | FlyWay migrations are not recreated: everything that is specified only in FlyWay scripts (e.g. triggers) must be manually applied (or integrated in import-dev.sql) |
+| dev | entity changes are applied directly | FlyWay migrations are not recreated: everything that is specified only in FlyWay scripts (e.g. triggers) must be manually applied (or integrated in import-dev.sql). Crashes sometimes |
 | dev-with-data | updates schema and keeps data | does not import mock data from import-dev.sql | 
-| test | see dev | see dev | 
+| test | see dev | FlyWay migrations are disabled for stability. Everything must be added to import-test.sql | 
 | prod | only applies FlyWay migrations | no mock data or dynamic schema updates | 
 
 It is suggested to start with the `dev` profile and switch to `dev-with-data` when the database should not be

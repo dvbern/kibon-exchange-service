@@ -28,7 +28,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
   db:
-    image: healthcheck/postgres:alpine
+    image: postgres:11-alpine
     environment:
      TZ: "Europe/Zurich"
      POSTGRES_USER: kibonExchange
