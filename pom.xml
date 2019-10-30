@@ -49,6 +49,18 @@
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-health</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-metrics</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy</artifactId>
         </dependency>
         <dependency>
@@ -79,7 +91,6 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>annotations</artifactId>
@@ -174,7 +185,6 @@
         </dependency>
         <!-- endregion -->
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -257,7 +267,6 @@
                                 </tags>
                             </build>
                         </image>
-
                         <image>
                             <name>docker.dvbern.ch/kibon/exchange-nginx:${project.version}</name>
                             <alias>exchange-nginx</alias>
@@ -274,7 +283,6 @@
             </plugin>
         </plugins>
     </build>
-
     <profiles>
         <profile>
             <id>native</id>

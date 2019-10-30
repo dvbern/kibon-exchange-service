@@ -44,6 +44,10 @@ import ch.dvbern.kibon.verfuegung.service.VerfuegungService;
 import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.eclipse.microprofile.metrics.MetricUnits;
+import org.eclipse.microprofile.metrics.annotation.Timed;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,14 +76,22 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 	JsonWebToken jsonWebToken;
 
 	@GET
+	@Operation(description = "Returns all kiBon Verfuegungen and corresponding institutions.")
 	@Transactional
 	@NoCache
 	@Nonnull
 	@Override
 	@RolesAllowed("user")
+	@Timed(name = "requestTimer",
+		description = "A measure of how long it takes to load Verfuegungen",
+		unit = MetricUnits.MILLISECONDS)
 	public VerfuegungenDTO getAll(
+		@Parameter(description = "Verfuegungen are ordered by their strictly monotonically increasing ID. Use this "
+			+ "parameter to get only Verfuegungen ID larger after_id. Useful to exclude already fetched Verfuegungen.")
 		@QueryParam("after_id") @Nullable Long afterId,
+		@Parameter(description = "Limits the maximum result set of Verfuegungen to the specified number")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit,
+		@Parameter(description = "Extension point for additional filtering, e.g. by institution. Currently not used.")
 		@QueryParam("$filter") @Nullable String filter) {
 
 		String clientName = jsonWebToken.getClaim("clientId");
@@ -87,13 +99,13 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 		Object realmAccess = jsonWebToken.getClaim("realm_access");
 		String userName = jsonWebToken.getName();
 
-		LOG.info("clientId {}, afterId {}, limit {}", clientName, afterId, limit);
-
 		LOG.info(
-			"Verfuegungen accessed by '{}' with clientName '{}' and realm_access '{}'",
+			"Verfuegungen accessed by '{}' with clientName '{}', realm_access '{}', limit '{}' and after_id '{}'",
 			userName,
 			clientName,
-			realmAccess);
+			realmAccess,
+			limit,
+			afterId);
 
 		// "filter" parameter is ignored at the moment. Added to API to make adding restrictions easily
 
