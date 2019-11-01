@@ -19,6 +19,7 @@ services:
     command: [
       "sh", "-c",
       "bin/kafka-server-start.sh config/server.properties \
+        --override listener.security.protocol.map=$${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP} \
         --override listeners=$${KAFKA_LISTENERS} \
         --override advertised.listeners=$${KAFKA_ADVERTISED_LISTENERS} \
         --override zookeeper.connect=$${KAFKA_ZOOKEEPER_CONNECT} \
@@ -31,9 +32,22 @@ services:
     environment:
       TZ: "Europe/Zurich"
       LOG_DIR: "/tmp/logs"
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:5.3.1
+    hostname: schema-registry
+    depends_on:
+      - zookeeper
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
 
   db:
     image: postgres:11-alpine
