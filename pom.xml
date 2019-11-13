@@ -14,20 +14,22 @@
     <properties>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <surefire-plugin.version>2.22.0</surefire-plugin.version>
-        <quarkus.version>0.27.0</quarkus.version>
-        <hamcrest.version>2.2</hamcrest.version>
-        <spotify.hamcrest.version>1.1.4</spotify.hamcrest.version>
-        <testcontainers.version>1.12.3</testcontainers.version>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+        <quarkus.version>1.0.0.CR1</quarkus.version>
+        <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <hamcrest.version>2.2</hamcrest.version>
+        <spotify.hamcrest.version>1.1.4</spotify.hamcrest.version>
+        <testcontainers.version>1.12.3</testcontainers.version>
         <docker.tag.latest>latest</docker.tag.latest>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.quarkus</groupId>
-                <artifactId>quarkus-bom</artifactId>
+                <artifactId>quarkus-universe-bom</artifactId>
                 <version>${quarkus.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -86,14 +88,24 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-avro-serializer</artifactId>
+            <version>5.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+            <version>1.9.1</version>
+        </dependency>
+        <dependency>
             <groupId>ch.dvbern.kibon</groupId>
             <artifactId>kibon-exchange-api-commons</artifactId>
-            <version>1.0.0-rc1</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
             <artifactId>kibon-exchange-api</artifactId>
-            <version>1.0.0-rc1</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.vladmihalcea</groupId>

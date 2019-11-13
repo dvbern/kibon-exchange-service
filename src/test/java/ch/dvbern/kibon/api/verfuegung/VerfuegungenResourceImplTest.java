@@ -42,8 +42,7 @@ import static org.hamcrest.Matchers.not;
 class VerfuegungenResourceImplTest {
 
 	@Test
-	public void
-	testGetAllEndpoint() {
+	public void testGetAllEndpoint() {
 		given()
 			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
@@ -59,8 +58,7 @@ class VerfuegungenResourceImplTest {
 	}
 
 	@Test
-	public void
-	testGetAllEndpointWithAfterIdParam() {
+	public void testGetAllEndpointWithAfterIdParam() {
 		given()
 			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
@@ -78,8 +76,7 @@ class VerfuegungenResourceImplTest {
 	}
 
 	@Test
-	public void
-	testGetAllEndpointWithLimit() {
+	public void testGetAllEndpointWithLimit() {
 		given()
 			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
@@ -95,8 +92,7 @@ class VerfuegungenResourceImplTest {
 	}
 
 	@Test
-	public void
-	testGetAllEndpointLimitMustBeNonnegative() {
+	public void testGetAllEndpointLimitMustBeNonnegative() {
 		given()
 			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)

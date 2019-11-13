@@ -17,29 +17,32 @@
 
 package ch.dvbern.kibon.verfuegung.facade;
 
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
-import ch.dvbern.kibon.kafka.MessageProcessingUtil;
+import ch.dvbern.kibon.kafka.MessageProcessor;
 import io.smallrye.reactive.messaging.kafka.KafkaMessage;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
+@SuppressWarnings("unused")
 @ApplicationScoped
 public class VerfuegungKafkaEventConsumer {
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
-	VerfuegungEventHandler verfuegungEventHandler;
+	VerfuegungEventHandler eventHandler;
 
-	@Transactional
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	MessageProcessor processor;
+
 	@Incoming("VerfuegungEvents")
-	public CompletionStage<Void> onMessage(@Nonnull KafkaMessage<String, byte[]> message) {
+	public CompletableFuture<Void> onMessage(@Nonnull KafkaMessage<String, VerfuegungEventDTO> message) {
 
-		return MessageProcessingUtil.process(message, VerfuegungEventDTO.class, verfuegungEventHandler);
+		return CompletableFuture.runAsync(() -> processor.process(message, eventHandler));
 	}
 }

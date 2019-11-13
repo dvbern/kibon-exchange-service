@@ -38,7 +38,6 @@ import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung_;
 import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Service responsible for {@link Verfuegung} handling.<br>
@@ -51,16 +50,16 @@ public class VerfuegungService {
 	@Inject
 	EntityManager em;
 
-	@SuppressWarnings({"CdiInjectionPointsInspection", "checkstyle:VisibilityModifier"})
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
-	ObjectMapper mapper;
+	VerfuegungConverter converter;
 
 	/**
 	 * Stores the verfuegung in response to the verfuegungCreated event.
 	 */
 	@Transactional(TxType.MANDATORY)
 	public void onVerfuegungCreated(@Nonnull VerfuegungEventDTO dto) {
-		Verfuegung verfuegung = mapper.convertValue(dto, Verfuegung.class);
+		Verfuegung verfuegung = converter.create(dto);
 
 		em.persist(verfuegung);
 	}

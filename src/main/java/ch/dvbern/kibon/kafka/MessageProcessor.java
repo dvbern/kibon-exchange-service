@@ -20,62 +20,57 @@ package ch.dvbern.kibon.kafka;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletionStage;
 
 import javax.annotation.Nonnull;
+import javax.enterprise.context.ApplicationScoped;
+import javax.transaction.Transactional;
 
-import ch.dvbern.kibon.exchange.commons.util.ObjectMapperUtil;
+import ch.dvbern.kibon.exchange.commons.util.EventUtil;
+import ch.dvbern.kibon.util.LocalDateTimeUtil;
 import io.smallrye.reactive.messaging.kafka.KafkaMessage;
 import io.smallrye.reactive.messaging.kafka.MessageHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.time.Instant.ofEpochMilli;
-import static java.time.ZoneId.systemDefault;
 
-public final class MessageProcessingUtil {
+@ApplicationScoped
+public class MessageProcessor {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MessageProcessingUtil.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MessageProcessor.class);
 
-	private MessageProcessingUtil() {
-		// util
-	}
-
+	@Transactional
 	@SuppressWarnings("PMD.AvoidCatchingThrowable")
-	@Nonnull
-	public static <T, H extends BaseEventHandler<T>> CompletionStage<Void> process(
-		@Nonnull KafkaMessage<String, byte[]> message,
-		@Nonnull Class<T> payloadClass,
+	public <T, H extends BaseEventHandler<T>> void process(
+		@Nonnull KafkaMessage<String, T> message,
 		@Nonnull H handler) {
 
 		try {
 			String key = message.getKey();
 			MessageHeaders headers = message.getHeaders();
 
-			Optional<String> eventIdOpt = headers.getOneAsString(ObjectMapperUtil.MESSAGE_HEADER_EVENT_ID);
+			Optional<String> eventIdOpt = headers.getOneAsString(EventUtil.MESSAGE_HEADER_EVENT_ID);
 			if (!eventIdOpt.isPresent()) {
 				LOG.warn("Skipping Kafka message with key = {}, eventId header was missing", key);
 
-				return message.ack();
+				return;
 			}
 
-			Optional<String> eventTypeOpt = headers.getOneAsString(ObjectMapperUtil.MESSAGE_HEADER_EVENT_TYPE);
+			Optional<String> eventTypeOpt = headers.getOneAsString(EventUtil.MESSAGE_HEADER_EVENT_TYPE);
 			if (!eventTypeOpt.isPresent()) {
 				LOG.warn("Skipping Kafka message with key = {}, eventType header was missing", key);
 
-				return message.ack();
+				return;
 			}
 
 			UUID eventId = UUID.fromString(eventIdOpt.get());
-			LocalDateTime eventTime = LocalDateTime.ofInstant(ofEpochMilli(message.getTimestamp()), systemDefault());
+			LocalDateTime eventTime = LocalDateTimeUtil.of(ofEpochMilli(message.getTimestamp()));
 
-			T eventDTO = ObjectMapperUtil.MAPPER.readValue(message.getPayload(), payloadClass);
+			T eventDTO = message.getPayload();
 
 			handler.onEvent(key, eventId, eventTime, eventTypeOpt.get(), eventDTO);
 		} catch (Throwable t) {
 			LOG.error("Error in message processing", t);
 		}
-
-		return message.ack();
 	}
 }

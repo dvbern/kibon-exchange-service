@@ -19,24 +19,25 @@ package ch.dvbern.kibon.institution.service;
 
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import ch.dvbern.kibon.exchange.commons.institution.AdresseDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.institution.model.Adresse;
 import ch.dvbern.kibon.institution.model.Institution;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ApplicationScoped
 public class InstitutionConverter {
 
-	@SuppressWarnings({"CdiInjectionPointsInspection", "checkstyle:VisibilityModifier"})
-	@Inject
-	ObjectMapper mapper;
-
 	@Nonnull
 	public Institution create(@Nonnull InstitutionEventDTO dto) {
-		return mapper.convertValue(dto, Institution.class);
+		Institution institution = new Institution();
+		institution.setId(dto.getId());
+		institution.setName(dto.getName());
+		institution.setTraegerschaft(dto.getTraegerschaft());
+
+		update(institution.getAdresse(), dto.getAdresse());
+
+		return institution;
 	}
 
 	public void update(@Nonnull Institution institution, @Nonnull InstitutionEventDTO dto) {

@@ -15,23 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.config;
+package ch.dvbern.kibon.util;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import javax.annotation.Nonnull;
-import javax.inject.Singleton;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.quarkus.jackson.ObjectMapperCustomizer;
+public final class LocalDateTimeUtil {
 
-@SuppressWarnings("unused")
-@Singleton
-public class CustomObjectMapperConfig implements ObjectMapperCustomizer {
+	private LocalDateTimeUtil() {
+		// util
+	}
 
-	@Override
-	public void customize(@Nonnull ObjectMapper mapper) {
-		mapper.registerModule(new JavaTimeModule());
-		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+	@Nonnull
+	public static LocalDateTime of(@Nonnull Instant instant) {
+		 return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 	}
 }
