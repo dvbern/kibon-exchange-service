@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#!groovy​
+@Library('dvbern-ci') _
 
 properties([
 		[$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '10']],
@@ -30,7 +30,7 @@ properties([
 ])
 
 def mvnVersion = "Maven_3.6.1"
-def jdkVersion = "JDK_1.8_221"
+def jdkVersion = "OpenJDK_1.8_222"
 // comma separated list of email addresses of all team members (for notification)
 def emailRecipients = "fabio.heer@dvbern.ch"
 
@@ -40,8 +40,18 @@ def featureBranchPrefix = "feature"
 def releaseBranchPrefix = "release"
 def hotfixBranchPrefix = "hotfix"
 
-if (params.performRelease) {
-	node {
+node {
+	def isUnix = isUnix()
+
+	def genericSh = {cmd ->
+		if (Boolean.valueOf(isUnix)) {
+			sh cmd
+		} else {
+			bat cmd
+		}
+	}
+
+	if (params.performRelease) {
 		currentBuild.displayName = "Release-${params.releaseversion}-${env.BUILD_NUMBER}"
 
 		stage('Checkout') {
@@ -55,10 +65,16 @@ if (params.performRelease) {
 
 		stage('Release') {
 			try {
-				withMaven(jdk: jdkVersion, maven: mvnVersion) {
-					genericSh "mvn -Pdvbern.oss -B jgitflow:release-start -DreleaseVersion=${params.releaseversion} " +
-
-							"-DdevelopmentVersion=${params.nextreleaseversion}-SNAPSHOT jgitflow:release-finish"
+				withCredentials([usernamePassword(credentialsId: 'jenkins-github-token', passwordVariable: 'password',
+						usernameVariable: 'username')]) {
+					withMaven(jdk: jdkVersion, maven: mvnVersion) {
+						genericSh "mvn -Pdvbern.oss -B jgitflow:release-start " +
+								"-DreleaseVersion=${params.releaseversion} " +
+								"-DdevelopmentVersion=${params.nextreleaseversion}-SNAPSHOT " +
+								"-Dusername=${username} " +
+								"-Dpassword=${password} " +
+								"jgitflow:release-finish"
+					}
 				}
 			} catch (Exception e) {
 				currentBuild.result = "FAILURE"
@@ -68,95 +84,67 @@ if (params.performRelease) {
 				throw e
 			}
 		}
+	} else {
+		node('docker') {
+			stage('Checkout') {
+				checkout([
+						$class           : 'GitSCM',
+						branches         : scm.branches,
+						extensions       : scm.extensions + [[$class: 'LocalBranch', localBranch: '']],
+						userRemoteConfigs: scm.userRemoteConfigs
+				])
+			}
 
-		stage('Trigger Master Build') {
-			// would not be needed if we use Git hooks
-			build job: "./", wait: false
-		}
-	}
-} else {
-	node('docker') {
-		stage('Checkout') {
-			checkout([
-					$class           : 'GitSCM',
-					branches         : scm.branches,
-					extensions       : scm.extensions + [[$class: 'LocalBranch', localBranch: '']],
-					userRemoteConfigs: scm.userRemoteConfigs
-			])
-		}
+			String branch = env.BRANCH_NAME.toString()
+			currentBuild.displayName = "${branch}-${pomVersion()}-${env.BUILD_NUMBER}"
 
-		String branch = env.BRANCH_NAME.toString()
-		currentBuild.displayName = "${branch}-${pomVersion()}-${env.BUILD_NUMBER}"
+			stage('Maven build') {
+				def handleFailures = {error ->
+					if (branch.startsWith(featureBranchPrefix)) {
+						// feature branche failures should only notify the feature owner
+						step([$class                                                         : 'Mailer',
+							  notifyEveryUnstableBuild: true, recipients: emailextrecipients
+								([[$class:
+										   'RequesterRecipientProvider']]), sendToIndividuals: true])
 
-		stage('Maven build') {
-			//returns a set of git revisions with the name of the committer
-			@NonCPS
-			def commitList = {
-				def changes = ""
-				currentBuild.changeSets.each {set ->
-					set.each {entry ->
-						changes += "${entry.commitId} - ${entry.msg} \n by ${entry.author.fullName}\n"
+					} else {
+						dvbErrorHandling.sendMail(emailRecipients, currentBuild, error)
 					}
 				}
-				return changes
-			}
 
-			def handleFailures = {
-				if (branch.startsWith(featureBranchPrefix)) {
-					// feature branche failures should only notify the feature owner
-					step([$class                  : 'Mailer',
-						  notifyEveryUnstableBuild: true,
-						  recipients              : emailextrecipients([[$class: 'RequesterRecipientProvider']]),
-						  sendToIndividuals       : true])
+				// in develop and master branches attempt to deploy the artifacts, otherwise only run to the verify
+				// phase.
+				def branchSpecificGoal = {
+					def masterGoal = "deploy docker:build docker:push"
+					if (branch.startsWith(masterBranchName)) {
+						return masterGoal
+					}
 
-				} else {
-					// notify the team
-					mail(to: emailRecipients,
-							subject: "${env.JOB_NAME} Maven build failed for branch: " + branch,
-							body: "last commits are: " + commitList().toString() + " (<${BUILD_URL}/console|Job>)")
-				}
-			}
+					if (branch.startsWith(developBranchName)) {
+						return masterGoal + " -Ddocker.tag.latest=latest-snapshot"
+					}
 
-			// in develop and master branches attempt to deploy the artifacts, otherwise only run to the verify phase.
-			def branchSpecificGoal = {
-				def masterGoal = "deploy docker:build docker:push"
-				if (branch.startsWith(masterBranchName)) {
-					return masterGoal
+					return "verify"
 				}
 
-				if (branch.startsWith(developBranchName)) {
-					return masterGoal + " -Ddocker.tag.latest=latest-snapshot"
+				try {
+					withMaven(jdk: jdkVersion, maven: mvnVersion) {
+						genericSh './mvnw -U -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
+					}
+					if (currentBuild.result == "UNSTABLE") {
+						handleFailures("build is unstable")
+					}
+				} catch (Exception e) {
+					currentBuild.result = "FAILURE"
+					handleFailures(e)
+					throw e
 				}
-
-				return "verify"
-			}
-
-			try {
-				withMaven(jdk: jdkVersion, maven: mvnVersion) {
-					genericSh './mvnw -U -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
-				}
-				if (currentBuild.result == "UNSTABLE") {
-					handleFailures()
-				}
-			} catch (Exception e) {
-				currentBuild.result = "FAILURE"
-				handleFailures()
-				throw e
 			}
 		}
 	}
 }
 
 def pomVersion() {
-	def pom = readFile 'pom.xml'
-	def project = new XmlSlurper().parseText(pom)
-	return project.version.toString()
-}
-
-def genericSh(cmd) {
-	if (Boolean.valueOf(isUnix())) {
-		sh cmd
-	} else {
-		bat cmd
-	}
+	def pom = readMavenPom file: 'pom.xml'
+	return pom.version
 }
