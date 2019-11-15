@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
+BASE=`dirname $0`
+ROOT=${BASE}/..
+
 VERSION=latest-snapshot
 
-cd ..
-./mvnw clean package -Dhibernate.types.print.banner=false -Pdevelopment-mode
-docker build -f docker/service/Dockerfile -t docker.dvbern.ch/kibon/exchange-service:${VERSION} .
+${ROOT}/mvnw -f ${ROOT}/pom.xml clean package -Dhibernate.types.print.banner=false -Pdevelopment-mode
+docker build -f ${BASE}/service/Dockerfile -t docker.dvbern.ch/kibon/exchange-service:${VERSION} ${ROOT}
 
-docker build -f docker/nginx/Dockerfile -t docker.dvbern.ch/kibon/exchange-nginx:${VERSION} docker/nginx/
+docker build -f ${BASE}/nginx/Dockerfile -t docker.dvbern.ch/kibon/exchange-nginx:${VERSION} ${BASE}/nginx/
