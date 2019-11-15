@@ -66,18 +66,14 @@ The debug with IntelliJ simply add a new `Remote` configuration an attach to the
 # Preparing for Production
 
 The docker/docker-compose.yml file is intended for local development, 
-where quarkus is diractly started through maven.
+where quarkus is directly started through maven.
 
 In production, an nginx-based proxy is set in front of the quarkus application and keycloak. 
 `https://my-domain/auth` is proxied to keycloak while `https://my-domain/api/` is proxied to quarkus.
-
-The proxy docker image can be built by executing 
-`docker-compose -f docker/docker-compose.prod.yml --project-directory docker build`
 
 At the moment the quarkus application has only been tested in JVM mode. 
 To create the docker images for exchange-service and the nginx-proxy run `./mvwn install docker:build`.
 
 To start a production-like environment, create the certificates for nginx and the quarkus application using 
-`docker/create-certs.sh`. See `docker/docker-compse.prod.yml` for the required paths in the volumes directive.
-Update `docker/.env` as desired.
+`docker/setup.sh`. Update `docker/.env` with host IP address and credentials.
 Finally, run `docker-compose -f docker/docker-compose.prod.yml --project-directory docker up`
