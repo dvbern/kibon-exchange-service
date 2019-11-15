@@ -87,7 +87,8 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 		unit = MetricUnits.MILLISECONDS)
 	public VerfuegungenDTO getAll(
 		@Parameter(description = "Verfuegungen are ordered by their strictly monotonically increasing ID. Use this "
-			+ "parameter to get only Verfuegungen ID larger after_id. Useful to exclude already fetched Verfuegungen.")
+			+ "parameter to get only Verfuegungen with ID larger after_id. Useful to exclude already fetched "
+			+ "Verfuegungen.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Limits the maximum result set of Verfuegungen to the specified number")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit,
