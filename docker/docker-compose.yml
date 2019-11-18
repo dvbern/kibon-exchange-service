@@ -35,6 +35,7 @@ services:
     ports:
       - "8081:8081"
     environment:
+      TZ: "Europe/Zurich"
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
       SCHEMA_REGISTRY_AVRO_COMPATIBILITY_LEVEL: 'forward_transitive'
