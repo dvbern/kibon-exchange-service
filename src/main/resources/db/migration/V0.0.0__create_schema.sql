@@ -30,6 +30,8 @@ CREATE TABLE verfuegung (
 			CHECK (version >= 0),
 	verfuegtam               TIMESTAMP    NOT NULL,
 	betreuungsart            VARCHAR(255) NOT NULL,
+	gemeindebfsnr            BIGINT       NOT NULL,
+	gemeindename             VARCHAR(255) NOT NULL,
 	kind                     JSONB        NOT NULL,
 	gesuchsteller            JSONB        NOT NULL,
 	zeitabschnitte           JSONB        NOT NULL,

@@ -53,6 +53,8 @@ public class VerfuegungConverter {
 		verfuegung.setVersion(dto.getVersion());
 		verfuegung.setVerfuegtAm(LocalDateTimeUtil.of(dto.getVerfuegtAm()));
 		verfuegung.setBetreuungsArt(dto.getBetreuungsArt());
+		verfuegung.setGemeindeBfsNr(dto.getGemeindeBfsNr());
+		verfuegung.setGemeindeName(dto.getGemeindeName());
 
 		verfuegung.setKind(toKind(dto.getKind()));
 		verfuegung.setGesuchsteller(toGesuchsteller(dto.getGesuchsteller()));

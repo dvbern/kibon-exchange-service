@@ -79,6 +79,14 @@ public class Verfuegung {
 	@Enumerated(EnumType.STRING)
 	private @NotNull BetreuungsangebotTyp betreuungsArt = BetreuungsangebotTyp.KITA;
 
+	@Nonnull
+	@Column(nullable = false, updatable = false)
+	private @NotNull Long gemeindeBfsNr = -1L;
+
+	@Nonnull
+	@Column(nullable = false, updatable = false)
+	private @NotNull String gemeindeName = "";
+
 	@Nullable
 	@Type(type = "jsonb-node")
 	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
@@ -120,7 +128,9 @@ public class Verfuegung {
 			getVon().equals(that.getVon()) &&
 			getBis().equals(that.getBis()) &&
 			getVerfuegtAm().equals(that.getVerfuegtAm()) &&
-			getBetreuungsArt() == that.getBetreuungsArt();
+			getBetreuungsArt() == that.getBetreuungsArt() &&
+			getGemeindeBfsNr().equals(that.getGemeindeBfsNr()) &&
+			getGemeindeName().equals(that.getGemeindeName());
 	}
 
 	@Override
@@ -132,7 +142,9 @@ public class Verfuegung {
 			getBis(),
 			getVersion(),
 			getVerfuegtAm(),
-			getBetreuungsArt());
+			getBetreuungsArt(),
+			getGemeindeBfsNr(),
+			getGemeindeName());
 	}
 
 	@Nonnull
@@ -205,6 +217,24 @@ public class Verfuegung {
 
 	public void setBetreuungsArt(@Nonnull BetreuungsangebotTyp betreuungsArt) {
 		this.betreuungsArt = betreuungsArt;
+	}
+
+	@Nonnull
+	public Long getGemeindeBfsNr() {
+		return gemeindeBfsNr;
+	}
+
+	public void setGemeindeBfsNr(@Nonnull Long gemeindeBfsNr) {
+		this.gemeindeBfsNr = gemeindeBfsNr;
+	}
+
+	@Nonnull
+	public String getGemeindeName() {
+		return gemeindeName;
+	}
+
+	public void setGemeindeName(@Nonnull String gemeindeName) {
+		this.gemeindeName = gemeindeName;
 	}
 
 	@Nullable

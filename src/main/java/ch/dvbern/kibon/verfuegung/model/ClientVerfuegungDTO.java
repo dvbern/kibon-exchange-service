@@ -55,6 +55,12 @@ public class ClientVerfuegungDTO {
 	private final BetreuungsangebotTyp betreuungsArt;
 
 	@Nonnull
+	private final Long gemeindeBfsNr;
+
+	@Nonnull
+	private final String gemeindeName;
+
+	@Nonnull
 	private final JsonNode kind;
 
 	@Nonnull
@@ -76,6 +82,8 @@ public class ClientVerfuegungDTO {
 		@Nonnull Integer version,
 		@Nonnull LocalDateTime verfuegtAm,
 		@Nonnull BetreuungsangebotTyp betreuungsArt,
+		@Nonnull Long gemeindeBfsNr,
+		@Nonnull String gemeindeName,
 		@Nonnull JsonNode kind,
 		@Nonnull JsonNode gesuchsteller,
 		@Nonnull JsonNode zeitabschnitte,
@@ -90,6 +98,8 @@ public class ClientVerfuegungDTO {
 		this.version = version;
 		this.verfuegtAm = verfuegtAm;
 		this.betreuungsArt = betreuungsArt;
+		this.gemeindeBfsNr = gemeindeBfsNr;
+		this.gemeindeName = gemeindeName;
 		this.kind = kind;
 		this.gesuchsteller = gesuchsteller;
 		this.zeitabschnitte = zeitabschnitte;
@@ -139,6 +149,16 @@ public class ClientVerfuegungDTO {
 	@Nonnull
 	public BetreuungsangebotTyp getBetreuungsArt() {
 		return betreuungsArt;
+	}
+
+	@Nonnull
+	public Long getGemeindeBfsNr() {
+		return gemeindeBfsNr;
+	}
+
+	@Nonnull
+	public String getGemeindeName() {
+		return gemeindeName;
 	}
 
 	@Nonnull

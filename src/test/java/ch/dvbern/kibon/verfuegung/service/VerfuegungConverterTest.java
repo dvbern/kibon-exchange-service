@@ -21,10 +21,14 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
@@ -52,13 +56,13 @@ import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static com.spotify.hamcrest.pojo.IsPojo.pojo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.comparesEqualTo;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 
 class VerfuegungConverterTest {
 
 	private final VerfuegungConverter converter = new VerfuegungConverter();
+	private static final Faker FAKER = new Faker();
 
 	@BeforeEach
 	public void setup() {
@@ -76,43 +80,66 @@ class VerfuegungConverterTest {
 
 	@Nonnull
 	private VerfuegungEventDTO createDTO() {
-		Faker faker = new Faker();
-		KindDTO kindDTO =
-			new KindDTO(faker.name().firstName(), faker.name().lastName(), toLocalDate(faker.date().birthday(1, 3)));
-		GesuchstellerDTO gesuchstellerDTO =
-			new GesuchstellerDTO(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress());
+		KindDTO kindDTO = createKindDTO();
+		GesuchstellerDTO gesuchstellerDTO = createGesuchstellerDTO();
 
-		VerfuegungEventDTO dto = new VerfuegungEventDTO();
-		dto.setKind(kindDTO);
-		dto.setGesuchsteller(gesuchstellerDTO);
-		dto.setBetreuungsArt(BetreuungsangebotTyp.TAGESFAMILIEN);
-		dto.setRefnr("1.1.1");
-		dto.setInstitutionId(UUID.randomUUID().toString());
-		dto.setVon(toLocalDate(faker.date().past(30, TimeUnit.DAYS)));
-		dto.setBis(toLocalDate(faker.date().past(20, TimeUnit.DAYS)));
-		dto.setVersion(2);
-		dto.setVerfuegtAm(Instant.now());
+		LocalDate von = toLocalDate(FAKER.date().past(30, TimeUnit.DAYS));
+		LocalDate bis = toLocalDate(FAKER.date().past(20, TimeUnit.DAYS));
 
-		ZeitabschnittDTO zeitabschnittDTO = new ZeitabschnittDTO(
-			dto.getVon(),
-			dto.getBis(),
-			2,
-			BigDecimal.valueOf(80),
-			70,
-			BigDecimal.valueOf(70),
-			BigDecimal.valueOf(2000),
-			BigDecimal.valueOf(500),
-			BigDecimal.valueOf(300),
-			BigDecimal.valueOf(200),
-			BigDecimal.valueOf(15),
-			BigDecimal.valueOf(23),
-			Zeiteinheit.HOURS
-		);
-
-		dto.setZeitabschnitte(Collections.singletonList(zeitabschnittDTO));
-		dto.setIgnorierteZeitabschnitte(Collections.emptyList());
+		VerfuegungEventDTO dto = VerfuegungEventDTO.newBuilder()
+			.setKind(kindDTO)
+			.setGesuchsteller(gesuchstellerDTO)
+			.setBetreuungsArt(BetreuungsangebotTyp.TAGESFAMILIEN)
+			.setRefnr("1.1.1")
+			.setInstitutionId(UUID.randomUUID().toString())
+			.setVon(von)
+			.setBis(bis)
+			.setVersion(2)
+			.setVerfuegtAm(Instant.now())
+			.setGemeindeBfsNr(FAKER.number().numberBetween(0, 400))
+			.setGemeindeName(FAKER.name().name())
+			.setZeitabschnitte(Arrays.asList(createZeitabschnittDTO(von, bis), createZeitabschnittDTO(von, bis)))
+			.setIgnorierteZeitabschnitte(Collections.singletonList(createZeitabschnittDTO(von, bis)))
+			.build();
 
 		return dto;
+	}
+
+	@Nonnull
+	private GesuchstellerDTO createGesuchstellerDTO() {
+		return GesuchstellerDTO.newBuilder()
+			.setVorname(FAKER.name().firstName())
+			.setNachname(FAKER.name().lastName())
+			.setEmail(FAKER.internet().emailAddress())
+			.build();
+	}
+
+	@Nonnull
+	private KindDTO createKindDTO() {
+		return KindDTO.newBuilder()
+			.setVorname(FAKER.name().firstName())
+			.setNachname(FAKER.name().lastName())
+			.setGeburtsdatum(toLocalDate(FAKER.date().birthday(1, 3)))
+			.build();
+	}
+
+	@Nonnull
+	private ZeitabschnittDTO createZeitabschnittDTO(LocalDate von, LocalDate bis) {
+		return ZeitabschnittDTO.newBuilder()
+			.setVon(von)
+			.setBis(bis)
+			.setVerfuegungNr(2)
+			.setEffektiveBetreuungPct(BigDecimal.valueOf(FAKER.number().randomDouble(2, 0, 1000)))
+			.setAnspruchPct(FAKER.number().randomDigit())
+			.setVerguenstigtPct(BigDecimal.valueOf(FAKER.number().randomDouble(2, 0, 1000)))
+			.setVollkosten(BigDecimal.valueOf(FAKER.number().randomDouble(2, 0, 1000)))
+			.setBetreuungsgutschein(BigDecimal.valueOf(FAKER.number().randomDouble(2, 0, 1000)))
+			.setMinimalerElternbeitrag(BigDecimal.valueOf(FAKER.number().randomDouble(2, 0, 1000)))
+			.setVerguenstigung(BigDecimal.valueOf(FAKER.number().randomDouble(2, 0, 1000)))
+			.setVerfuegteAnzahlZeiteinheiten(BigDecimal.valueOf(FAKER.number().randomDouble(2, 0, 1000)))
+			.setAnspruchsberechtigteAnzahlZeiteinheiten(BigDecimal.valueOf(FAKER.number().randomDouble(2, 0, 1000)))
+			.setZeiteinheit(Zeiteinheit.HOURS)
+			.build();
 	}
 
 	@Nonnull
@@ -133,12 +160,19 @@ class VerfuegungConverterTest {
 			.withProperty("betreuungsArt", is(dto.getBetreuungsArt()))
 			.withProperty("kind", matchesKindDTO(dto.getKind()))
 			.withProperty("gesuchsteller", matchesGesuchstellerDTO(dto.getGesuchsteller()))
-			.withProperty(
-				"zeitabschnitte",
-				is(jsonArray(contains(matchesZeitabschnittDTO(dto.getZeitabschnitte().get(0))))))
-			.withProperty(
-				"ignorierteZeitabschnitte",
-				is(jsonArray(hasSize(dto.getIgnorierteZeitabschnitte().size()))));
+			.where(
+				Verfuegung::getZeitabschnitte,
+				is(jsonArray(containsInAnyOrder(toMatchers(dto.getZeitabschnitte())))))
+			.where(
+				Verfuegung::getIgnorierteZeitabschnitte,
+				is(jsonArray(containsInAnyOrder(toMatchers(dto.getIgnorierteZeitabschnitte())))));
+	}
+
+	@Nonnull
+	private Collection<Matcher<? super JsonNode>> toMatchers(List<ZeitabschnittDTO> zeitabschnitte) {
+		return zeitabschnitte.stream()
+			.map(this::matchesZeitabschnittDTO)
+			.collect(Collectors.toList());
 	}
 
 	@Nonnull
