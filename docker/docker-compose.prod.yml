@@ -48,7 +48,8 @@ services:
       TZ: "Europe/Zurich"
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
-      SCHEMA_REGISTRY_AVRO_COMPATIBILITY_LEVEL: 'forward_transitive'
+      SCHEMA_REGISTRY_AVRO_COMPATIBILITY_LEVEL: 'full_transitive'
+      SCHEMA_REGISTRY_DEBUG: 'true'
 
   keycloak:
     image: quay.io/keycloak/keycloak:7.0.0
