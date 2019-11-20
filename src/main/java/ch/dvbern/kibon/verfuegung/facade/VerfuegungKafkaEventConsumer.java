@@ -26,6 +26,8 @@ import javax.inject.Inject;
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
 import ch.dvbern.kibon.kafka.MessageProcessor;
 import io.smallrye.reactive.messaging.kafka.KafkaMessage;
+import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
+import org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
 @SuppressWarnings("unused")
@@ -41,8 +43,10 @@ public class VerfuegungKafkaEventConsumer {
 	MessageProcessor processor;
 
 	@Incoming("VerfuegungEvents")
+	@Acknowledgment(Strategy.MANUAL)
 	public CompletableFuture<Void> onMessage(@Nonnull KafkaMessage<String, VerfuegungEventDTO> message) {
 
-		return CompletableFuture.runAsync(() -> processor.process(message, eventHandler));
+		return CompletableFuture.runAsync(() -> processor.process(message, eventHandler))
+			.thenCompose(f -> message.ack());
 	}
 }
