@@ -85,6 +85,8 @@ public class VerfuegungService {
 			verfuegung.get(Verfuegung_.version),
 			verfuegung.get(Verfuegung_.verfuegtAm),
 			verfuegung.get(Verfuegung_.betreuungsArt),
+			verfuegung.get(Verfuegung_.gemeindeBfsNr),
+			verfuegung.get(Verfuegung_.gemeindeName),
 			verfuegung.get(Verfuegung_.kind),
 			verfuegung.get(Verfuegung_.gesuchsteller),
 			verfuegung.get(Verfuegung_.zeitabschnitte),
