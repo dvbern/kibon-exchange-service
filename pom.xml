@@ -252,6 +252,10 @@
                                     <name>hibernate.types.print.banner</name>
                                     <value>false</value>
                                 </property>
+                                <property>
+                                    <name>group.id</name>
+                                    <value>${project.version}</value>
+                                </property>
                             </properties>
                         </configuration>
                     </execution>
