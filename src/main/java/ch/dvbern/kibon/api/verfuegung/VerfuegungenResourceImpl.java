@@ -43,6 +43,7 @@ import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.service.VerfuegungService;
 import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Timed;
@@ -67,13 +68,17 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 	@Inject
 	InstitutionService institutionService;
 
-	@SuppressWarnings({ "CdiInjectionPointsInspection", "checkstyle:VisibilityModifier" })
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	ObjectMapper objectMapper;
 
 	@SuppressWarnings({ "checkstyle:VisibilityModifier", "CdiInjectionPointsInspection" })
 	@Inject
 	JsonWebToken jsonWebToken;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	SecurityIdentity identity;
 
 	@GET
 	@Operation(description = "Returns all kiBon Verfuegungen and corresponding institutions.")
@@ -96,15 +101,14 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 		@QueryParam("$filter") @Nullable String filter) {
 
 		String clientName = jsonWebToken.getClaim("clientId");
-		// jsonWebToken.getGroups() is an empty object and does not read from realm_access property.
-		Object realmAccess = jsonWebToken.getClaim("realm_access");
-		String userName = jsonWebToken.getName();
+		Set<String> groups = identity.getRoles();
+		String userName = identity.getPrincipal().getName();
 
 		LOG.info(
-			"Verfuegungen accessed by '{}' with clientName '{}', realm_access '{}', limit '{}' and after_id '{}'",
+			"Verfuegungen accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id '{}'",
 			userName,
 			clientName,
-			realmAccess,
+			groups,
 			limit,
 			afterId);
 
