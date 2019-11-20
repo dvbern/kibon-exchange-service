@@ -278,6 +278,7 @@
                 <version>${surefire-plugin.version}</version>
                 <configuration>
                     <systemProperties>
+                        <hibernate.types.print.banner>false</hibernate.types.print.banner>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                     </systemProperties>
                 </configuration>
