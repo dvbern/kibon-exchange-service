@@ -43,7 +43,8 @@ public abstract class BaseEventHandler<T> {
 		@Nonnull T dto) {
 
 		if (consumedMessageService.alreadyProcessed(eventId)) {
-			LOG.info("Event with UUID '{}' was already retrieved, ignoring it", eventId);
+			LOG.info("Event with UUID '{}' of type '{}' was already retrieved, ignoring it", eventId, eventType);
+
 			return;
 		}
 
