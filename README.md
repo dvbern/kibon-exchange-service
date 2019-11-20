@@ -15,7 +15,7 @@ and `kibon-exchange_db_1`. Sometimes Kafka fails at startup.
 ### Start the Quarkus Application
 Quarkus runs best from a terminal:
 
-`./mvnw compile quarkus:dev -Dhibernate.types.print.banner=false`
+`./mvnw compile quarkus:dev`
 
 This will start Quarkus in Hot Replace mode, migrate the FlyWay schema and then execut the 
 statements in `src/main/resources/import-dev.sql`. Unfortunately, it looks like the execution order is not consistent
@@ -37,7 +37,7 @@ wiped.
 
 To start with a specific profile run with the `quarkus.profile` parameter, e.g.:
 
-`./mvnw compile quarkus:dev -Dquarkus.profile=dev-update -Dhibernate.types.print.banner=false`
+`./mvnw compile quarkus:dev -Dquarkus.profile=dev-update`
 
 ### Port Configuration
 The PostgreSQL database runs on 15432 to avoid conflicts with native installations.
@@ -59,7 +59,7 @@ debug mode, this port is typically already in use. In that case, Quarkus logs "P
 mode".
 
 The Port can be changed by adding the debug property, e.g.:
-`./mvnw compile quarkus:dev -Ddebug=5006 -Dquarkus.profile=dev-with-data -Dhibernate.types.print.banner=false`
+`./mvnw compile quarkus:dev -Ddebug=5006 -Dquarkus.profile=dev-with-data`
 
 The debug with IntelliJ simply add a new `Remote` configuration an attach to the JVM with the debug port.
 
