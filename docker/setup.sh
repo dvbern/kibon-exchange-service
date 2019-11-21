@@ -26,7 +26,7 @@ function createCert() {
   fi
 }
 
-mkdir -p nginx/certs service/certs kafka/logs zookeeper/logs
+mkdir -p nginx/certs service/certs kafka/data kafka/jvmlogs zookeeper/data zookeeper/log zookeeper/jvmlogs
 createCert $1 nginx/certs
 createCert $1 service/certs
 
