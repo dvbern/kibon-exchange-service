@@ -40,10 +40,8 @@ def featureBranchPrefix = "feature"
 def releaseBranchPrefix = "release"
 def hotfixBranchPrefix = "hotfix"
 
-def unix = true
-
 def genericSh = {cmd ->
-	if (Boolean.valueOf(unix)) {
+	if (isUnix()) {
 		sh cmd
 	} else {
 		bat cmd
@@ -54,8 +52,6 @@ if (params.performRelease) {
 	currentBuild.displayName = "Release-${params.releaseversion}-${env.BUILD_NUMBER}"
 
 	node {
-		unix = isUnix()
-
 		stage('Checkout') {
 
 			checkout([
@@ -91,8 +87,6 @@ if (params.performRelease) {
 	}
 } else {
 	node('docker') {
-		unix = unix()
-
 		stage('Checkout') {
 			checkout([
 					$class           : 'GitSCM',
