@@ -40,7 +40,7 @@ def featureBranchPrefix = "feature"
 def releaseBranchPrefix = "release"
 def hotfixBranchPrefix = "hotfix"
 
-def isUnix = isUnix()
+def isUnix = true
 
 def genericSh = {cmd ->
 	if (Boolean.valueOf(isUnix)) {
@@ -54,7 +54,10 @@ if (params.performRelease) {
 	currentBuild.displayName = "Release-${params.releaseversion}-${env.BUILD_NUMBER}"
 
 	node {
+		isUnix = isUnix()
+
 		stage('Checkout') {
+
 			checkout([
 					$class           : 'GitSCM',
 					branches         : [[name: "${developBranchName}"]],
@@ -88,6 +91,8 @@ if (params.performRelease) {
 	}
 } else {
 	node('docker') {
+		isUnix = isUnix()
+
 		stage('Checkout') {
 			checkout([
 					$class           : 'GitSCM',
@@ -104,11 +109,12 @@ if (params.performRelease) {
 			def handleFailures = {error ->
 				if (branch.startsWith(featureBranchPrefix)) {
 					// feature branche failures should only notify the feature owner
-					step([$class                                                         : 'Mailer',
-						  notifyEveryUnstableBuild                                       : true, recipients:
+					step([$class                                                                       : 'Mailer',
+						  notifyEveryUnstableBuild                                                     : true,
+						  recipients                                                                   :
 								  emailextrecipients
-							([[$class:
-									   'RequesterRecipientProvider']]), sendToIndividuals: true])
+										  ([[$class:
+													 'RequesterRecipientProvider']]), sendToIndividuals: true])
 
 				} else {
 					dvbErrorHandling.sendMail(emailRecipients, currentBuild, error)
