@@ -40,20 +40,20 @@ def featureBranchPrefix = "feature"
 def releaseBranchPrefix = "release"
 def hotfixBranchPrefix = "hotfix"
 
-node {
-	def isUnix = isUnix()
+def isUnix = isUnix()
 
-	def genericSh = {cmd ->
-		if (Boolean.valueOf(isUnix)) {
-			sh cmd
-		} else {
-			bat cmd
-		}
+def genericSh = {cmd ->
+	if (Boolean.valueOf(isUnix)) {
+		sh cmd
+	} else {
+		bat cmd
 	}
+}
 
-	if (params.performRelease) {
-		currentBuild.displayName = "Release-${params.releaseversion}-${env.BUILD_NUMBER}"
+if (params.performRelease) {
+	currentBuild.displayName = "Release-${params.releaseversion}-${env.BUILD_NUMBER}"
 
+	node {
 		stage('Checkout') {
 			checkout([
 					$class           : 'GitSCM',
@@ -66,6 +66,7 @@ node {
 		stage('Release') {
 			try {
 				withCredentials([usernamePassword(credentialsId: 'jenkins-github-token', passwordVariable: 'password',
+
 						usernameVariable: 'username')]) {
 					withMaven(jdk: jdkVersion, maven: mvnVersion) {
 						genericSh "mvn -Pdvbern.oss -B jgitflow:release-start " +
@@ -84,61 +85,62 @@ node {
 				throw e
 			}
 		}
-	} else {
-		node('docker') {
-			stage('Checkout') {
-				checkout([
-						$class           : 'GitSCM',
-						branches         : scm.branches,
-						extensions       : scm.extensions + [[$class: 'LocalBranch', localBranch: '']],
-						userRemoteConfigs: scm.userRemoteConfigs
-				])
+	}
+} else {
+	node('docker') {
+		stage('Checkout') {
+			checkout([
+					$class           : 'GitSCM',
+					branches         : scm.branches,
+					extensions       : scm.extensions + [[$class: 'LocalBranch', localBranch: '']],
+					userRemoteConfigs: scm.userRemoteConfigs
+			])
+		}
+
+		String branch = env.BRANCH_NAME.toString()
+		currentBuild.displayName = "${branch}-${pomVersion()}-${env.BUILD_NUMBER}"
+
+		stage('Maven build') {
+			def handleFailures = {error ->
+				if (branch.startsWith(featureBranchPrefix)) {
+					// feature branche failures should only notify the feature owner
+					step([$class                                                         : 'Mailer',
+						  notifyEveryUnstableBuild                                       : true, recipients:
+								  emailextrecipients
+							([[$class:
+									   'RequesterRecipientProvider']]), sendToIndividuals: true])
+
+				} else {
+					dvbErrorHandling.sendMail(emailRecipients, currentBuild, error)
+				}
 			}
 
-			String branch = env.BRANCH_NAME.toString()
-			currentBuild.displayName = "${branch}-${pomVersion()}-${env.BUILD_NUMBER}"
-
-			stage('Maven build') {
-				def handleFailures = {error ->
-					if (branch.startsWith(featureBranchPrefix)) {
-						// feature branche failures should only notify the feature owner
-						step([$class                                                         : 'Mailer',
-							  notifyEveryUnstableBuild: true, recipients: emailextrecipients
-								([[$class:
-										   'RequesterRecipientProvider']]), sendToIndividuals: true])
-
-					} else {
-						dvbErrorHandling.sendMail(emailRecipients, currentBuild, error)
-					}
+			// in develop and master branches attempt to deploy the artifacts, otherwise only run to the verify
+			// phase.
+			def branchSpecificGoal = {
+				def masterGoal = "deploy docker:build docker:push"
+				if (branch.startsWith(masterBranchName)) {
+					return masterGoal
 				}
 
-				// in develop and master branches attempt to deploy the artifacts, otherwise only run to the verify
-				// phase.
-				def branchSpecificGoal = {
-					def masterGoal = "deploy docker:build docker:push"
-					if (branch.startsWith(masterBranchName)) {
-						return masterGoal
-					}
-
-					if (branch.startsWith(developBranchName)) {
-						return masterGoal + " -Ddocker.tag.latest=latest-snapshot"
-					}
-
-					return "verify"
+				if (branch.startsWith(developBranchName)) {
+					return masterGoal + " -Ddocker.tag.latest=latest-snapshot"
 				}
 
-				try {
-					withMaven(jdk: jdkVersion, maven: mvnVersion) {
-						genericSh './mvnw -U -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
-					}
-					if (currentBuild.result == "UNSTABLE") {
-						handleFailures("build is unstable")
-					}
-				} catch (Exception e) {
-					currentBuild.result = "FAILURE"
-					handleFailures(e)
-					throw e
+				return "verify"
+			}
+
+			try {
+				withMaven(jdk: jdkVersion, maven: mvnVersion) {
+					genericSh './mvnw -U -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
 				}
+				if (currentBuild.result == "UNSTABLE") {
+					handleFailures("build is unstable")
+				}
+			} catch (Exception e) {
+				currentBuild.result = "FAILURE"
+				handleFailures(e)
+				throw e
 			}
 		}
 	}
