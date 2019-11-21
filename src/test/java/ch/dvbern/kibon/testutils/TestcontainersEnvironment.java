@@ -22,11 +22,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Destroyed;
+import javax.enterprise.event.Observes;
 
 import com.google.common.collect.ImmutableMap;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -40,6 +45,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  */
 @Testcontainers
 public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleManager {
+
+	private static final Logger LOG = LoggerFactory.getLogger(TestcontainersEnvironment.class);
 
 	private static final String DB_SERVICE = "db_1";
 	private static final int DB_PORT = 5432;
@@ -88,8 +95,20 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 		return systemProps;
 	}
 
+	/**
+	 * @see #terminate(Object)
+	 */
 	@Override
 	public void stop() {
+	}
+
+	/**
+	 * The {@link #stop} method is called before the application is destored. If we stop Kafka in {@link #stop}, then
+	 * the Vert.X Kafka client keeps trying to reconnect to Kafka until it finally times out (after about 90s).
+	 * <p>
+	 * Thus we listen to the @Destroyed event to stop Kafka after the application quit.
+	 */
+	public void terminate(@Observes @Destroyed(ApplicationScoped.class) Object event) {
 		kafka.stop();
 		ENVIRONMENT.stop();
 	}
