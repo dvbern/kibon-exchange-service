@@ -20,8 +20,8 @@ package ch.dvbern.kibon.verfuegung.service;
 import javax.persistence.EntityManager;
 
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
-import ch.dvbern.kibon.testutils.EasyMockExtension;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung;
+import org.easymock.EasyMockExtension;
 import org.easymock.Mock;
 import org.easymock.MockType;
 import org.easymock.TestSubject;

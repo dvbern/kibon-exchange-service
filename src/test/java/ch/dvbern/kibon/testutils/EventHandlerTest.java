@@ -24,6 +24,7 @@ import javax.annotation.Nonnull;
 
 import ch.dvbern.kibon.consumedmessage.ConsumedMessageService;
 import ch.dvbern.kibon.kafka.BaseEventHandler;
+import org.easymock.EasyMockExtension;
 import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
 import org.easymock.MockType;

@@ -23,7 +23,7 @@ import javax.persistence.EntityManager;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.institution.model.Institution;
-import ch.dvbern.kibon.testutils.EasyMockExtension;
+import org.easymock.EasyMockExtension;
 import org.easymock.LogicalOperator;
 import org.easymock.Mock;
 import org.easymock.MockType;
