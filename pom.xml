@@ -103,12 +103,12 @@
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
             <artifactId>kibon-exchange-api-commons</artifactId>
-            <version>1.0.0-rc4</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
             <artifactId>kibon-exchange-api</artifactId>
-            <version>1.0.0-rc4</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.vladmihalcea</groupId>
