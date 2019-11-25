@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2019 DV Bern AG, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package ch.dvbern.kibon.verfuegung.model;
 
 import java.time.LocalDateTime;
@@ -15,6 +32,7 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -32,9 +50,15 @@ import org.hibernate.annotations.Immutable;
 @Immutable
 public class ClientVerfuegung {
 
+	// The hashcode should always return the same value, regardless of entity state transitions.
+	// Since equals only includes the auto-generated 'id', we must provide a constant value.
+	// See https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+	private static final int HASH_CODE = 31;
+
 	@Nonnull
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clientverfuegung_generator")
+	@SequenceGenerator(name = "clientverfuegung_generator", sequenceName = "clientverfuegung_id_seq")
 	@Column(updatable = false, nullable = false)
 	private @NotNull Long id = -1L;
 
@@ -78,7 +102,7 @@ public class ClientVerfuegung {
 
 	@Override
 	public int hashCode() {
-		return 31;
+		return HASH_CODE;
 	}
 
 	@Nonnull

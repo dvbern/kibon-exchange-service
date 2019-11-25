@@ -35,8 +35,8 @@ location / {
     gzip_types      text/plain text/css application/json application/javascript image/svg+xml;
 
     # Reverse proxy for API
-    location ~ ^/api/(.*)$ {
-        proxy_pass https://apiserver/$1;
+    location /api/ {
+        proxy_pass https://apiserver/;
 
         include /etc/nginx/conf.d/include.proxy.backend;
         break;

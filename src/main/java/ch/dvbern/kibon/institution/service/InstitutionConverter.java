@@ -1,25 +1,43 @@
+/*
+ * Copyright (C) 2019 DV Bern AG, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package ch.dvbern.kibon.institution.service;
 
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import ch.dvbern.kibon.exchange.commons.institution.AdresseDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.institution.model.Adresse;
 import ch.dvbern.kibon.institution.model.Institution;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ApplicationScoped
 public class InstitutionConverter {
 
-	@SuppressWarnings("CdiInjectionPointsInspection")
-	@Inject
-	ObjectMapper mapper;
-
 	@Nonnull
 	public Institution create(@Nonnull InstitutionEventDTO dto) {
-		return mapper.convertValue(dto, Institution.class);
+		Institution institution = new Institution();
+		institution.setId(dto.getId());
+		institution.setName(dto.getName());
+		institution.setTraegerschaft(dto.getTraegerschaft());
+
+		update(institution.getAdresse(), dto.getAdresse());
+
+		return institution;
 	}
 
 	public void update(@Nonnull Institution institution, @Nonnull InstitutionEventDTO dto) {

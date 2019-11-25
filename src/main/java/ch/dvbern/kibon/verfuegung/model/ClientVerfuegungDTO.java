@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2019 DV Bern AG, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package ch.dvbern.kibon.verfuegung.model;
 
 import java.time.LocalDate;
@@ -38,6 +55,12 @@ public class ClientVerfuegungDTO {
 	private final BetreuungsangebotTyp betreuungsArt;
 
 	@Nonnull
+	private final Long gemeindeBfsNr;
+
+	@Nonnull
+	private final String gemeindeName;
+
+	@Nonnull
 	private final JsonNode kind;
 
 	@Nonnull
@@ -59,6 +82,8 @@ public class ClientVerfuegungDTO {
 		@Nonnull Integer version,
 		@Nonnull LocalDateTime verfuegtAm,
 		@Nonnull BetreuungsangebotTyp betreuungsArt,
+		@Nonnull Long gemeindeBfsNr,
+		@Nonnull String gemeindeName,
 		@Nonnull JsonNode kind,
 		@Nonnull JsonNode gesuchsteller,
 		@Nonnull JsonNode zeitabschnitte,
@@ -73,6 +98,8 @@ public class ClientVerfuegungDTO {
 		this.version = version;
 		this.verfuegtAm = verfuegtAm;
 		this.betreuungsArt = betreuungsArt;
+		this.gemeindeBfsNr = gemeindeBfsNr;
+		this.gemeindeName = gemeindeName;
 		this.kind = kind;
 		this.gesuchsteller = gesuchsteller;
 		this.zeitabschnitte = zeitabschnitte;
@@ -122,6 +149,16 @@ public class ClientVerfuegungDTO {
 	@Nonnull
 	public BetreuungsangebotTyp getBetreuungsArt() {
 		return betreuungsArt;
+	}
+
+	@Nonnull
+	public Long getGemeindeBfsNr() {
+		return gemeindeBfsNr;
+	}
+
+	@Nonnull
+	public String getGemeindeName() {
+		return gemeindeName;
 	}
 
 	@Nonnull

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2019 DV Bern AG, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package ch.dvbern.kibon.verfuegung.model;
 
 import java.time.LocalDate;
@@ -62,6 +79,14 @@ public class Verfuegung {
 	@Enumerated(EnumType.STRING)
 	private @NotNull BetreuungsangebotTyp betreuungsArt = BetreuungsangebotTyp.KITA;
 
+	@Nonnull
+	@Column(nullable = false, updatable = false)
+	private @NotNull Long gemeindeBfsNr = -1L;
+
+	@Nonnull
+	@Column(nullable = false, updatable = false)
+	private @NotNull String gemeindeName = "";
+
 	@Nullable
 	@Type(type = "jsonb-node")
 	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
@@ -82,6 +107,7 @@ public class Verfuegung {
 	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
 	private @NotNull JsonNode ignorierteZeitabschnitte = null;
 
+	@SuppressWarnings("checkstyle:CyclomaticComplexity")
 	@Override
 	public boolean equals(@Nullable Object o) {
 		if (this == o) {
@@ -102,7 +128,9 @@ public class Verfuegung {
 			getVon().equals(that.getVon()) &&
 			getBis().equals(that.getBis()) &&
 			getVerfuegtAm().equals(that.getVerfuegtAm()) &&
-			getBetreuungsArt() == that.getBetreuungsArt();
+			getBetreuungsArt() == that.getBetreuungsArt() &&
+			getGemeindeBfsNr().equals(that.getGemeindeBfsNr()) &&
+			getGemeindeName().equals(that.getGemeindeName());
 	}
 
 	@Override
@@ -114,7 +142,9 @@ public class Verfuegung {
 			getBis(),
 			getVersion(),
 			getVerfuegtAm(),
-			getBetreuungsArt());
+			getBetreuungsArt(),
+			getGemeindeBfsNr(),
+			getGemeindeName());
 	}
 
 	@Nonnull
@@ -187,6 +217,24 @@ public class Verfuegung {
 
 	public void setBetreuungsArt(@Nonnull BetreuungsangebotTyp betreuungsArt) {
 		this.betreuungsArt = betreuungsArt;
+	}
+
+	@Nonnull
+	public Long getGemeindeBfsNr() {
+		return gemeindeBfsNr;
+	}
+
+	public void setGemeindeBfsNr(@Nonnull Long gemeindeBfsNr) {
+		this.gemeindeBfsNr = gemeindeBfsNr;
+	}
+
+	@Nonnull
+	public String getGemeindeName() {
+		return gemeindeName;
+	}
+
+	public void setGemeindeName(@Nonnull String gemeindeName) {
+		this.gemeindeName = gemeindeName;
 	}
 
 	@Nullable

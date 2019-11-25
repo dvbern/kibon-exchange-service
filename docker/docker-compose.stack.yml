@@ -4,7 +4,6 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:5.3.1
-    # make sure to match the UID:GID of the host (due to volume binding)
     user: "1000"
     networks:
       - kibon_exchange_backbone
@@ -59,6 +58,8 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:7.0.0
+    ports:
+      - "8180:8080"
     networks:
       - kibon_exchange_backbone
     volumes:
@@ -80,39 +81,6 @@ services:
       KEYCLOAK_IMPORT: "/opt/jboss/kibon_realm.json"
       KITADMIN_SECRET: ${KITADMIN_SECRET}
       KIBON_EXCHANGE_SERVICE_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
-
-  service:
-    # activated, because the service crashes at boot when keycloak is not available https://github.com/quarkusio/quarkus/issues/4619
-    restart: on-failure
-    image: docker.dvbern.ch/kibon/exchange-service:${VERSION}
-    networks:
-      - kibon_exchange_backbone
-    depends_on:
-      - kafka
-      - keycloak
-    volumes:
-      - ./service/certs/key.pem:/key.pem:ro
-      - ./service/certs/cert.pem:/cert.pem:ro
-    environment:
-      TZ: "Europe/Zurich"
-      KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_ADDR}:9092"
-      QUARKUS_DATASOURCE_URL: "jdbc:postgresql://${DB_ADDR}:${DB_PORT}/kibon-exchange"
-      QUARKUS_DATASOURCE_PASSWORD: ${QUARKUS_DATASOURCE_PASSWORD}
-      # this requires a trusted certificate: change to public URL passing through netscaler
-      QUARKUS_OIDC_AUTH_SERVER_URL: "http://keycloak:8080/auth/realms/kibon"
-      QUARKUS_OIDC_CREDENTIALS_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
-
-  nginx:
-    image: docker.dvbern.ch/kibon/exchange-nginx:${VERSION}
-    networks:
-      - kibon_exchange_backbone
-    depends_on:
-      - service
-    ports:
-      - "443:443"
-    volumes:
-      - ./nginx/certs/key.pem:/etc/nginx/certs/key.pem:ro
-      - ./nginx/certs/cert.pem:/etc/nginx/certs/cert.pem:ro
 
 networks:
   kibon_exchange_backbone:

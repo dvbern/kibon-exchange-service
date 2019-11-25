@@ -15,19 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.persistence;
+package ch.dvbern.kibon.util;
 
-import javax.persistence.MappedSuperclass;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import org.hibernate.annotations.TypeDef;
+import javax.annotation.Nonnull;
 
-@SuppressWarnings("EmptyClass")
-@TypeDef(name = "json", typeClass = JsonStringType.class)
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@TypeDef(name = "jsonb-node", typeClass = JsonNodeBinaryType.class)
-@MappedSuperclass
-public class TypeDefs {
+public final class LocalDateTimeUtil {
+
+	private LocalDateTimeUtil() {
+		// util
+	}
+
+	@Nonnull
+	public static LocalDateTime of(@Nonnull Instant instant) {
+		 return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+	}
 }

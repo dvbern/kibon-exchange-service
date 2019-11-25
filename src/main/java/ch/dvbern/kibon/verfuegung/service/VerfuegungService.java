@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2019 DV Bern AG, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package ch.dvbern.kibon.verfuegung.service;
 
 import java.util.List;
@@ -21,7 +38,6 @@ import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung_;
 import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Service responsible for {@link Verfuegung} handling.<br>
@@ -30,19 +46,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ApplicationScoped
 public class VerfuegungService {
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	EntityManager em;
 
-	@SuppressWarnings("CdiInjectionPointsInspection")
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
-	ObjectMapper mapper;
+	VerfuegungConverter converter;
 
 	/**
 	 * Stores the verfuegung in response to the verfuegungCreated event.
 	 */
 	@Transactional(TxType.MANDATORY)
 	public void onVerfuegungCreated(@Nonnull VerfuegungEventDTO dto) {
-		Verfuegung verfuegung = mapper.convertValue(dto, Verfuegung.class);
+		Verfuegung verfuegung = converter.create(dto);
 
 		em.persist(verfuegung);
 	}
@@ -68,6 +85,8 @@ public class VerfuegungService {
 			verfuegung.get(Verfuegung_.version),
 			verfuegung.get(Verfuegung_.verfuegtAm),
 			verfuegung.get(Verfuegung_.betreuungsArt),
+			verfuegung.get(Verfuegung_.gemeindeBfsNr),
+			verfuegung.get(Verfuegung_.gemeindeName),
 			verfuegung.get(Verfuegung_.kind),
 			verfuegung.get(Verfuegung_.gesuchsteller),
 			verfuegung.get(Verfuegung_.zeitabschnitte),
