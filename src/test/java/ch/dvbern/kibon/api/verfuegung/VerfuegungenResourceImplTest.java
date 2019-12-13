@@ -102,4 +102,15 @@ class VerfuegungenResourceImplTest {
 			.assertThat()
 			.statusCode(Status.BAD_REQUEST.getStatusCode());
 	}
+
+	@Test
+	public void testGetAllEndpointRequiresAuthorisation() {
+		given()
+			.contentType(ContentType.JSON)
+			.when()
+			.get("v1/verfuegungen")
+			.then()
+			.assertThat()
+			.statusCode(Status.FORBIDDEN.getStatusCode());
+	}
 }
