@@ -111,6 +111,6 @@ class VerfuegungenResourceImplTest {
 			.get("v1/verfuegungen")
 			.then()
 			.assertThat()
-			.statusCode(Status.FORBIDDEN.getStatusCode());
+			.statusCode(Status.UNAUTHORIZED.getStatusCode());
 	}
 }
