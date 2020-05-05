@@ -5,10 +5,10 @@ services:
   db:
     image: postgres:11-alpine
     environment:
-     TZ: "Europe/Zurich"
-     POSTGRES_USER: kibonExchange
-     POSTGRES_PASSWORD: kibonExchange
-     POSTGRES_DB: kibon-exchange
+      TZ: "Europe/Zurich"
+      POSTGRES_USER: kibonExchange
+      POSTGRES_PASSWORD: kibonExchange
+      POSTGRES_DB: kibon-exchange
 
   keycloak:
     image: quay.io/keycloak/keycloak:7.0.0
