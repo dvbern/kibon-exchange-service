@@ -81,7 +81,10 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 	SecurityIdentity identity;
 
 	@GET
-	@Operation(description = "Returns all kiBon Verfuegungen and corresponding institutions.")
+	@Operation(
+		summary = "Returns all kiBon Verfuegungen and corresponding institutions which were made available.",
+		description = "Returns all kiBon Verfuegungen and corresponding institutions, which were made available "
+		+ "to the client in the kiBon application.")
 	@Transactional
 	@NoCache
 	@Nonnull
