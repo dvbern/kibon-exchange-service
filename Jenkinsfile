@@ -40,50 +40,17 @@ def featureBranchPrefix = "feature"
 def releaseBranchPrefix = "release"
 def hotfixBranchPrefix = "hotfix"
 
-def genericSh = {cmd ->
-	if (isUnix()) {
-		sh cmd
-	} else {
-		bat cmd
-	}
-}
-
 if (params.performRelease) {
-	currentBuild.displayName = "Release-${params.releaseversion}-${env.BUILD_NUMBER}"
+	// see https://issues.jenkins-ci.org/browse/JENKINS-53512
+	def releaseVersion = params.releaseversion
+	def nextReleaseVersion = params.nextreleaseversion
 
-	node {
-		stage('Checkout') {
-
-			checkout([
-					$class           : 'GitSCM',
-					branches         : [[name: "${developBranchName}"]],
-					extensions       : [[$class: 'LocalBranch', localBranch: "${developBranchName}"]],
-					userRemoteConfigs: scm.userRemoteConfigs
-			])
-		}
-
-		stage('Release') {
-			try {
-				withCredentials([usernamePassword(credentialsId: 'jenkins-github-token', passwordVariable: 'password',
-
-						usernameVariable: 'username')]) {
-					withMaven(jdk: jdkVersion, maven: mvnVersion) {
-						genericSh "mvn -Pdvbern.oss -B jgitflow:release-start " +
-								"-DreleaseVersion=${params.releaseversion} " +
-								"-DdevelopmentVersion=${params.nextreleaseversion}-SNAPSHOT " +
-								"-Dusername=${username} " +
-								"-Dpassword=${password} " +
-								"jgitflow:release-finish"
-					}
-				}
-			} catch (Exception e) {
-				currentBuild.result = "FAILURE"
-				// notify the team
-				mail(to: emailRecipients, subject: "${env.JOB_NAME} Release failed", body: "See: " +
-						"(<${BUILD_URL}/console|Job>)")
-				throw e
-			}
-		}
+	dvbJGitFlowRelease {
+		releaseversion = releaseVersion
+		nextreleaseversion = nextReleaseVersion
+		emailRecipients
+		jdkVersion
+		credentialsId = 'jenkins-github-token'
 	}
 } else {
 	node('docker') {
@@ -97,7 +64,7 @@ if (params.performRelease) {
 		}
 
 		String branch = env.BRANCH_NAME.toString()
-		currentBuild.displayName = "${branch}-${pomVersion()}-${env.BUILD_NUMBER}"
+		currentBuild.displayName = "${branch}-${dvbMaven.pomVersion()}-${env.BUILD_NUMBER}"
 
 		stage('Maven build') {
 			def handleFailures = {error ->
@@ -132,7 +99,9 @@ if (params.performRelease) {
 
 			try {
 				withMaven(jdk: jdkVersion, maven: mvnVersion) {
-					genericSh './mvnw -U -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
+					dvbUtil.genericSh(
+							'./mvnw -U -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
+					)
 				}
 				if (currentBuild.result == "UNSTABLE") {
 					handleFailures("build is unstable")
@@ -143,10 +112,29 @@ if (params.performRelease) {
 				throw e
 			}
 		}
-	}
-}
 
-def pomVersion() {
-	def pom = readMavenPom file: 'pom.xml'
-	return pom.version
+		if (branch.startsWith(masterBranchName) || branch.startsWith(developBranchName)) {
+			stage('Deploy') {
+				sshPublisher(publishers: [sshPublisherDesc(
+						configName: 'kibon-exchange-dev',
+						transfers: [sshTransfer(
+								cleanRemote: false,
+								excludes: '',
+								execCommand: '/opt/kibon-exchange-service/restart.sh',
+								execTimeout: 120000,
+								flatten: false,
+								makeEmptyDirs: false,
+								noDefaultExcludes: false,
+								patternSeparator: '[, ]+',
+								remoteDirectory: '',
+								remoteDirectorySDF:
+										false,
+								removePrefix: '',
+								sourceFiles: '')],
+						usePromotionTimestamp: false,
+						useWorkspaceInPromotion: false,
+						verbose: false)])
+			}
+		}
+	}
 }
