@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
-import javax.enterprise.context.Destroyed;
 
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.exchange.commons.types.Zeiteinheit;
@@ -210,6 +209,7 @@ class VerfuegungConverterTest {
 				"anspruchsberechtigteAnzahlZeiteinheiten",
 				is(matchesBigDecimal(dto.getAnspruchsberechtigteAnzahlZeiteinheiten())))
 			.where("zeiteinheit", is(jsonText(dto.getZeiteinheit().name())))
+			.where("regelwerk", is(jsonText(dto.getRegelwerk().name())))
 		);
 	}
 
