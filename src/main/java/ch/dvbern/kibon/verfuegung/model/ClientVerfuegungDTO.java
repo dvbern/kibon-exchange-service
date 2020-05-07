@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 import javax.annotation.Nonnull;
 
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
-import ch.dvbern.kibon.exchange.commons.types.Regelwerk;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class ClientVerfuegungDTO {
@@ -73,9 +72,6 @@ public class ClientVerfuegungDTO {
 	@Nonnull
 	private final JsonNode ignorierteZeitabschnitte;
 
-	@Nonnull
-	private Regelwerk regelwerk = Regelwerk.ASIV;
-
 	public ClientVerfuegungDTO(
 		@Nonnull Long id,
 		@Nonnull LocalDateTime availableSince,
@@ -91,8 +87,7 @@ public class ClientVerfuegungDTO {
 		@Nonnull JsonNode kind,
 		@Nonnull JsonNode gesuchsteller,
 		@Nonnull JsonNode zeitabschnitte,
-		@Nonnull JsonNode ignorierteZeitabschnitte,
-		@Nonnull Regelwerk regelwerk
+		@Nonnull JsonNode ignorierteZeitabschnitte
 	) {
 		this.id = id;
 		this.availableSince = availableSince;
@@ -109,7 +104,6 @@ public class ClientVerfuegungDTO {
 		this.gesuchsteller = gesuchsteller;
 		this.zeitabschnitte = zeitabschnitte;
 		this.ignorierteZeitabschnitte = ignorierteZeitabschnitte;
-		this.regelwerk = regelwerk;
 	}
 
 	@Nonnull
@@ -185,10 +179,5 @@ public class ClientVerfuegungDTO {
 	@Nonnull
 	public JsonNode getIgnorierteZeitabschnitte() {
 		return ignorierteZeitabschnitte;
-	}
-
-	@Nonnull
-	public Regelwerk getRegelwerk() {
-		return regelwerk;
 	}
 }
