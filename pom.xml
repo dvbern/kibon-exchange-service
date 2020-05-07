@@ -11,17 +11,21 @@
     <version>1.0.2-SNAPSHOT</version>
 
     <properties>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <surefire-plugin.version>2.22.0</surefire-plugin.version>
-        <maven.compiler.parameters>true</maven.compiler.parameters>
-        <quarkus.version>1.0.1.Final</quarkus.version>
-        <compiler-plugin.version>3.8.1</compiler-plugin.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <quarkus.version>1.0.1.Final</quarkus.version>
         <hamcrest.version>2.2</hamcrest.version>
         <spotify.hamcrest.version>1.1.5</spotify.hamcrest.version>
         <testcontainers.version>1.12.3</testcontainers.version>
+        <compiler-plugin.version>3.8.1</compiler-plugin.version>
+        <surefire-plugin.version>2.22.0</surefire-plugin.version>
+        <kibon.exchange.api.commons.version>1.0.1-SNAPSHOT</kibon.exchange.api.commons.version>
+
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+
         <docker.tag.latest>latest</docker.tag.latest>
     </properties>
 
@@ -101,7 +105,7 @@
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
             <artifactId>kibon-exchange-api-commons</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>${kibon.exchange.api.commons.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
@@ -214,7 +218,15 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-authz-client</artifactId>
-            <version>7.0.0</version>
+            <version>10.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.dvbern.kibon</groupId>
+            <artifactId>kibon-exchange-api-commons</artifactId>
+            <classifier>tests</classifier>
+            <type>test-jar</type>
+            <version>${kibon.exchange.api.commons.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- endregion -->
