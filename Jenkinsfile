@@ -29,7 +29,6 @@ properties([
 		])
 ])
 
-def mvnVersion = "Maven_3.6.1"
 def jdkVersion = "OpenJDK_1.8_222"
 // comma separated list of email addresses of all team members (for notification)
 def emailRecipients = "fabio.heer@dvbern.ch"
@@ -98,7 +97,7 @@ if (params.performRelease) {
 			}
 
 			try {
-				withMaven(jdk: jdkVersion, maven: mvnVersion) {
+				withMaven(jdk: jdkVersion) {
 					dvbUtil.genericSh(
 							'./mvnw -U -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
 					)
@@ -111,6 +110,11 @@ if (params.performRelease) {
 				handleFailures(e)
 				throw e
 			}
+		}
+
+		stage('Dependency Check') {
+			dependencyCheck additionalArguments: '', odcInstallation: 'latest'
+			dependencyCheckPublisher pattern: ''
 		}
 
 		if (branch.startsWith(masterBranchName) || branch.startsWith(developBranchName)) {
