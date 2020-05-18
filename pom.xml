@@ -26,7 +26,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
 
-        <docker.tag.latest>latest</docker.tag.latest>
+        <docker.tag.latest>latest-snapshot</docker.tag.latest>
     </properties>
 
     <dependencyManagement>
