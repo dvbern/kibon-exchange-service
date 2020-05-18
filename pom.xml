@@ -25,6 +25,9 @@
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <maven-compiler-plugin.version>${compiler-plugin.version}</maven-compiler-plugin.version>
+        <maven-compiler-plugin.target>${maven.compiler.source}</maven-compiler-plugin.target>
+        <maven-compiler-plugin.source>${maven.compiler.target}</maven-compiler-plugin.source>
 
         <docker.tag.latest>latest-snapshot</docker.tag.latest>
     </properties>
