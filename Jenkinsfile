@@ -29,9 +29,9 @@ properties([
 		])
 ])
 
-def jdkVersion = "OpenJDK_1.8_222"
+def jdk = "OpenJDK_11.0.4"
 // comma separated list of email addresses of all team members (for notification)
-def emailRecipients = "fabio.heer@dvbern.ch"
+def recipients = "fabio.heer@dvbern.ch"
 
 def masterBranchName = "master"
 def developBranchName = "develop"
@@ -47,8 +47,8 @@ if (params.performRelease) {
 	dvbJGitFlowRelease {
 		releaseversion = releaseVersion
 		nextreleaseversion = nextReleaseVersion
-		emailRecipients
-		jdkVersion
+		emailRecipients = recipients
+		jdkVersion = jdk
 		credentialsId = 'jenkins-github-token'
 	}
 } else {
@@ -69,15 +69,14 @@ if (params.performRelease) {
 			def handleFailures = {error ->
 				if (branch.startsWith(featureBranchPrefix)) {
 					// feature branche failures should only notify the feature owner
-					step([$class                                                                       : 'Mailer',
-						  notifyEveryUnstableBuild                                                     : true,
-						  recipients                                                                   :
-								  emailextrecipients
-										  ([[$class:
-													 'RequesterRecipientProvider']]), sendToIndividuals: true])
+					step([
+							$class                  : 'Mailer',
+							notifyEveryUnstableBuild: true,
+							recipients              : emailextrecipients([[$class: 'RequesterRecipientProvider']]),
+							sendToIndividuals       : true])
 
 				} else {
-					dvbErrorHandling.sendMail(emailRecipients, currentBuild, error)
+					dvbErrorHandling.sendMail(recipients, currentBuild, error)
 				}
 			}
 
@@ -97,7 +96,7 @@ if (params.performRelease) {
 			}
 
 			try {
-				withMaven(jdk: jdkVersion) {
+				withMaven(jdk: jdk) {
 					dvbUtil.genericSh(
 							'./mvnw -U -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
 					)
