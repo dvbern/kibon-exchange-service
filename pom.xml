@@ -17,7 +17,7 @@
         <quarkus.version>1.4.2.Final</quarkus.version>
         <hamcrest.version>2.2</hamcrest.version>
         <spotify.hamcrest.version>1.1.5</spotify.hamcrest.version>
-        <testcontainers.version>1.12.3</testcontainers.version>
+        <testcontainers.version>1.14.2</testcontainers.version>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <surefire-plugin.version>2.22.1</surefire-plugin.version>
         <kibon.exchange.api.commons.version>1.1.0</kibon.exchange.api.commons.version>
@@ -122,7 +122,7 @@
         <dependency>
             <groupId>com.vladmihalcea</groupId>
             <artifactId>hibernate-types-52</artifactId>
-            <version>2.5.0</version>
+            <version>2.9.10</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -213,19 +213,19 @@
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
-            <version>4.1</version>
+            <version>4.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-authz-client</artifactId>
-            <version>10.0.0</version>
+            <version>10.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -302,7 +302,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.31.0</version>
+                <version>0.33.0</version>
                 <configuration>
                     <imagePullPolicy>always</imagePullPolicy>
                     <skipPush>false</skipPush>
