@@ -84,8 +84,6 @@ services:
       KIBON_EXCHANGE_SERVICE_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
 
   service:
-    # activated, because the service crashes at boot when keycloak is not available https://github.com/quarkusio/quarkus/issues/4619
-    restart: on-failure
     image: docker.dvbern.ch/kibon/exchange-service:${VERSION}
     networks:
       - kibon_exchange_backbone
@@ -103,6 +101,8 @@ services:
       QUARKUS_DATASOURCE_PASSWORD: ${QUARKUS_DATASOURCE_PASSWORD}
       # this requires a trusted certificate: change to public URL passing through netscaler
       QUARKUS_OIDC_AUTH_SERVER_URL: "http://keycloak:8080/auth/realms/kibon"
+      # we have to wait until keycloak is up and running
+      QUARKUS_OIDC_CONNECTION_DELAY: "30s"
       QUARKUS_OIDC_CREDENTIALS_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
 
   nginx:
