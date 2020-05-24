@@ -109,6 +109,7 @@ public class VerfuegungConverter {
 			.put("verguenstigung", zeitabschnitt.getVerguenstigung())
 			.put("verfuegteAnzahlZeiteinheiten", zeitabschnitt.getVerfuegteAnzahlZeiteinheiten())
 			.put("anspruchsberechtigteAnzahlZeiteinheiten", zeitabschnitt.getAnspruchsberechtigteAnzahlZeiteinheiten())
-			.put("zeiteinheit", zeitabschnitt.getZeiteinheit().name());
+			.put("zeiteinheit", zeitabschnitt.getZeiteinheit().name())
+			.put("regelwerk", zeitabschnitt.getRegelwerk().name());
 	}
 }

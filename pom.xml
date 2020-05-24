@@ -8,21 +8,28 @@
     </parent>
     <groupId>ch.dvbern.kibon</groupId>
     <artifactId>kibon-exchange-service</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
 
     <properties>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <surefire-plugin.version>2.22.0</surefire-plugin.version>
-        <maven.compiler.parameters>true</maven.compiler.parameters>
-        <quarkus.version>1.0.1.Final</quarkus.version>
-        <compiler-plugin.version>3.8.1</compiler-plugin.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <quarkus.version>1.4.2.Final</quarkus.version>
         <hamcrest.version>2.2</hamcrest.version>
         <spotify.hamcrest.version>1.1.5</spotify.hamcrest.version>
-        <testcontainers.version>1.12.3</testcontainers.version>
-        <docker.tag.latest>latest</docker.tag.latest>
+        <testcontainers.version>1.14.2</testcontainers.version>
+        <compiler-plugin.version>3.8.1</compiler-plugin.version>
+        <surefire-plugin.version>2.22.1</surefire-plugin.version>
+        <kibon.exchange.api.commons.version>1.1.0</kibon.exchange.api.commons.version>
+
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven-compiler-plugin.version>${compiler-plugin.version}</maven-compiler-plugin.version>
+        <maven-compiler-plugin.target>${maven.compiler.source}</maven-compiler-plugin.target>
+        <maven-compiler-plugin.source>${maven.compiler.target}</maven-compiler-plugin.source>
+
+        <docker.tag.latest>latest-snapshot</docker.tag.latest>
     </properties>
 
     <dependencyManagement>
@@ -83,6 +90,10 @@
             <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-logging-sentry</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>annotations</artifactId>
             <version>3.0.1u2</version>
@@ -101,31 +112,21 @@
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
             <artifactId>kibon-exchange-api-commons</artifactId>
-            <version>1.0.0</version>
+            <version>${kibon.exchange.api.commons.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
             <artifactId>kibon-exchange-api</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.vladmihalcea</groupId>
             <artifactId>hibernate-types-52</artifactId>
-            <version>2.5.0</version>
+            <version>2.9.10</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-jpamodelgen</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jakarta.xml.bind-api</artifactId>
-                    <groupId>jakarta.xml.bind</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- region testing -->
@@ -134,12 +135,6 @@
             <artifactId>testcontainers</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -162,12 +157,6 @@
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jaxb-api</artifactId>
-                    <groupId>javax.xml.bind</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -202,19 +191,27 @@
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
-            <version>4.1</version>
+            <version>4.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-authz-client</artifactId>
-            <version>7.0.0</version>
+            <version>10.0.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.dvbern.kibon</groupId>
+            <artifactId>kibon-exchange-api-commons</artifactId>
+            <classifier>tests</classifier>
+            <type>test-jar</type>
+            <version>${kibon.exchange.api.commons.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- endregion -->
@@ -283,7 +280,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.31.0</version>
+                <version>0.33.0</version>
                 <configuration>
                     <imagePullPolicy>always</imagePullPolicy>
                     <skipPush>false</skipPush>
@@ -299,6 +296,9 @@
                                     <tag>${docker.tag.latest}</tag>
                                     <tag>${project.version}</tag>
                                 </tags>
+                                <args>
+                                    <BUILD_VERSION>${project.version}</BUILD_VERSION>
+                                </args>
                             </build>
                         </image>
                         <image>

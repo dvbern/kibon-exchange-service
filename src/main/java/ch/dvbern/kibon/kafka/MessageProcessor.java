@@ -17,6 +17,7 @@
 
 package ch.dvbern.kibon.kafka;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,12 +28,11 @@ import javax.transaction.Transactional;
 
 import ch.dvbern.kibon.exchange.commons.util.EventUtil;
 import ch.dvbern.kibon.util.LocalDateTimeUtil;
-import io.smallrye.reactive.messaging.kafka.KafkaMessage;
-import io.smallrye.reactive.messaging.kafka.MessageHeaders;
+import io.smallrye.reactive.messaging.kafka.KafkaRecord;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.time.Instant.ofEpochMilli;
 
 @ApplicationScoped
 public class MessageProcessor {
@@ -42,29 +42,29 @@ public class MessageProcessor {
 	@Transactional
 	@SuppressWarnings("PMD.AvoidCatchingThrowable")
 	public <T, H extends BaseEventHandler<T>> void process(
-		@Nonnull KafkaMessage<String, T> message,
+		@Nonnull KafkaRecord<String, T> message,
 		@Nonnull H handler) {
 
 		try {
 			String key = message.getKey();
-			MessageHeaders headers = message.getHeaders();
+			Headers headers = message.getHeaders();
 
-			Optional<String> eventIdOpt = headers.getOneAsString(EventUtil.MESSAGE_HEADER_EVENT_ID);
-			if (!eventIdOpt.isPresent()) {
+			Optional<String> eventIdOpt = getHeaderValue(headers, EventUtil.MESSAGE_HEADER_EVENT_ID);
+			if (eventIdOpt.isEmpty()) {
 				LOG.warn("Skipping Kafka message with key = {}, eventId header was missing", key);
 
 				return;
 			}
 
-			Optional<String> eventTypeOpt = headers.getOneAsString(EventUtil.MESSAGE_HEADER_EVENT_TYPE);
-			if (!eventTypeOpt.isPresent()) {
+			Optional<String> eventTypeOpt = getHeaderValue(headers, EventUtil.MESSAGE_HEADER_EVENT_TYPE);
+			if (eventTypeOpt.isEmpty()) {
 				LOG.warn("Skipping Kafka message with key = {}, eventType header was missing", key);
 
 				return;
 			}
 
 			UUID eventId = UUID.fromString(eventIdOpt.get());
-			LocalDateTime eventTime = LocalDateTimeUtil.of(ofEpochMilli(message.getTimestamp()));
+			LocalDateTime eventTime = LocalDateTimeUtil.of(message.getTimestamp());
 
 			T eventDTO = message.getPayload();
 
@@ -72,5 +72,12 @@ public class MessageProcessor {
 		} catch (Throwable t) {
 			LOG.error("Error in message processing", t);
 		}
+	}
+
+	@Nonnull
+	private Optional<String> getHeaderValue(@Nonnull Headers headers, @Nonnull String key) {
+		return Optional.ofNullable(headers.lastHeader(key))
+			.map(Header::value)
+			.map(value -> new String(value, StandardCharsets.UTF_8));
 	}
 }
