@@ -60,7 +60,7 @@ services:
   keycloak:
     # Unfortunatley, scriptimport does not work with keyclaok > 7.0.0 - https://issues.redhat.com/browse/KEYCLOAK-12198
     # use keycloak 7.0.0 to initialise the database, then upgrade to 10.0.0
-    image: quay.io/keycloak/keycloak:10.0.0
+    image: quay.io/keycloak/keycloak:10.0.1
     networks:
       - kibon_exchange_backbone
     volumes:
@@ -104,6 +104,9 @@ services:
       # we have to wait until keycloak is up and running
       QUARKUS_OIDC_CONNECTION_DELAY: "30s"
       QUARKUS_OIDC_CREDENTIALS_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
+      QUARKUS_LOG_SENTRY: "true"
+      QUARKUS_LOG_SENTRY_DSN:
+      QUARKUS_LOG_SENTRY_ENVIRONMENT:
 
   nginx:
     image: docker.dvbern.ch/kibon/exchange-nginx:${VERSION}

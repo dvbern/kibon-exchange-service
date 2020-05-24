@@ -15,7 +15,8 @@
 #
 ###
 FROM fabric8/java-alpine-openjdk11-jre
-ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Dhibernate.types.print.banner=false"
+ARG BUILD_VERSION
+ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Dquarkus.log.sentry.release=$BUILD_VERSION -Djava.util.logging.manager=org.jboss.logmanager.LogManager  -Dhibernate.types.print.banner=false"
 ENV AB_ENABLED=jmx_exporter
 
 RUN apk update \

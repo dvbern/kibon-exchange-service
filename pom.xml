@@ -90,6 +90,10 @@
             <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-logging-sentry</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>annotations</artifactId>
             <version>3.0.1u2</version>
@@ -314,6 +318,9 @@
                                     <tag>${docker.tag.latest}</tag>
                                     <tag>${project.version}</tag>
                                 </tags>
+                                <args>
+                                    <BUILD_VERSION>${project.version}</BUILD_VERSION>
+                                </args>
                             </build>
                         </image>
                         <image>
