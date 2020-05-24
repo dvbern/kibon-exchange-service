@@ -37,7 +37,7 @@ class BaseEventHandlerTest {
 
 	@Nonnull
 	private BaseEventHandler<String> createHandler(boolean throwOnProcessEvent) {
-		BaseEventHandler<String> handler = new BaseEventHandler<String>() {
+		BaseEventHandler<String> handler = new BaseEventHandler<>() {
 			@Override
 			protected void processEvent(
 				@Nonnull UUID eventId,

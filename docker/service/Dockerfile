@@ -14,7 +14,7 @@
 # docker run -i --rm -p 8080:8080 kibon-exchange/service
 #
 ###
-FROM fabric8/java-alpine-openjdk8-jre
+FROM fabric8/java-alpine-openjdk11-jre
 ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Dhibernate.types.print.banner=false"
 ENV AB_ENABLED=jmx_exporter
 
