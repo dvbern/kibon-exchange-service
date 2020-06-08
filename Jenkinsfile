@@ -112,10 +112,16 @@ if (params.performRelease) {
 		}
 
 		stage('Dependency Check') {
-			// dependencyCheck requires java in the PATH.
-			withEnv(["PATH+JDK=${tool 'OpenJDK_11.0.4'}/bin"]) {
-				dependencyCheck additionalArguments: '', odcInstallation: 'latest'
-				dependencyCheckPublisher pattern: ''
+			try {
+				// dependencyCheck requires java in the PATH.
+				withEnv(["PATH+JDK=${tool 'OpenJDK_11.0.4'}/bin"]) {
+					sh "echo $PATH"
+					dependencyCheck additionalArguments: '', odcInstallation: 'latest'
+					dependencyCheckPublisher pattern: ''
+				}
+			} catch (Exception e) {
+				currentBuild.result = "UNSTABLE"
+				handleFailures("Dependency Check failed: " + e.toString())
 			}
 		}
 
