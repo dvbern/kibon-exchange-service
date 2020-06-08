@@ -112,8 +112,11 @@ if (params.performRelease) {
 		}
 
 		stage('Dependency Check') {
-			dependencyCheck additionalArguments: '', odcInstallation: 'latest'
-			dependencyCheckPublisher pattern: ''
+			// dependencyCheck requires java in the PATH.
+			withEnv(["PATH+JDK=${tool 'OpenJDK_11.0.4'}/bin"]) {
+				dependencyCheck additionalArguments: '', odcInstallation: 'latest'
+				dependencyCheckPublisher pattern: ''
+			}
 		}
 
 		if (branch.startsWith(masterBranchName) || branch.startsWith(developBranchName)) {
