@@ -98,7 +98,7 @@ if (params.performRelease) {
 			try {
 				withMaven(jdk: jdk) {
 					dvbUtil.genericSh(
-							'./mvnw -U -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
+							'./mvnw -U -B -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
 					)
 				}
 				if (currentBuild.result == "UNSTABLE") {
