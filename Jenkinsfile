@@ -114,7 +114,7 @@ if (params.performRelease) {
 		stage('Dependency Check') {
 			try {
 				// dependencyCheck requires java in the PATH.
-				withEnv(["PATH+JDK=${tool 'OpenJDK_11.0.4'}/bin"]) {
+				withEnv(["JAVA_HOME=${tool 'OpenJDK_11.0.4'}", "PATH+JDK=${JAVA_HOME}/bin"]) {
 					sh "echo $PATH"
 					dependencyCheck additionalArguments: '', odcInstallation: 'latest'
 					dependencyCheckPublisher pattern: ''
