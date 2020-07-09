@@ -55,36 +55,6 @@ location / {
         add_header Content-Security-Policy "$cspDefault; $cspStyle; $cspFont; $cspImg; script-src 'self' 'unsafe-eval' 'unsafe-inline'" always;
         break;
    }
-
-#    # Reverse proxy for Monitoring
-#    location /monitoring {
-#        proxy_pass https://apiserver/monitoring/$1;
-#
-#        include /etc/nginx/conf.d/include.proxy.backend;
-#
-#        # Require basic auth
-#        include /etc/nginx/conf.d/include.basic_auth;
-#
-#        # JavaMelody contains unsafe inline scripts, we allow them only for this location
-#        add_header Content-Security-Policy "$cspDefault; $cspStyle; $cspImg; script-src 'self' 'unsafe-eval' 'unsafe-inline'" always;
-#        break;
-#   }
-
-#    # Reverse proxy for User Tracking
-#    location /piwik/ {
-#        proxy_pass https://piwik.dvbern.ch/;
-#
-#        include /etc/nginx/conf.d/include.proxy.dvbern;
-#        break;
-#   }
-
-#    # Reverse proxy for Error Tracking
-#    location /sentry/ {
-#        proxy_pass https://sentry.dvbern.ch/;
-#
-#        include /etc/nginx/conf.d/include.proxy.dvbern;
-#        break;
-#    }
 }
 
 access_log /var/log/nginx/access.log main if=$log_ua;
