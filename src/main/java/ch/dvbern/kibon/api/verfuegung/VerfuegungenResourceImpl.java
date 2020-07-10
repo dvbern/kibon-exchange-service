@@ -35,7 +35,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import ch.dvbern.kibon.exchange.api.institution.model.InstitutionDTO;
-import ch.dvbern.kibon.exchange.api.verfuegung.VerfuegungenResource;
 import ch.dvbern.kibon.exchange.api.verfuegung.model.ws.VerfuegungDTO;
 import ch.dvbern.kibon.exchange.api.verfuegung.model.ws.VerfuegungenDTO;
 import ch.dvbern.kibon.institution.service.InstitutionService;
@@ -49,14 +48,16 @@ import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/v1/verfuegungen")
+@Path("/verfuegungen")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class VerfuegungenResourceImpl implements VerfuegungenResource {
+public class VerfuegungenResourceImpl {
 
 	private static final Logger LOG = LoggerFactory.getLogger(VerfuegungenResourceImpl.class);
 
@@ -84,11 +85,14 @@ public class VerfuegungenResourceImpl implements VerfuegungenResource {
 	@Operation(
 		summary = "Returns all kiBon Verfuegungen and corresponding institutions which were made available.",
 		description = "Returns all kiBon Verfuegungen and corresponding institutions, which were made available "
-		+ "to the client in the kiBon application.")
+			+ "to the client in the kiBon application.")
+	@SecurityRequirement(name = "OAuth2", scopes = "user")
+	@APIResponse(responseCode = "200", name = "VerfuegungenDTO")
+	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
+	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
 	@Transactional
 	@NoCache
 	@Nonnull
-	@Override
 	@RolesAllowed("user")
 	@Timed(name = "requestTimer",
 		description = "A measure of how long it takes to load Verfuegungen",
