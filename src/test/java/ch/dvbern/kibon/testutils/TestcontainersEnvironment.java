@@ -46,8 +46,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleManager {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TestcontainersEnvironment.class);
-
 	private static final String DB_SERVICE = "db_1";
 	private static final int DB_PORT = 5432;
 

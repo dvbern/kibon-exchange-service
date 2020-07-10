@@ -51,7 +51,12 @@ When changing the ports, don't forget to update `src/main/resources/application.
 | quarkus.keycloak.auth-server-url | http://localhost:8180/auth | Keycloak Server |
 | quarkus.datasource.url | jdbc:postgresql://localhost:15432/kibon-exchange | Postgres Database |
 | kafka.bootstrap.servers | localhost:9092 | Kafka Server |
-| quarkus.http.port |8380| Application Port, e.g. http://localhost:8380/v1/verfuegungen |
+| quarkus.http.port |8380| Application Port, e.g. http://localhost:8380/api/v1/verfuegungen |
+
+### Swagger-UI and Keycloak integration
+In development mode, swagger-ui is integrated under /api/v1/swagger-ui. To interact with the REST endpoints, 
+authorization is required. Thus a full development stack should be started (see above). Additionally,
+read in ./dev-proxy/README.md how to create and start a proxy. 
 
 # Debugging the Quarkus Application
 Quarkus allows remote debugging on default Port 5005. When another application like a WildFly is already running in
@@ -72,7 +77,7 @@ In production, an nginx-based proxy is set in front of the quarkus application a
 `https://my-domain/auth` is proxied to keycloak while `https://my-domain/api/` is proxied to quarkus.
 
 At the moment the quarkus application has only been tested in JVM mode. 
-To create the docker images for exchange-service and the nginx-proxy run `./mvwn install docker:build`.
+To create the docker images for exchange-service and the nginx-proxy run `./mvnw install docker:build`.
 
 To start a production-like environment, create the certificates for nginx and the quarkus application using 
 `docker/setup.sh`. Update `docker/.env` with host IP address and credentials.
