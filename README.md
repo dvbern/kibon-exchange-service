@@ -77,7 +77,7 @@ In production, an nginx-based proxy is set in front of the quarkus application a
 `https://my-domain/auth` is proxied to keycloak while `https://my-domain/api/` is proxied to quarkus.
 
 At the moment the quarkus application has only been tested in JVM mode. 
-To create the docker images for exchange-service and the nginx-proxy run `./mvwn install docker:build`.
+To create the docker images for exchange-service and the nginx-proxy run `./mvnw install docker:build`.
 
 To start a production-like environment, create the certificates for nginx and the quarkus application using 
 `docker/setup.sh`. Update `docker/.env` with host IP address and credentials.
