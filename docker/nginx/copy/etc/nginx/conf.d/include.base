@@ -8,7 +8,9 @@ client_body_timeout 300s;
 # Security Headers
 # See https://securityheaders.com/
 set $cspDefault "default-src 'self'";
-set $cspScript  "script-src 'self' piwik.dvbern.ch";
+# the sha value is for swagger-ui. It will likely fail with quarkus updates. Never versions of swagger-ui should not
+# require csp exceptions though: https://github.com/swagger-api/swagger-ui/issues/4187
+set $cspScript  "script-src 'self' piwik.dvbern.ch 'sha256-mzuPeIRLdZ6QFxxZPLDbOc0jQxXVUFMjiZBJhZduI/U='";
 set $cspStyle   "style-src 'self' 'unsafe-inline'";
 set $cspFont    "font-src 'self' data:";
 set $cspImg     "img-src 'self' piwik.dvbern.ch * data: blob:";
@@ -35,8 +37,8 @@ location / {
     gzip_types      text/plain text/css application/json application/javascript image/svg+xml;
 
     # Reverse proxy for API
-    location /api/ {
-        proxy_pass https://apiserver/;
+    location /api/v1/ {
+        proxy_pass https://apiserver;
 
         include /etc/nginx/conf.d/include.proxy.backend;
         break;
@@ -55,36 +57,6 @@ location / {
         add_header Content-Security-Policy "$cspDefault; $cspStyle; $cspFont; $cspImg; script-src 'self' 'unsafe-eval' 'unsafe-inline'" always;
         break;
    }
-
-#    # Reverse proxy for Monitoring
-#    location /monitoring {
-#        proxy_pass https://apiserver/monitoring/$1;
-#
-#        include /etc/nginx/conf.d/include.proxy.backend;
-#
-#        # Require basic auth
-#        include /etc/nginx/conf.d/include.basic_auth;
-#
-#        # JavaMelody contains unsafe inline scripts, we allow them only for this location
-#        add_header Content-Security-Policy "$cspDefault; $cspStyle; $cspImg; script-src 'self' 'unsafe-eval' 'unsafe-inline'" always;
-#        break;
-#   }
-
-#    # Reverse proxy for User Tracking
-#    location /piwik/ {
-#        proxy_pass https://piwik.dvbern.ch/;
-#
-#        include /etc/nginx/conf.d/include.proxy.dvbern;
-#        break;
-#   }
-
-#    # Reverse proxy for Error Tracking
-#    location /sentry/ {
-#        proxy_pass https://sentry.dvbern.ch/;
-#
-#        include /etc/nginx/conf.d/include.proxy.dvbern;
-#        break;
-#    }
 }
 
 access_log /var/log/nginx/access.log main if=$log_ua;

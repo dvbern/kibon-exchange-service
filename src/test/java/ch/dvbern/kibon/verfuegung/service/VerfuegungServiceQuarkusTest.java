@@ -44,13 +44,13 @@ import static org.hamcrest.Matchers.is;
 class VerfuegungServiceQuarkusTest {
 
 	@Inject
-	private VerfuegungService verfuegungService;
+	VerfuegungService verfuegungService;
 
 	@Inject
-	private ClientService clientService;
+	ClientService clientService;
 
 	@Inject
-	private TransactionHelper tx;
+	TransactionHelper tx;
 
 	// Instead of using the @Transactional annotation or @TransactionalQuarkusTest we start the transactions manually.
 	// Otherwise only one transaction for the whole test is started, such that the second call of on verfuegungService

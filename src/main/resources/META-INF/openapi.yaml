@@ -1,0 +1,21 @@
+---
+info:
+  title: kiBon Exchange Service API
+  version: "1.0"
+
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      description: This API uses OAuth 2 with the client credentials grant flow.
+      flows:
+        clientCredentials:
+          tokenUrl: /../auth/realms/kibon/protocol/openid-connect/token
+          scopes:
+            user: allow access to verfuegugen
+            familyportal: allow accessing institutions with dataset for family portal Bern
+  responses:
+    Unauthorized:
+      description: Authentication information is missing or invalid
+    Forbidden:
+      description: Access denied

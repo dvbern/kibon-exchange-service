@@ -65,20 +65,21 @@ if (params.performRelease) {
 		String branch = env.BRANCH_NAME.toString()
 		currentBuild.displayName = "${branch}-${dvbMaven.pomVersion()}-${env.BUILD_NUMBER}"
 
-		stage('Maven build') {
-			def handleFailures = {error ->
-				if (branch.startsWith(featureBranchPrefix)) {
-					// feature branche failures should only notify the feature owner
-					step([
-							$class                  : 'Mailer',
-							notifyEveryUnstableBuild: true,
-							recipients              : emailextrecipients([[$class: 'RequesterRecipientProvider']]),
-							sendToIndividuals       : true])
+		def handleFailures = {error ->
+			if (branch.startsWith(featureBranchPrefix)) {
+				// feature branche failures should only notify the feature owner
+				step([
+						$class                  : 'Mailer',
+						notifyEveryUnstableBuild: true,
+						recipients              : emailextrecipients([[$class: 'RequesterRecipientProvider']]),
+						sendToIndividuals       : true])
 
-				} else {
-					dvbErrorHandling.sendMail(recipients, currentBuild, error)
-				}
+			} else {
+				dvbErrorHandling.sendMail(recipients, currentBuild, error)
 			}
+		}
+
+		stage('Maven build') {
 
 			// in develop and master branches attempt to deploy the artifacts, otherwise only run to the verify
 			// phase.
@@ -98,7 +99,7 @@ if (params.performRelease) {
 			try {
 				withMaven(jdk: jdk) {
 					dvbUtil.genericSh(
-							'./mvnw -U -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
+							'./mvnw -U -B -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
 					)
 				}
 				if (currentBuild.result == "UNSTABLE") {
@@ -108,14 +109,6 @@ if (params.performRelease) {
 				currentBuild.result = "FAILURE"
 				handleFailures(e)
 				throw e
-			}
-		}
-
-		stage('Dependency Check') {
-			// dependencyCheck requires java in the PATH.
-			withEnv(["PATH+JDK=${tool 'OpenJDK_11.0.4'}/bin"]) {
-				dependencyCheck additionalArguments: '', odcInstallation: 'latest'
-				dependencyCheckPublisher pattern: ''
 			}
 		}
 
