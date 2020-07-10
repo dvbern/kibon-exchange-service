@@ -13,6 +13,7 @@ components:
           tokenUrl: /../auth/realms/kibon/protocol/openid-connect/token
           scopes:
             user: allow access to verfuegugen
+            familyportal: allow accessing institutions with dataset for family portal Bern
   responses:
     Unauthorized:
       description: Authentication information is missing or invalid
