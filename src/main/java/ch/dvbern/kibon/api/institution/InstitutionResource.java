@@ -50,6 +50,14 @@ import org.jboss.resteasy.annotations.cache.NoCache;
 @Consumes(MediaType.APPLICATION_JSON)
 public class InstitutionResource {
 
+	/**
+	 * This endpoint is just a stub to provide API documentation for an upcoming API, used by by company Internezzo to
+	 * to implement a new version of
+	 * <a href="https://www.fambe.sites.be.ch/fambe_sites/de/index/kitas_tagesfamilienfinden/kitas_tagesfamilienfinden/kitas_tagesfamilienfinden.html">Familienportal</a>.
+	 * <p>
+	 * The actualy API will have to get additional data from the kiBon institutions (stammdaten), with some changes
+	 * about opening hours and addresses.
+	 */
 	@GET
 	@Path("/familyportal")
 	@Operation(
@@ -75,6 +83,7 @@ public class InstitutionResource {
 		return dto;
 	}
 
+	@SuppressWarnings("checkstyle:MagicNumber")
 	@Nonnull
 	private FamilyPortalInstitutionDTO createStub1() {
 		FamilyPortalInstitutionDTO institution = new FamilyPortalInstitutionDTO();
@@ -102,6 +111,7 @@ public class InstitutionResource {
 		return institution;
 	}
 
+	@SuppressWarnings("checkstyle:MagicNumber")
 	@Nonnull
 	private KontaktAngabenDTO createKontaktAngabenDV() {
 		KontaktAngabenDTO dto = new KontaktAngabenDTO();
