@@ -17,9 +17,9 @@ Quarkus runs best from a terminal:
 
 `./mvnw compile quarkus:dev`
 
-This will start Quarkus in Hot Replace mode, migrate the FlyWay schema and then execut the 
+This will start Quarkus in Hot Replace mode, migrate the FlyWay schema and then execute the 
 statements in `src/main/resources/import-dev.sql`. Unfortunately, it looks like the execution order is not consistent
-(maybe both started asynchronously?). Combining both, import scritps and FlyWay migrations is not properly supported
+(maybe both started asynchronously?). Combining both, import scripts and FlyWay migrations is not properly supported
 and may result in random crashes.
 
 There are a couple of other profiles defined in application.propperties.
@@ -54,7 +54,7 @@ When changing the ports, don't forget to update `src/main/resources/application.
 | quarkus.http.port |8380| Application Port, e.g. http://localhost:8380/api/v1/verfuegungen |
 
 ### Swagger-UI and Keycloak integration
-In development mode, swagger-ui is integrated under /api/v1/swagger-ui. To interact with the REST endpoints, 
+Swagger-ui is integrated under /api/v1/swagger-ui. To interact with the REST endpoints, 
 authorization is required. Thus a full development stack should be started (see above). Additionally,
 read in ./dev-proxy/README.md how to create and start a proxy. 
 
@@ -74,7 +74,7 @@ The docker/docker-compose.yml file is intended for local development,
 where quarkus is directly started through maven.
 
 In production, an nginx-based proxy is set in front of the quarkus application and keycloak. 
-`https://my-domain/auth` is proxied to keycloak while `https://my-domain/api/` is proxied to quarkus.
+`https://my-domain/auth/` is proxied to keycloak while `https://my-domain/api/v1/` is proxied to quarkus.
 
 At the moment the quarkus application has only been tested in JVM mode. 
 To create the docker images for exchange-service and the nginx-proxy run `./mvnw install docker:build`.
