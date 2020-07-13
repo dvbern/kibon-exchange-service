@@ -1,6 +1,6 @@
 # kiBon Exchange Service
 
-## Development Environement Setup
+## Development Environment Setup
 
 ### Prepare the Environment
 There are several services which must be running before the Quarkus application is started:
