@@ -37,7 +37,7 @@ wiped.
 
 To start with a specific profile run with the `quarkus.profile` parameter, e.g.:
 
-`./mvnw compile quarkus:dev -Dquarkus.profile=dev-update`
+`./mvnw compile quarkus:dev -Dquarkus.profile=dev-with-data -Pdevelopment-mode`
 
 ### Port Configuration
 The PostgreSQL database runs on 15432 to avoid conflicts with native installations.
