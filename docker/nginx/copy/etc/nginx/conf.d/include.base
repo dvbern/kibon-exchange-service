@@ -36,6 +36,15 @@ location / {
     gzip_proxied    any;
     gzip_types      text/plain text/css application/json application/javascript image/svg+xml;
 
+    # some redirects to maintain compatibilty with previous deployments
+    location = /api/health {
+       return 301 /api/v1/health;
+    }
+    location = /api/openapi {
+       return 301 /api/v1/openapi;
+    }
+
+
     # Reverse proxy for API
     location /api/v1/ {
         proxy_pass https://apiserver;
