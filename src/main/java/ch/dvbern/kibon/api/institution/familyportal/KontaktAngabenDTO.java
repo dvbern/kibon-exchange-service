@@ -20,7 +20,7 @@ package ch.dvbern.kibon.api.institution.familyportal;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import ch.dvbern.kibon.exchange.api.institution.model.AdresseDTO;
+import ch.dvbern.kibon.exchange.api.common.institution.AdresseDTO;
 
 public class KontaktAngabenDTO extends AdresseDTO {
 

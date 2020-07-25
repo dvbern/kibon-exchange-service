@@ -34,9 +34,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import ch.dvbern.kibon.exchange.api.institution.model.InstitutionDTO;
-import ch.dvbern.kibon.exchange.api.verfuegung.model.ws.VerfuegungDTO;
-import ch.dvbern.kibon.exchange.api.verfuegung.model.ws.VerfuegungenDTO;
+import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
+import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungDTO;
+import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungenDTO;
 import ch.dvbern.kibon.institution.service.InstitutionService;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.service.VerfuegungService;

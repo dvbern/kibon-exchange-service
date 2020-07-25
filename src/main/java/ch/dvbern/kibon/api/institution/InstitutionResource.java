@@ -37,7 +37,7 @@ import ch.dvbern.kibon.api.institution.familyportal.AltersKategorie;
 import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalDTO;
 import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalInstitutionDTO;
 import ch.dvbern.kibon.api.institution.familyportal.KontaktAngabenDTO;
-import ch.dvbern.kibon.exchange.api.verfuegung.model.BetreuungsAngebot;
+import ch.dvbern.kibon.exchange.api.common.verfuegung.BetreuungsAngebot;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.Operation;

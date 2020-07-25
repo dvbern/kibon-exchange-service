@@ -35,7 +35,7 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
-import ch.dvbern.kibon.exchange.api.institution.model.InstitutionDTO;
+import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.institution.model.Adresse;
 import ch.dvbern.kibon.institution.model.Adresse_;
