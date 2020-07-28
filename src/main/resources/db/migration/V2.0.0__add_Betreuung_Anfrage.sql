@@ -33,3 +33,72 @@ CREATE INDEX clientbetreuunganfrage_idx1
 
 CREATE INDEX betreuunganfrage_idx1
 	ON betreuunganfrage(institutionid);
+
+CREATE FUNCTION betreuunganfrage_insert() RETURNS TRIGGER
+	SECURITY DEFINER
+	LANGUAGE plpgsql
+AS
+$$
+BEGIN
+	INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id, since)
+		(SELECT nextval('clientbetreuunganfrage_id_seq'), c.active, c.clientname, c.institutionid, new.id,
+				c.grantedsince
+		 FROM client c
+		 WHERE c.institutionid = new.institutionid);
+	RETURN new;
+END;
+$$;
+
+CREATE TRIGGER betreuunganfrage_insert
+	AFTER INSERT
+	ON betreuunganfrage
+	FOR EACH ROW
+EXECUTE PROCEDURE betreuunganfrage_insert();
+-- endregion
+
+-- region new client trigger
+
+CREATE FUNCTION clientbetreuunganfrage_insert() RETURNS TRIGGER
+	SECURITY DEFINER
+	LANGUAGE plpgsql
+AS
+$$
+BEGIN
+	INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id, since)
+		(SELECT nextval('clientbetreuunganfrage_id_seq'), new.active, new.clientname, new.institutionid, ba.id, new
+		.grantedsince
+		 FROM betreuunganfrage ba
+		 WHERE ba.institutionid = new.institutionid
+		 ORDER BY new.grantedsince, ba.id);
+	RETURN new;
+END;
+$$;
+
+CREATE TRIGGER clientbetreuunganfrage_insert
+	AFTER INSERT
+	ON client
+	FOR EACH ROW
+EXECUTE PROCEDURE clientbetreuunganfrage_insert();
+-- endregion
+
+-- region toggle active flag
+
+CREATE FUNCTION clientbetreuunganfrage_active_toggle() RETURNS TRIGGER
+	SECURITY DEFINER
+	LANGUAGE plpgsql
+AS
+$$
+BEGIN
+	UPDATE clientbetreuunganfrage
+	SET active = new.active
+	WHERE client_clientname = new.clientname AND client_institutionid = new.institutionid;
+	RETURN new;
+END;
+$$;
+
+CREATE TRIGGER clientbetreuunganfrage_active_toggle
+	AFTER UPDATE
+	ON client
+	FOR EACH ROW
+EXECUTE PROCEDURE clientbetreuunganfrage_active_toggle();
+-- endregion
