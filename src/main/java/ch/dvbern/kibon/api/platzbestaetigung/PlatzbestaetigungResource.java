@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.api.platzbesteatigung;
+package ch.dvbern.kibon.api.platzbestaetigung;
 
 import java.util.List;
 import java.util.Set;
@@ -54,9 +54,9 @@ import org.slf4j.LoggerFactory;
 @Path("/platzbestaetigung")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class PlatzbesteatigungResource {
+public class PlatzbestaetigungResource {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PlatzbesteatigungResource.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PlatzbestaetigungResource.class);
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
