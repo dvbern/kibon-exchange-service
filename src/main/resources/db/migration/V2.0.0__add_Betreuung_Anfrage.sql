@@ -6,7 +6,6 @@ CREATE TABLE betreuunganfrage (
 	institutionid            VARCHAR(255) NOT NULL,
 	periodevon                      DATE         NOT NULL,
 	periodebis                      DATE         NOT NULL,
-	verfuegtam               TIMESTAMP    NOT NULL,
 	betreuungsart            VARCHAR(255) NOT NULL,
 	kind                     JSONB        NOT NULL,
 	gesuchsteller            JSONB        NOT NULL,

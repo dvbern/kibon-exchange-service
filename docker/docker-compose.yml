@@ -4,6 +4,8 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:5.3.1
+    networks:
+      - kibon-exchange
     ports:
       - "2181:2181"
     environment:
@@ -12,6 +14,8 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:5.3.1
+    networks:
+      - kibon-exchange
     depends_on:
       - zookeeper
     ports:
@@ -29,6 +33,8 @@ services:
   schema-registry:
     image: confluentinc/cp-schema-registry:5.3.1
     hostname: schema-registry
+    networks:
+      - kibon-exchange
     depends_on:
       - zookeeper
       - kafka
@@ -43,6 +49,8 @@ services:
 
   db:
     image: postgres:11-alpine
+    networks:
+      - kibon-exchange
     ports:
       - "15432:5432"
     environment:
@@ -53,6 +61,8 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:7.0.0
+    networks:
+      - kibon-exchange
     ports:
       - "8180:8080"
       - "8543:8443"
