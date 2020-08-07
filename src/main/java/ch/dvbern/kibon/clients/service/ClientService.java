@@ -100,7 +100,7 @@ public class ClientService {
 	}
 
 	@Nonnull
-	private Optional<Client> find(@Nonnull ClientId id) {
+	public Optional<Client> find(@Nonnull ClientId id) {
 		return Optional.ofNullable(em.find(Client.class, id));
 	}
 }

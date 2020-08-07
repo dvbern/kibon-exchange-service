@@ -18,6 +18,7 @@
 package ch.dvbern.kibon.api.platzbestaetigung;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,14 +28,23 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
+import ch.dvbern.kibon.clients.model.Client;
+import ch.dvbern.kibon.clients.model.ClientId;
+import ch.dvbern.kibon.clients.service.ClientService;
 import ch.dvbern.kibon.exchange.api.common.platzbestaetigung.BetreuungAnfrageDTO;
+import ch.dvbern.kibon.exchange.api.common.platzbestaetigung.BetreuungDTO;
+import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungEventDTO;
+import ch.dvbern.kibon.platzbestaetigung.facade.BetreuungKafkaEventProducer;
 import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.platzbestaetigung.service.BetreuungAnfrageService;
 import ch.dvbern.kibon.platzbestaetigung.service.filter.ClientBetreuungAnfrageFilter;
@@ -58,6 +68,8 @@ public class PlatzbestaetigungResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PlatzbestaetigungResource.class);
 
+	private static final int UNAUTHORIZED = 401;
+
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	BetreuungAnfrageService betreuungAnfrageService;
@@ -73,6 +85,14 @@ public class PlatzbestaetigungResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	SecurityIdentity identity;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	BetreuungKafkaEventProducer betreuungProducer;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	ClientService clientService;
 
 	@GET
 	@Operation(
@@ -126,5 +146,43 @@ public class PlatzbestaetigungResource {
 	@Nonnull
 	private BetreuungAnfrageDTO convert(@Nonnull ClientBetreuungAnfrageDTO model) {
 		return objectMapper.convertValue(model, BetreuungAnfrageDTO.class);
+	}
+
+	@PUT
+	@Operation(summary = "Put a Betreuung into Kafka for Kibon.",
+		description = "This service allow to put a BetreuungDTO into the kafka Topic for kiBon")
+	@SecurityRequirement(name = "OAuth2", scopes = "user")
+	@APIResponse(responseCode = "200", name = "Accepted")
+	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
+	@Path("/betreuung")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@RolesAllowed("user")
+	public Response sendBetreuungToKafka(
+		@Nonnull @NotNull BetreuungDTO betreuungDTO
+	){
+		String clientName = jsonWebToken.getClaim("clientId");
+		Set<String> groups = identity.getRoles();
+		String userName = identity.getPrincipal().getName();
+
+		LOG.info(
+			"Betreuung sended by '{}' with clientName '{}', roles '{}'",
+			userName,
+			clientName,
+			groups);
+
+		BetreuungEventDTO betreuungAnfrageEventDTO = objectMapper.convertValue(betreuungDTO,
+			BetreuungEventDTO.class);
+
+		Optional<Client> client = clientService.find(new ClientId(clientName,
+			betreuungAnfrageEventDTO.getInstitutionId()));
+
+		if(!client.isPresent() || !client.get().getActive()){
+			return Response.status(UNAUTHORIZED).build();
+		}
+
+		//send Event an kafka
+		betreuungProducer.process(betreuungAnfrageEventDTO);
+		return Response.ok().build();
 	}
 }
