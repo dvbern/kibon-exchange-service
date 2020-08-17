@@ -24,17 +24,17 @@ import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
 import ch.dvbern.kibon.kafka.BaseEventHandler;
 import ch.dvbern.kibon.kafka.EventType;
 import ch.dvbern.kibon.platzbestaetigung.service.BetreuungAnfrageService;
-import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static ch.dvbern.kibon.kafka.EventType.BETREUUNG_ANFRAGE_ADDED;
 
 @ApplicationScoped
-public class BetreuungAnfrageEventHandler  extends BaseEventHandler<BetreuungAnfrageEventDTO> {
+public class BetreuungAnfrageEventHandler extends BaseEventHandler<BetreuungAnfrageEventDTO> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BetreuungAnfrageEventHandler.class);
 
