@@ -7,7 +7,7 @@ There are several services which must be running before the Quarkus application 
 Postgres, Kafka and eventually Keycloak.
 
 Postgres and Kafka can be started from the project root with
- `docker-compose -f docker/docker-compose.yml --project-path docker --project-directory docker up -d`
+ `docker-compose -f docker/docker-compose.yml --project-directory docker up -d`
 
  or from the `./docker` directory with `docker-compose up -d`.
 
