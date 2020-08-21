@@ -89,6 +89,7 @@ public class InstitutionService {
 		return resultList;
 	}
 
+	@Nonnull
 	private TypedQuery<InstitutionDTO> getInstitutionDTOTypedQuery(
 		@Nonnull Set<String> institutionIds) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -124,7 +125,7 @@ public class InstitutionService {
 		@Nonnull String institutionId,
 		@Nonnull String clientName) {
 		// Allow institution to be acessed only when it belongs to Client
-		if (institutionId.isEmpty() || !isClientInstitution(institutionId, clientName)) {
+		if (institutionId.isBlank() || !isClientInstitution(institutionId, clientName)) {
 
 			return new InstitutionDTO();
 		}
@@ -136,7 +137,7 @@ public class InstitutionService {
 		return result;
 	}
 
-	private boolean isClientInstitution(String institutionId, String clientName) {
+	private boolean isClientInstitution(@Nonnull String institutionId, @Nonnull String clientName) {
 		Client client = em.find(Client.class, new ClientId(clientName, institutionId));
 
 		return client != null;

@@ -32,8 +32,8 @@ import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import ch.dvbern.kibon.api.institution.familyportal.AltersKategorie;
@@ -112,6 +112,7 @@ public class InstitutionResource {
 	}
 
 	@GET
+	@Path("{id}")
 	@Operation(
 		summary = "Returns institution for the give id.",
 		description = "Returns institution for the give id to the client application.")
@@ -129,7 +130,7 @@ public class InstitutionResource {
 	public InstitutionDTO get(
 		@Parameter(description = "Institutions are identified with their IDs. Use this "
 			+ "parameter to get the Institution with given id.")
-		@QueryParam("id") @Nonnull String id) {
+		@PathParam("id") @Nonnull String id) {
 
 		String clientName = jsonWebToken.getClaim("clientId");
 		Set<String> groups = identity.getRoles();
