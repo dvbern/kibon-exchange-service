@@ -120,6 +120,7 @@ public class InstitutionResource {
 	@APIResponse(responseCode = "200", name = "InstitutionDTO")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
+	@APIResponse(responseCode = "404", ref = "#/components/responses/NotFound")
 	@Transactional
 	@NoCache
 	@Nonnull

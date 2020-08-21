@@ -80,12 +80,15 @@ EXECUTE PROCEDURE client_active_toggle();
 INSERT INTO client (clientname, grantedsince, institutionid, active)
 VALUES ('kitAdmin', now(), '1', TRUE),
 	   ('kitAdmin', now() - INTERVAL '3 days', '2', TRUE),
+	   ('kitAdmin', now() - INTERVAL '4 days', '3', FALSE),
 	   ('KiD', now() - INTERVAL '5 days', '2', FALSE),
 	   ('CSE', now() - INTERVAL '3 days', '1', TRUE);
 
 INSERT INTO institution (id, adresszusatz, hausnummer, land, ort, plz, strasse, name, traegerschaft)
 VALUES ('1', NULL, '21', 'CH', 'Bern', '3006', 'Nussbaumstrasse', 'DV Kids', 'DV Bern AG'),
-	   ('2', NULL, '21', 'CH', 'Bern', '3022', 'Nussbaumstrasse', 'DV Juniors', 'DV Bern AG');
+	   ('2', NULL, '21', 'CH', 'Bern', '3022', 'Nussbaumstrasse', 'DV Juniors', 'DV Bern AG'),
+       ('3', NULL, '21', 'CH', 'Bern', '3022', 'Nussbaumstrasse', 'DV Teens', 'DV Bern AG'),
+       ('4', NULL, '21', 'CH', 'Bern', '3022', 'Nussbaumstrasse', 'DV Tweens', 'DV Bern AG');
 
 INSERT INTO verfuegung (betreuungsart, bis, gesuchsteller, ignoriertezeitabschnitte, institutionid, gemeindebfsnr,
 						gemeindename, kind, refnr, verfuegtam, version, von, zeitabschnitte)

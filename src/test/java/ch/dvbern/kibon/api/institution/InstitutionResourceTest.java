@@ -26,17 +26,12 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
 import static com.spotify.hamcrest.jackson.JsonMatchers.isJsonStringMatching;
-import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
-import static com.spotify.hamcrest.jackson.JsonMatchers.jsonInt;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTestResource(TestcontainersEnvironment.class)
 @QuarkusTest
@@ -48,13 +43,52 @@ class InstitutionResourceTest {
 			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
 			.when()
-			.get("/institutions?id=1")
+			.get("/institutions/1")
 			.then()
 			.assertThat()
 			.statusCode(Status.OK.getStatusCode())
 			.body(isJsonStringMatching(jsonObject()
-				.where("institution", is(jsonObject()
-					.where("id", is(jsonInt(equalTo(1))))))
+				.where("id", is(jsonText(equalTo("1"))))
 			));
+	}
+
+	@Test
+	void testGetInstitutionByIdWithUnknownID() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.get("/institutions/unknown")
+			.then()
+			.assertThat()
+			.statusCode(Status.NOT_FOUND.getStatusCode());
+	}
+
+	@Test
+	void testGetInstitutionByIdWithoutActiveClientPermission() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.get("/institutions/3")
+			.then()
+			.assertThat()
+			// Zhe Institution & client exist, FORBIDDEN shall be returned when the client is no longer
+			// permitted to access the institution.
+			.statusCode(Status.FORBIDDEN.getStatusCode());
+	}
+
+	@Test
+	void testGetInstitutionByIdWithoutClientPermission() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.get("/institutions/4")
+			.then()
+			.assertThat()
+			// Even though the Institution actually exists, NOT_FOUND shall be returned when the client lacks
+			// permission
+			.statusCode(Status.NOT_FOUND.getStatusCode());
 	}
 }
