@@ -23,6 +23,7 @@ import ch.dvbern.kibon.testutils.TestcontainersEnvironment;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static com.spotify.hamcrest.jackson.JsonMatchers.isJsonStringMatching;
@@ -37,6 +38,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
+@Disabled
 @QuarkusTestResource(TestcontainersEnvironment.class)
 @QuarkusTest
 class VerfuegungenResourceImplTest {
