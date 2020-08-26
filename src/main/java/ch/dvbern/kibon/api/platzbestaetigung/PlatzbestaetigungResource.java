@@ -41,7 +41,7 @@ import ch.dvbern.kibon.clients.service.ClientService;
 import ch.dvbern.kibon.exchange.api.common.platzbestaetigung.BetreuungAnfrageDTO;
 import ch.dvbern.kibon.exchange.api.common.platzbestaetigung.BetreuungDTO;
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungEventDTO;
-import ch.dvbern.kibon.platzbestaetigung.facade.BetreuungKafkaEventProducer;
+import ch.dvbern.kibon.platzbestaetigung.facade.PlatzbestaetigungKafkaEventProducer;
 import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.platzbestaetigung.service.BetreuungAnfrageService;
 import ch.dvbern.kibon.platzbestaetigung.service.filter.ClientBetreuungAnfrageFilter;
@@ -85,7 +85,7 @@ public class PlatzbestaetigungResource {
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
-	BetreuungKafkaEventProducer betreuungProducer;
+	PlatzbestaetigungKafkaEventProducer platzbestaetigungProducer;
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
@@ -151,11 +151,10 @@ public class PlatzbestaetigungResource {
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
 	@APIResponse(responseCode = "200", name = "Accepted")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
-	@Path("/betreuung")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed("user")
-	public Response sendBetreuungToKafka(
+	public Response sendPlatzbestaetigungBetreuungToKafka(
 		@Nonnull @NotNull BetreuungDTO betreuungDTO
 	){
 		String clientName = jsonWebToken.getClaim("clientId");
@@ -180,7 +179,7 @@ public class PlatzbestaetigungResource {
 		}
 */
 		//send Event an kafka
-		betreuungProducer.process(betreuungEventDTO);
+		platzbestaetigungProducer.process(betreuungEventDTO);
 		return Response.ok().build();
 	}
 }
