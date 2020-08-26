@@ -25,6 +25,7 @@ import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -34,6 +35,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
@@ -121,25 +124,38 @@ public class InstitutionService {
 	}
 
 	@Nonnull
-	public InstitutionDTO get(
+	public Response get(
 		@Nonnull String institutionId,
 		@Nonnull String clientName) {
-		// Allow institution to be acessed only when it belongs to Client
-		if (institutionId.isBlank() || !isClientInstitution(institutionId, clientName)) {
+		if (institutionId.isBlank()) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
 
-			return new InstitutionDTO();
+		Client client = em.find(Client.class, new ClientId(clientName, institutionId));
+
+		if (client == null) {
+			// Institution not found for given client
+			return Response.status(Status.NOT_FOUND).build();
+		}
+
+		if(!client.getActive()) {
+			// Client not active (forbidden) for given institution
+			return Response.status(Status.FORBIDDEN).build();
 		}
 
 		TypedQuery<InstitutionDTO> q = getInstitutionDTOTypedQuery(Collections.singleton(institutionId));
+		InstitutionDTO result;
 
-		InstitutionDTO result = q.getSingleResult();
+		try {
+			result = q.getSingleResult();
+		} catch (NoResultException e) {
+			// Institution does not exist
+			// It should not happen
+			return Response.status(Status.INTERNAL_SERVER_ERROR)
+				.entity("IntitutionDTO not found for ID: " + institutionId)
+				.build();
+		}
 
-		return result;
-	}
-
-	private boolean isClientInstitution(@Nonnull String institutionId, @Nonnull String clientName) {
-		Client client = em.find(Client.class, new ClientId(clientName, institutionId));
-
-		return client != null;
+		return Response.ok(result).build();
 	}
 }

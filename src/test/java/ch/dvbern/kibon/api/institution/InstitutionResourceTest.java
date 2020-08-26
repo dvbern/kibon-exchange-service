@@ -73,7 +73,7 @@ class InstitutionResourceTest {
 			.get("/institutions/3")
 			.then()
 			.assertThat()
-			// Zhe Institution & client exist, FORBIDDEN shall be returned when the client is no longer
+			// The Institution & client exist, FORBIDDEN shall be returned when the client is no longer
 			// permitted to access the institution.
 			.statusCode(Status.FORBIDDEN.getStatusCode());
 	}

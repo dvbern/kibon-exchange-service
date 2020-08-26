@@ -35,15 +35,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import ch.dvbern.kibon.api.institution.familyportal.AltersKategorie;
 import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalDTO;
 import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalInstitutionDTO;
 import ch.dvbern.kibon.api.institution.familyportal.KontaktAngabenDTO;
-import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.verfuegung.BetreuungsAngebot;
 import ch.dvbern.kibon.institution.service.InstitutionService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.MetricUnits;
@@ -65,10 +64,6 @@ public class InstitutionResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	InstitutionService institutionService;
-
-	@SuppressWarnings("checkstyle:VisibilityModifier")
-	@Inject
-	ObjectMapper objectMapper;
 
 	@SuppressWarnings({ "checkstyle:VisibilityModifier", "CdiInjectionPointsInspection" })
 	@Inject
@@ -128,7 +123,7 @@ public class InstitutionResource {
 	@Timed(name = "requestTimer",
 		description = "A measure of how long it takes to load an Institution",
 		unit = MetricUnits.MILLISECONDS)
-	public InstitutionDTO get(
+	public Response get(
 		@Parameter(description = "Institutions are identified with their IDs. Use this "
 			+ "parameter to get the Institution with given id.")
 		@PathParam("id") @Nonnull String id) {
@@ -144,9 +139,7 @@ public class InstitutionResource {
 			groups,
 			id);
 
-		InstitutionDTO institutionDTO = institutionService.get(id, clientName);
-
-		return institutionDTO;
+		return institutionService.get(id, clientName);
 	}
 
 	@SuppressWarnings("checkstyle:MagicNumber")
