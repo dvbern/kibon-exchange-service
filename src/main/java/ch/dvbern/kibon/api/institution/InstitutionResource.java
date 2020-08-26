@@ -36,11 +36,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import ch.dvbern.kibon.api.institution.familyportal.AltersKategorie;
 import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalDTO;
 import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalInstitutionDTO;
 import ch.dvbern.kibon.api.institution.familyportal.KontaktAngabenDTO;
+import ch.dvbern.kibon.clients.model.Client;
+import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.verfuegung.BetreuungsAngebot;
 import ch.dvbern.kibon.institution.service.InstitutionService;
 import io.quarkus.security.identity.SecurityIdentity;
@@ -139,7 +142,22 @@ public class InstitutionResource {
 			groups,
 			id);
 
-		return institutionService.get(id, clientName);
+		Client client = institutionService.getClient(id, clientName);
+
+		if (client == null) {
+			// Institution not found for given client
+			return Response.status(Status.NOT_FOUND).build();
+		}
+
+		if(!client.getActive()) {
+			// Client not active (forbidden) for given institution
+			return Response.status(Status.FORBIDDEN).build();
+		}
+
+		// Get InstitutionDTO
+		InstitutionDTO institutionDTO = institutionService.get(id, clientName);
+
+		return Response.ok(institutionDTO).build();
 	}
 
 	@SuppressWarnings("checkstyle:MagicNumber")

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -35,8 +36,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
@@ -123,25 +122,19 @@ public class InstitutionService {
 			.setParameter(idsParam, institutionIds);
 	}
 
+	@Nullable
+	public Client getClient(@Nonnull String institutionId, @Nonnull String clientName) {
+		if (institutionId.isBlank()) {
+			return null;
+		}
+
+		return em.find(Client.class, new ClientId(clientName, institutionId));
+	}
+
 	@Nonnull
-	public Response get(
+	public InstitutionDTO get(
 		@Nonnull String institutionId,
 		@Nonnull String clientName) {
-		if (institutionId.isBlank()) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-
-		Client client = em.find(Client.class, new ClientId(clientName, institutionId));
-
-		if (client == null) {
-			// Institution not found for given client
-			return Response.status(Status.NOT_FOUND).build();
-		}
-
-		if(!client.getActive()) {
-			// Client not active (forbidden) for given institution
-			return Response.status(Status.FORBIDDEN).build();
-		}
 
 		TypedQuery<InstitutionDTO> q = getInstitutionDTOTypedQuery(Collections.singleton(institutionId));
 		InstitutionDTO result;
@@ -151,11 +144,9 @@ public class InstitutionService {
 		} catch (NoResultException e) {
 			// Institution does not exist
 			// It should not happen
-			return Response.status(Status.INTERNAL_SERVER_ERROR)
-				.entity("IntitutionDTO not found for ID: " + institutionId)
-				.build();
+			return new InstitutionDTO();
 		}
 
-		return Response.ok(result).build();
+		return result;
 	}
 }
