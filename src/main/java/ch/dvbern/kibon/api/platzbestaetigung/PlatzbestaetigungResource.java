@@ -18,6 +18,7 @@
 package ch.dvbern.kibon.api.platzbestaetigung;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import ch.dvbern.kibon.clients.model.Client;
+import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.clients.service.ClientService;
 import ch.dvbern.kibon.exchange.api.common.platzbestaetigung.BetreuungAnfrageDTO;
 import ch.dvbern.kibon.exchange.api.common.platzbestaetigung.BetreuungDTO;
@@ -65,7 +68,7 @@ public class PlatzbestaetigungResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PlatzbestaetigungResource.class);
 
-	//private static final int UNAUTHORIZED = 401;
+	private static final int UNAUTHORIZED = 401;
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
@@ -170,14 +173,13 @@ public class PlatzbestaetigungResource {
 		BetreuungEventDTO betreuungEventDTO = objectMapper.convertValue(betreuungDTO,
 			BetreuungEventDTO.class);
 
-		//Todo temporary deactivated for testing Kafka need to be activated again
-		/*Optional<Client> client = clientService.find(new ClientId(clientName,
+		Optional<Client> client = clientService.find(new ClientId(clientName,
 			betreuungEventDTO.getInstitutionId()));
 
 		if(!client.isPresent() || !client.get().getActive()){
 			return Response.status(UNAUTHORIZED).build();
 		}
-*/
+
 		//send Event an kafka
 		platzbestaetigungProducer.process(betreuungEventDTO);
 		return Response.ok().build();
