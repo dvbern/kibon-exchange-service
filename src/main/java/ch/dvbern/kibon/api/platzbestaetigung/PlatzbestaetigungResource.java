@@ -154,6 +154,7 @@ public class PlatzbestaetigungResource {
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
 	@APIResponse(responseCode = "200", name = "Accepted")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
+	@APIResponse(responseCode = "500", ref = "#/components/responses/Unauthorized")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed("user")
@@ -181,7 +182,12 @@ public class PlatzbestaetigungResource {
 		}
 
 		//send Event an kafka
-		platzbestaetigungProducer.process(betreuungEventDTO);
-		return Response.ok().build();
+		try {
+			platzbestaetigungProducer.process(betreuungEventDTO);
+			return Response.ok().build();
+		}
+		catch (IllegalStateException e){
+			return Response.serverError().build();  //500
+		}
 	}
 }

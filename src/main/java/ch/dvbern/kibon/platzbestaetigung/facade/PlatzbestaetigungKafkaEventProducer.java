@@ -20,13 +20,13 @@ import org.eclipse.microprofile.reactive.messaging.Message;
 import static ch.dvbern.kibon.exchange.commons.util.EventUtil.MESSAGE_HEADER_EVENT_TYPE;
 
 @ApplicationScoped
-public class PlatzbestaetigungKafkaEventProducer {
+public class PlatzbestaetigungKafkaEventProducer{
 
 	@Inject
 	@Channel("PlatzbestaetigungBetreuungEvents")
 	private Emitter<BetreuungEventDTO> platzbestaetigungBetreuungEvents;
 
-	public void process(BetreuungEventDTO betreuungEventDTO) {
+	public void process(BetreuungEventDTO betreuungEventDTO) throws IllegalStateException{
 		String key = betreuungEventDTO.getRefnr();
 		String eventType = "PlatzbestaetigungBetreuung";
 
