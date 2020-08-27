@@ -19,3 +19,5 @@ components:
       description: Authentication information is missing or invalid
     Forbidden:
       description: Access denied
+    NotFound:
+      description: Requested resource does not exist

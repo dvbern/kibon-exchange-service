@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -35,6 +36,8 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import ch.dvbern.kibon.clients.model.Client;
+import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.institution.model.Adresse;
@@ -80,6 +83,16 @@ public class InstitutionService {
 			return Collections.emptyList();
 		}
 
+		TypedQuery<InstitutionDTO> q = getInstitutionDTOTypedQuery(institutionIds);
+
+		List<InstitutionDTO> resultList = q.getResultList();
+
+		return resultList;
+	}
+
+	@Nonnull
+	private TypedQuery<InstitutionDTO> getInstitutionDTOTypedQuery(
+		@Nonnull Set<String> institutionIds) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<InstitutionDTO> query = cb.createQuery(InstitutionDTO.class);
 		Root<Institution> root = query.from(Institution.class);
@@ -104,11 +117,24 @@ public class InstitutionService {
 
 		query.where(idPredicate);
 
-		TypedQuery<InstitutionDTO> q = em.createQuery(query)
+		return em.createQuery(query)
 			.setParameter(idsParam, institutionIds);
+	}
 
-		List<InstitutionDTO> resultList = q.getResultList();
+	@Nullable
+	public Client getClient(@Nonnull String institutionId, @Nonnull String clientName) {
+		if (institutionId.isBlank()) {
+			return null;
+		}
 
-		return resultList;
+		return em.find(Client.class, new ClientId(clientName, institutionId));
+	}
+
+	@Nonnull
+	public InstitutionDTO get(@Nonnull String institutionId) {
+
+		TypedQuery<InstitutionDTO> q = getInstitutionDTOTypedQuery(Collections.singleton(institutionId));
+
+		return q.getSingleResult();
 	}
 }
