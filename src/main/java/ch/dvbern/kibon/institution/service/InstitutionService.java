@@ -26,7 +26,6 @@ import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -132,21 +131,10 @@ public class InstitutionService {
 	}
 
 	@Nonnull
-	public InstitutionDTO get(
-		@Nonnull String institutionId,
-		@Nonnull String clientName) {
+	public InstitutionDTO get(@Nonnull String institutionId) {
 
 		TypedQuery<InstitutionDTO> q = getInstitutionDTOTypedQuery(Collections.singleton(institutionId));
-		InstitutionDTO result;
 
-		try {
-			result = q.getSingleResult();
-		} catch (NoResultException e) {
-			// Institution does not exist
-			// It should not happen
-			return new InstitutionDTO();
-		}
-
-		return result;
+		return q.getSingleResult();
 	}
 }

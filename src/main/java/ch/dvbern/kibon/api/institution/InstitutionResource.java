@@ -149,13 +149,13 @@ public class InstitutionResource {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 
-		if(!client.getActive()) {
+		if (!client.getActive()) {
 			// Client not active (forbidden) for given institution
 			return Response.status(Status.FORBIDDEN).build();
 		}
 
 		// Get InstitutionDTO
-		InstitutionDTO institutionDTO = institutionService.get(id, clientName);
+		InstitutionDTO institutionDTO = institutionService.get(id);
 
 		return Response.ok(institutionDTO).build();
 	}
