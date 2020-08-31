@@ -40,10 +40,10 @@ import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
-import ch.dvbern.kibon.institution.model.Adresse;
-import ch.dvbern.kibon.institution.model.Adresse_;
-import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.Institution_;
+import ch.dvbern.kibon.institution.model.KontaktAngaben;
+import ch.dvbern.kibon.institution.model.Institution;
+import ch.dvbern.kibon.institution.model.KontaktAngaben_;
 
 /**
  * Service responsible for {@link Institution} handling.
@@ -78,6 +78,15 @@ public class InstitutionService {
 	}
 
 	@Nonnull
+	public List<Institution> getAll() {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
+		query.from(Institution.class);
+
+		return em.createQuery(query).getResultList();
+	}
+
+	@Nonnull
 	public List<InstitutionDTO> get(@Nonnull Set<String> institutionIds) {
 		if (institutionIds.isEmpty()) {
 			return Collections.emptyList();
@@ -96,19 +105,19 @@ public class InstitutionService {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<InstitutionDTO> query = cb.createQuery(InstitutionDTO.class);
 		Root<Institution> root = query.from(Institution.class);
-		Path<Adresse> adresse = root.get(Institution_.adresse);
+		Path<KontaktAngaben> adresse = root.get(Institution_.kontaktAdresse);
 
 		query.select(cb.construct(
 			InstitutionDTO.class,
 			root.get(Institution_.id),
 			root.get(Institution_.name),
 			root.get(Institution_.traegerschaft),
-			adresse.get(Adresse_.strasse),
-			adresse.get(Adresse_.hausnummer),
-			adresse.get(Adresse_.adresszusatz),
-			adresse.get(Adresse_.plz),
-			adresse.get(Adresse_.ort),
-			adresse.get(Adresse_.land)
+			adresse.get(KontaktAngaben_.strasse),
+			adresse.get(KontaktAngaben_.hausnummer),
+			adresse.get(KontaktAngaben_.adresszusatz),
+			adresse.get(KontaktAngaben_.plz),
+			adresse.get(KontaktAngaben_.ort),
+			adresse.get(KontaktAngaben_.land)
 		));
 
 		//noinspection rawtypes

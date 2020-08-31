@@ -17,13 +17,9 @@
 
 package ch.dvbern.kibon.api.institution;
 
-import java.math.BigDecimal;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.security.RolesAllowed;
@@ -38,14 +34,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import ch.dvbern.kibon.api.institution.familyportal.AltersKategorie;
 import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalDTO;
 import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalInstitutionDTO;
-import ch.dvbern.kibon.api.institution.familyportal.KontaktAngabenDTO;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
-import ch.dvbern.kibon.exchange.api.common.verfuegung.BetreuungsAngebot;
+import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.service.InstitutionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.MetricUnits;
@@ -76,13 +71,13 @@ public class InstitutionResource {
 	@Inject
 	SecurityIdentity identity;
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	ObjectMapper objectMapper;
+
 	/**
-	 * This endpoint is just a stub to provide API documentation for an upcoming API, used by by company Internezzo to
-	 * to implement a new version of
+	 * This endpoint is used by by company Internezzo to implement a new version of
 	 * <a href="https://www.fambe.sites.be.ch/fambe_sites/de/index/kitas_tagesfamilienfinden/kitas_tagesfamilienfinden/kitas_tagesfamilienfinden.html">Familienportal</a>.
-	 * <p>
-	 * The actualy API will have to get additional data from the kiBon institutions (stammdaten), with some changes
-	 * about opening hours and addresses.
 	 */
 	@GET
 	@Path("/familyportal")
@@ -102,9 +97,10 @@ public class InstitutionResource {
 		description = "A measure of how long it takes to load FamilyPortalDTO",
 		unit = MetricUnits.MILLISECONDS)
 	public FamilyPortalDTO getForFamilyPortal() {
+		List<Institution> all = institutionService.getAll();
 		FamilyPortalDTO dto = new FamilyPortalDTO();
 
-		dto.getInstitutionen().add(createStub1());
+		dto.setInstitutionen(Arrays.asList(objectMapper.convertValue(all, FamilyPortalInstitutionDTO[].class)));
 
 		return dto;
 	}
@@ -158,53 +154,5 @@ public class InstitutionResource {
 		InstitutionDTO institutionDTO = institutionService.get(id);
 
 		return Response.ok(institutionDTO).build();
-	}
-
-	@SuppressWarnings("checkstyle:MagicNumber")
-	@Nonnull
-	private FamilyPortalInstitutionDTO createStub1() {
-		FamilyPortalInstitutionDTO institution = new FamilyPortalInstitutionDTO();
-		institution.setId(UUID.randomUUID().toString());
-		institution.setBetreuungsArt(BetreuungsAngebot.KITA);
-		institution.setTraegerschaft(null);
-		institution.setName("stub1");
-
-		institution.setKontaktAdresse(createKontaktAngabenDV());
-		institution.setBetreuungsAdressen(Collections.singletonList(createKontaktAngabenDV()));
-
-		institution.setOeffnungsTage(Arrays.asList(DayOfWeek.FRIDAY, DayOfWeek.MONDAY, DayOfWeek.THURSDAY));
-		institution.setOffenVon(LocalTime.of(7, 0));
-		institution.setOffenBis(LocalTime.of(19, 0));
-		institution.setOeffnungsAbweichungen("Freitags nur bis 17 Uhr");
-
-		institution.setAltersKategorien(Arrays.asList(
-			AltersKategorie.KINDERGARTEN,
-			AltersKategorie.BABY,
-			AltersKategorie.VORSCHULE));
-
-		institution.setAnzahlPlaetze(BigDecimal.valueOf(26.5));
-		institution.setAnzahlPlaetzeFirmen(BigDecimal.valueOf(3.75));
-
-		return institution;
-	}
-
-	@SuppressWarnings("checkstyle:MagicNumber")
-	@Nonnull
-	private KontaktAngabenDTO createKontaktAngabenDV() {
-		KontaktAngabenDTO dto = new KontaktAngabenDTO();
-		dto.setAnschrift("DV Bern AG");
-		dto.setStrasse("Nussbaumstrasse");
-		dto.setHausnummer("21");
-		dto.setAdresszusatz("Postfach 106");
-		dto.setPlz("CH-3000");
-		dto.setOrt("Bern 22");
-		dto.setLand("CH");
-		dto.getGemeinde().setBfsNummer(351L);
-		dto.getGemeinde().setName("Bern");
-		dto.setWebseite("https://www.dvbern.ch/");
-		dto.setTelefon("+41 31 378 24 24");
-		dto.setEmail("hallo@dvbern.ch");
-
-		return dto;
 	}
 }

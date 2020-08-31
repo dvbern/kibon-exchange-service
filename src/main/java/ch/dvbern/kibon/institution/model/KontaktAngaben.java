@@ -17,17 +17,22 @@
 
 package ch.dvbern.kibon.institution.model;
 
-import java.util.Objects;
 import java.util.StringJoiner;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Embeddable
-public class Adresse {
+public class KontaktAngaben {
+
+	@Nullable
+	private String anschrift = null;
 
 	@Nonnull
 	private @NotNull String strasse = "";
@@ -47,35 +52,24 @@ public class Adresse {
 	@Nonnull
 	private @NotEmpty String land = "";
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) {
-			return true;
-		}
+	@Nullable
+	@Embedded
+	@AttributeOverride(name = "name", column = @Column(name = "gemeinde_name"))
+	private Gemeinde gemeinde = null;
 
-		if (!(o instanceof Adresse)) {
-			return false;
-		}
+	@Nullable
+	private String email = null;
 
-		Adresse adresse = (Adresse) o;
+	@Nullable
+	private String telefon = null;
 
-		return getStrasse().equals(adresse.getStrasse()) &&
-			Objects.equals(getHausnummer(), adresse.getHausnummer()) &&
-			Objects.equals(getAdresszusatz(), adresse.getAdresszusatz()) &&
-			getPlz().equals(adresse.getPlz()) &&
-			getOrt().equals(adresse.getOrt()) &&
-			getLand().equals(adresse.getLand());
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(getStrasse(), getHausnummer(), getAdresszusatz(), getPlz(), getOrt(), getLand());
-	}
+	@Nullable
+	private String webseite = null;
 
 	@Override
 	@Nonnull
 	public String toString() {
-		return new StringJoiner(", ", Adresse.class.getSimpleName() + '[', "]")
+		return new StringJoiner(", ", KontaktAngaben.class.getSimpleName() + '[', "]")
 			.add("strasse='" + strasse + '\'')
 			.add("hausnummer='" + hausnummer + '\'')
 			.add("adresszusatz='" + adresszusatz + '\'')
@@ -83,6 +77,15 @@ public class Adresse {
 			.add("ort='" + ort + '\'')
 			.add("land='" + land + '\'')
 			.toString();
+	}
+
+	@Nullable
+	public String getAnschrift() {
+		return anschrift;
+	}
+
+	public void setAnschrift(@Nullable String anschrift) {
+		this.anschrift = anschrift;
 	}
 
 	@Nonnull
@@ -137,5 +140,41 @@ public class Adresse {
 
 	public void setLand(@Nonnull String land) {
 		this.land = land;
+	}
+
+	@Nullable
+	public Gemeinde getGemeinde() {
+		return gemeinde;
+	}
+
+	public void setGemeinde(@Nullable Gemeinde gemeinde) {
+		this.gemeinde = gemeinde;
+	}
+
+	@Nullable
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(@Nullable String email) {
+		this.email = email;
+	}
+
+	@Nullable
+	public String getTelefon() {
+		return telefon;
+	}
+
+	public void setTelefon(@Nullable String telefon) {
+		this.telefon = telefon;
+	}
+
+	@Nullable
+	public String getWebseite() {
+		return webseite;
+	}
+
+	public void setWebseite(@Nullable String website) {
+		this.webseite = website;
 	}
 }
