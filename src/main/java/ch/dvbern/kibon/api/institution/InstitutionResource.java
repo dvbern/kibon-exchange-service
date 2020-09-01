@@ -97,7 +97,7 @@ public class InstitutionResource {
 		description = "A measure of how long it takes to load FamilyPortalDTO",
 		unit = MetricUnits.MILLISECONDS)
 	public FamilyPortalDTO getForFamilyPortal() {
-		List<Institution> all = institutionService.getAll();
+		List<Institution> all = institutionService.getForFamilyPortal();
 		FamilyPortalDTO dto = new FamilyPortalDTO();
 
 		dto.setInstitutionen(Arrays.asList(objectMapper.convertValue(all, FamilyPortalInstitutionDTO[].class)));

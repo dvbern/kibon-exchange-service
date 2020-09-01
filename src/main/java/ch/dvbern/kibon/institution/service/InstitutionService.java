@@ -18,6 +18,7 @@
 package ch.dvbern.kibon.institution.service;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -40,9 +41,10 @@ import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
+import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.Institution_;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
-import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.KontaktAngaben_;
 
 /**
@@ -78,12 +80,21 @@ public class InstitutionService {
 	}
 
 	@Nonnull
-	public List<Institution> getAll() {
+	public List<Institution> getForFamilyPortal() {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
-		query.from(Institution.class);
+		Root<Institution> root = query.from(Institution.class);
 
-		return em.createQuery(query).getResultList();
+		//noinspection rawtypes
+		ParameterExpression<Set> betreuungsArtParam = cb.parameter(Set.class, "betreuungsArtParam");
+		query.where(root.get(Institution_.betreuungsArt).in(betreuungsArtParam));
+
+		Set<BetreuungsangebotTyp> familyPortalSet =
+			EnumSet.of(BetreuungsangebotTyp.KITA, BetreuungsangebotTyp.TAGESFAMILIEN);
+
+		return em.createQuery(query)
+			.setParameter(betreuungsArtParam, familyPortalSet)
+			.getResultList();
 	}
 
 	@Nonnull

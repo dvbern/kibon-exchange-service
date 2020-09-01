@@ -43,7 +43,7 @@ VALUES ('1', 'DV Kids', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3006
 	   ('3', 'DV Teens', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
 		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now()),
 	   ('4', 'DV Tweens', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
-		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now());
+		'TAGESSCHULE', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now());
 
 INSERT INTO verfuegung (betreuungsart, bis, gesuchsteller, ignoriertezeitabschnitte, institutionid, gemeindebfsnr,
 						gemeindename, kind, refnr, verfuegtam, version, von, zeitabschnitte)

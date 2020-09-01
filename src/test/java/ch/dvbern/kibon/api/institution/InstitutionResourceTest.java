@@ -19,6 +19,7 @@ package ch.dvbern.kibon.api.institution;
 
 import javax.ws.rs.core.Response.Status;
 
+import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.testutils.TestcontainersEnvironment;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
@@ -26,10 +27,13 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
 import static com.spotify.hamcrest.jackson.JsonMatchers.isJsonStringMatching;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.either;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.is;
 
 @QuarkusTestResource(TestcontainersEnvironment.class)
@@ -89,5 +93,41 @@ class InstitutionResourceTest {
 			// Even though the Institution actually exists, NOT_FOUND shall be returned when the client lacks
 			// permission
 			.statusCode(Status.NOT_FOUND.getStatusCode());
+	}
+
+	@Test
+	void testGetFamilyPortalRequiresFamilyPortalRole() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.get("/institutions/familyportal")
+			.then()
+			.assertThat()
+			.statusCode(Status.FORBIDDEN.getStatusCode());
+	}
+
+	@Test
+	void testGetFamilyPortalOnlyReturnsTAGESFAMILIENorKITA() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getFamilyPortalAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.get("/institutions/familyportal")
+			.then()
+			.assertThat()
+			.statusCode(Status.OK.getStatusCode())
+			.body(isJsonStringMatching(jsonObject()
+				.where("institutionen", is(jsonArray(
+					everyItem(jsonObject().where(
+						"betreuungsArt",
+						either(
+							jsonText(BetreuungsangebotTyp.TAGESFAMILIEN.name())
+						).or(
+							jsonText(BetreuungsangebotTyp.KITA.name())
+						)
+					))
+				)))
+			));
 	}
 }
