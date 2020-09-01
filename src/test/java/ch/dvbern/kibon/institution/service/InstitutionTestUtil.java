@@ -36,6 +36,7 @@ import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 
 import static ch.dvbern.kibon.exchange.commons.types.Wochentag.FRIDAY;
@@ -120,7 +121,10 @@ public final class InstitutionTestUtil {
 	@Nonnull
 	public static Institution fromDTO(@Nonnull InstitutionEventDTO dto) {
 		Institution institution = new Institution();
+		institution.setName(dto.getName());
+		institution.setTraegerschaft(dto.getTraegerschaft());
 		InstitutionConverter converter = new InstitutionConverter();
+		converter.mapper = new ObjectMapper();
 
 		converter.update(institution, dto);
 
