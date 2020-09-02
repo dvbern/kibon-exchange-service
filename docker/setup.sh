@@ -7,6 +7,9 @@ function fileExists() {
   fi
 }
 
+SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+cd ${SCRIPTPATH}
+
 fileExists keycloak/kibon_realm.json
 fileExists keycloak/set-secrets.sh
 

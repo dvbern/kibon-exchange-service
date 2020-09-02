@@ -30,8 +30,6 @@ import com.google.common.collect.ImmutableMap;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -53,7 +51,7 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 	private static final int KEYCLOAK_PORT = 8080;
 
 	@Container
-	private final KafkaContainer kafka = new KafkaContainer();
+	private final KafkaContainer kafka = new KafkaContainer("5.5.1");
 
 	@SuppressWarnings("rawtypes")
 	@Container
@@ -63,10 +61,16 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 			.withExposedService(KEYCLOAK_SERVICE, KEYCLOAK_PORT);
 
 	private static AuthzClient authzClient = null;
+	private static AuthzClient authzClientFambe = null;
 
 	@Nonnull
 	public static String getAccessToken() {
 		return authzClient.obtainAccessToken().getToken();
+	}
+
+	@Nonnull
+	public static String getFamilyPortalAccessToken() {
+		return authzClientFambe.obtainAccessToken().getToken();
 	}
 
 	@Override
@@ -88,7 +92,9 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 		String keycloakURL = "http://" + keycloakHost + ':' + keycloakPort + "/auth";
 		systemProps.put("quarkus.oidc.auth-server-url", keycloakURL + "/realms/kibon");
 
-		createKeycloakClientConfiguration(keycloakURL);
+		authzClient =
+			createKeycloakClientConfiguration(keycloakURL, "kitAdmin", "657d6aef-bdc3-40e9-9992-024810d2b24b");
+		authzClientFambe = createKeycloakClientConfiguration(keycloakURL, "fambe", "FamilyPortal-PW");
 
 		return systemProps;
 	}
@@ -111,14 +117,19 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 		ENVIRONMENT.stop();
 	}
 
-	private void createKeycloakClientConfiguration(@Nonnull String authServerURL) {
-		Map<String, Object> clientSecret = ImmutableMap.of("secret", "657d6aef-bdc3-40e9-9992-024810d2b24b");
+	@Nonnull
+	private AuthzClient createKeycloakClientConfiguration(
+		@Nonnull String authServerURL,
+		@Nonnull String clientId,
+		@Nonnull String secret) {
 
-		Configuration configuration = new Configuration(authServerURL, "kibon", "kitAdmin", clientSecret, null);
+		Map<String, Object> clientSecret = ImmutableMap.of("secret", secret);
+
+		Configuration configuration = new Configuration(authServerURL, "kibon", clientId, clientSecret, null);
 		configuration.setVerifyTokenAudience(true);
 		configuration.setUseResourceRoleMappings(true);
 		configuration.setConfidentialPort(0);
 
-		authzClient = AuthzClient.create(configuration);
+		return AuthzClient.create(configuration);
 	}
 }

@@ -17,6 +17,7 @@
 
 package ch.dvbern.kibon.verfuegung.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -66,7 +67,7 @@ class VerfuegungServiceQuarkusTest {
 			allOf(hasSize(400), everyItem(hasProperty("institutionId", anyOf(is("1"), is("2")))))
 		);
 
-		// deactive the client kitAdmin for institutionId 1
+		// deactivate the client kitAdmin for institutionId 1
 		InstitutionClientEventDTO dto = new InstitutionClientEventDTO("1", "kitAdmin", "EXCHANGE_SERVICE_USER");
 		tx.newTransaction(() -> clientService.onClientRemoved(dto));
 
@@ -76,5 +77,8 @@ class VerfuegungServiceQuarkusTest {
 			allForClient,
 			allOf(hasSize(100), everyItem(hasProperty("institutionId", is("2"))))
 		);
+
+		// restore client (to make sure following integration tests get the expected DB setup)
+		tx.newTransaction(() -> clientService.onClientAdded(dto, LocalDateTime.now()));
 	}
 }

@@ -17,30 +17,59 @@
 
 package ch.dvbern.kibon.institution.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
-import ch.dvbern.kibon.exchange.commons.institution.AdresseDTO;
+import ch.dvbern.kibon.exchange.commons.institution.AltersKategorie;
+import ch.dvbern.kibon.exchange.commons.institution.GemeindeDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
-import ch.dvbern.kibon.institution.model.Adresse;
+import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
+import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.exchange.commons.util.DateConverter;
+import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
+import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
+import ch.dvbern.kibon.institution.model.KontaktAngaben;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
+
+import static ch.dvbern.kibon.exchange.commons.types.Wochentag.FRIDAY;
+import static ch.dvbern.kibon.exchange.commons.types.Wochentag.MONDAY;
+import static ch.dvbern.kibon.exchange.commons.types.Wochentag.THURSDAY;
+import static ch.dvbern.kibon.exchange.commons.types.Wochentag.TUESDAY;
+import static ch.dvbern.kibon.exchange.commons.types.Wochentag.WEDNESDAY;
 
 public final class InstitutionTestUtil {
 
-	public static final Comparator<Adresse> ADRESSE_COMPARATOR = Comparator
-		.comparing(Adresse::getStrasse)
-		.thenComparing(Adresse::getHausnummer, Comparator.nullsLast(Comparator.naturalOrder()))
-		.thenComparing(Adresse::getAdresszusatz, Comparator.nullsLast(Comparator.naturalOrder()))
-		.thenComparing(Adresse::getPlz)
-		.thenComparing(Adresse::getOrt)
-		.thenComparing(Adresse::getLand);
+	public static final Comparator<Gemeinde> GEMEINDE_COMPARATOR = Comparator
+		.comparing(Gemeinde::getName, Comparator.nullsLast(Comparator.naturalOrder()))
+		.thenComparing(Gemeinde::getBfsNummer, Comparator.nullsLast(Comparator.naturalOrder()));
+
+	public static final Comparator<KontaktAngaben> ADRESSE_COMPARATOR = Comparator
+		.comparing(KontaktAngaben::getAnschrift, Comparator.nullsLast(Comparator.naturalOrder()))
+		.thenComparing(KontaktAngaben::getStrasse)
+		.thenComparing(KontaktAngaben::getHausnummer, Comparator.nullsLast(Comparator.naturalOrder()))
+		.thenComparing(KontaktAngaben::getAdresszusatz, Comparator.nullsLast(Comparator.naturalOrder()))
+		.thenComparing(KontaktAngaben::getPlz)
+		.thenComparing(KontaktAngaben::getOrt)
+		.thenComparing(KontaktAngaben::getLand)
+		.thenComparing(KontaktAngaben::getGemeinde, Comparator.nullsLast(GEMEINDE_COMPARATOR))
+		.thenComparing(KontaktAngaben::getEmail, Comparator.nullsLast(Comparator.naturalOrder()))
+		.thenComparing(KontaktAngaben::getTelefon, Comparator.nullsLast(Comparator.naturalOrder()))
+		.thenComparing(KontaktAngaben::getWebseite, Comparator.nullsLast(Comparator.naturalOrder()));
 
 	public static final Comparator<Institution> INSTITUTION_COMPARATOR = Comparator
 		.comparing(Institution::getName)
 		.thenComparing(Institution::getTraegerschaft, Comparator.nullsLast(Comparator.naturalOrder()))
-		.thenComparing(Institution::getAdresse, ADRESSE_COMPARATOR);
+		.thenComparing(Institution::getKontaktAdresse, ADRESSE_COMPARATOR);
+
+	private static final Faker FAKER = new Faker();
 
 	private InstitutionTestUtil() {
 		// util
@@ -48,23 +77,54 @@ public final class InstitutionTestUtil {
 
 	@Nonnull
 	public static InstitutionEventDTO createInstitutionEvent() {
-		Faker faker = new Faker();
+		KontaktAngabenDTO adresse = fakeKontaktAngabenDTO();
 
-		AdresseDTO adresse = new AdresseDTO(
-			faker.address().streetName(),
-			faker.address().buildingNumber(),
+		return new InstitutionEventDTO(
+			"99",
+			FAKER.funnyName().name(),
+			FAKER.funnyName().name(),
+			BetreuungsangebotTyp.TAGESFAMILIEN,
+			adresse,
+			Arrays.asList(fakeKontaktAngabenDTO(), fakeKontaktAngabenDTO()),
+			Arrays.asList(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY),
+			TimeConverter.serialize(LocalTime.of(7, 30)),
+			TimeConverter.serialize(LocalTime.of(19, 0)),
 			null,
-			faker.address().zipCode(),
-			faker.address().cityName(),
-			faker.address().countryCode());
+			Collections.singletonList(AltersKategorie.VORSCHULE),
+			true,
+			BigDecimal.valueOf(13.23),
+			BigDecimal.valueOf(7.13),
+			DateConverter.fromLocalDateTime(LocalDateTime.now())
+		);
+	}
 
-		return new InstitutionEventDTO("99", faker.funnyName().name(), faker.funnyName().name(), adresse);
+	@Nonnull
+	private static KontaktAngabenDTO fakeKontaktAngabenDTO() {
+		GemeindeDTO gemeinde = new GemeindeDTO("Bern", null);
+
+		KontaktAngabenDTO adresse = new KontaktAngabenDTO(
+			FAKER.company().name(),
+			FAKER.address().streetName(),
+			FAKER.address().buildingNumber(),
+			null,
+			FAKER.address().zipCode(),
+			FAKER.address().cityName(),
+			FAKER.address().countryCode(),
+			gemeinde,
+			FAKER.internet().emailAddress(),
+			FAKER.phoneNumber().phoneNumber(),
+			FAKER.internet().url()
+		);
+		return adresse;
 	}
 
 	@Nonnull
 	public static Institution fromDTO(@Nonnull InstitutionEventDTO dto) {
 		Institution institution = new Institution();
+		institution.setName(dto.getName());
+		institution.setTraegerschaft(dto.getTraegerschaft());
 		InstitutionConverter converter = new InstitutionConverter();
+		converter.mapper = new ObjectMapper();
 
 		converter.update(institution, dto);
 

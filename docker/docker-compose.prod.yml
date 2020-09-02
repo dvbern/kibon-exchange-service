@@ -3,7 +3,7 @@ version: '2'
 services:
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:5.3.1
+    image: confluentinc/cp-zookeeper:5.5.1
     # make sure to match the UID:GID of the host (due to volume binding)
     user: "1000"
     networks:
@@ -19,7 +19,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
 
   kafka:
-    image: confluentinc/cp-kafka:5.3.1
+    image: confluentinc/cp-kafka:5.5.1
     # make sure to match the UID:GID of the host (due to volume binding)
     user: "1000"
     networks:
@@ -41,7 +41,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:5.3.1
+    image: confluentinc/cp-schema-registry:5.5.1
     hostname: schema-registry
     networks:
       - kibon_exchange_backbone
@@ -60,7 +60,7 @@ services:
   keycloak:
     # Unfortunatley, scriptimport does not work with keyclaok > 7.0.0 - https://issues.redhat.com/browse/KEYCLOAK-12198
     # use keycloak 7.0.0 to initialise the database, then upgrade to 10.0.0
-    image: quay.io/keycloak/keycloak:10.0.1
+    image: quay.io/keycloak/keycloak:10.0.2
     networks:
       - kibon_exchange_backbone
     volumes:

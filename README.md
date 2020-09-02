@@ -6,10 +6,12 @@
 There are several services which must be running before the Quarkus application is started:
 Postgres, Kafka and eventually Keycloak.
 
-Postgres and Kafka can be started with
- `docker-compose -f docker/docker-compose.yml up -d`
+Postgres and Kafka can be started from the project root with
+ `docker-compose -f docker/docker-compose.yml --project-directory docker up -d`
 
-Make sure that three services start: `kibon-exchange_zookeeper_1`, `kibon-exchange_kafka_1`, 
+ or from the `./docker` directory with `docker-compose up -d`.
+
+Make sure that four services start: `kibon-exchange_zookeeper_1`, `kibon-exchange_kafka_1`, `kibon-exchange_keycloak_1`
 and `kibon-exchange_db_1`. Sometimes Kafka fails at startup.
 
 ### Start the Quarkus Application
@@ -17,7 +19,7 @@ Quarkus runs best from a terminal:
 
 `./mvnw compile quarkus:dev`
 
-This will start Quarkus in Hot Replace mode, migrate the FlyWay schema and then execute the 
+This will start Quarkus in Hot Replace mode, migrate the FlyWay schema and then execute the
 statements in `src/main/resources/import-dev.sql`. Unfortunately, it looks like the execution order is not consistent
 (maybe both started asynchronously?). Combining both, import scripts and FlyWay migrations is not properly supported
 and may result in random crashes.
@@ -28,9 +30,9 @@ There are a couple of other profiles defined in application.propperties.
 | Profile | Pros | Cons |
 | --- | --- | --- |
 | dev | entity changes are applied directly | FlyWay migrations are not recreated: everything that is specified only in FlyWay scripts (e.g. triggers) must be manually applied (or integrated in import-dev.sql). Crashes sometimes |
-| dev-with-data | updates schema and keeps data | does not import mock data from import-dev.sql | 
-| test | see dev | FlyWay migrations are disabled for stability. Everything must be added to import-test.sql | 
-| prod | only applies FlyWay migrations | no mock data or dynamic schema updates | 
+| dev-with-data | updates schema and keeps data | does not import mock data from import-dev.sql |
+| test | see dev | FlyWay migrations are disabled for stability. Everything must be added to import-test.sql |
+| prod | only applies FlyWay migrations | no mock data or dynamic schema updates |
 
 It is suggested to start with the `dev` profile and switch to `dev-with-data` when the database should not be
 wiped.
@@ -54,13 +56,13 @@ When changing the ports, don't forget to update `src/main/resources/application.
 | quarkus.http.port |8380| Application Port, e.g. http://localhost:8380/api/v1/verfuegungen |
 
 ### Swagger-UI and Keycloak integration
-Swagger-ui is integrated under /api/v1/swagger-ui. To interact with the REST endpoints, 
+Swagger-ui is integrated under /api/v1/swagger-ui. To interact with the REST endpoints,
 authorization is required. Thus a full development stack should be started (see above). Additionally,
-read in ./dev-proxy/README.md how to create and start a proxy. 
+read in ./dev-proxy/README.md how to create and start a proxy.
 
 # Debugging the Quarkus Application
 Quarkus allows remote debugging on default Port 5005. When another application like a WildFly is already running in
-debug mode, this port is typically already in use. In that case, Quarkus logs "Port 5005 in use, not starting in debug 
+debug mode, this port is typically already in use. In that case, Quarkus logs "Port 5005 in use, not starting in debug
 mode".
 
 The Port can be changed by adding the debug property, e.g.:
@@ -70,15 +72,15 @@ The debug with IntelliJ simply add a new `Remote` configuration an attach to the
 
 # Preparing for Production
 
-The docker/docker-compose.yml file is intended for local development, 
+The docker/docker-compose.yml file is intended for local development,
 where quarkus is directly started through maven.
 
-In production, an nginx-based proxy is set in front of the quarkus application and keycloak. 
+In production, an nginx-based proxy is set in front of the quarkus application and keycloak.
 `https://my-domain/auth/` is proxied to keycloak while `https://my-domain/api/v1/` is proxied to quarkus.
 
-At the moment the quarkus application has only been tested in JVM mode. 
+At the moment the quarkus application has only been tested in JVM mode.
 To create the docker images for exchange-service and the nginx-proxy run `./mvnw install docker:build`.
 
-To start a production-like environment, create the certificates for nginx and the quarkus application using 
+To start a production-like environment, create the certificates for nginx and the quarkus application using
 `docker/setup.sh`. Update `docker/.env` with host IP address and credentials.
 Finally, run `docker-compose -f docker/docker-compose.prod.yml --project-directory docker up`

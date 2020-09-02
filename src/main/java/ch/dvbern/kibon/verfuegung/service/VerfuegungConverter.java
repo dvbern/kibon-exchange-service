@@ -25,11 +25,11 @@ import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import ch.dvbern.kibon.exchange.commons.util.DateConverter;
 import ch.dvbern.kibon.exchange.commons.verfuegung.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.verfuegung.KindDTO;
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
 import ch.dvbern.kibon.exchange.commons.verfuegung.ZeitabschnittDTO;
-import ch.dvbern.kibon.util.LocalDateTimeUtil;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -51,7 +51,7 @@ public class VerfuegungConverter {
 		verfuegung.setVon(dto.getVon());
 		verfuegung.setBis(dto.getBis());
 		verfuegung.setVersion(dto.getVersion());
-		verfuegung.setVerfuegtAm(LocalDateTimeUtil.of(dto.getVerfuegtAm()));
+		verfuegung.setVerfuegtAm(DateConverter.of(dto.getVerfuegtAm()));
 		verfuegung.setBetreuungsArt(dto.getBetreuungsArt());
 		verfuegung.setGemeindeBfsNr(dto.getGemeindeBfsNr());
 		verfuegung.setGemeindeName(dto.getGemeindeName());

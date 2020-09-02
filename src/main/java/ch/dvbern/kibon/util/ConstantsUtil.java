@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 DV Bern AG, Switzerland
+ * Copyright (C) 2020 DV Bern AG, Switzerland
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,20 +17,10 @@
 
 package ch.dvbern.kibon.util;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+public final class ConstantsUtil {
 
-import javax.annotation.Nonnull;
+	public static final int TEXT_AREA_SIZE = 4000;
 
-public final class LocalDateTimeUtil {
-
-	private LocalDateTimeUtil() {
-		// util
-	}
-
-	@Nonnull
-	public static LocalDateTime of(@Nonnull Instant instant) {
-		 return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+	private ConstantsUtil() {
 	}
 }

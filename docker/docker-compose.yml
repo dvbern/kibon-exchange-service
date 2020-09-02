@@ -3,7 +3,7 @@ version: '2'
 services:
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:5.3.1
+    image: confluentinc/cp-zookeeper:5.5.1
     networks:
       - kibon-exchange
     ports:
@@ -13,7 +13,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
 
   kafka:
-    image: confluentinc/cp-kafka:5.3.1
+    image: confluentinc/cp-kafka:5.5.1
     networks:
       - kibon-exchange
     depends_on:
@@ -31,7 +31,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:5.3.1
+    image: confluentinc/cp-schema-registry:5.5.1
     hostname: schema-registry
     networks:
       - kibon-exchange
