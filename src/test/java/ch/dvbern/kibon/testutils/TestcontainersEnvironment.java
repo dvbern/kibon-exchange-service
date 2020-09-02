@@ -51,7 +51,7 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 	private static final int KEYCLOAK_PORT = 8080;
 
 	@Container
-	private final KafkaContainer kafka = new KafkaContainer();
+	private final KafkaContainer kafka = new KafkaContainer("5.5.1");
 
 	@SuppressWarnings("rawtypes")
 	@Container
