@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
+import ch.dvbern.kibon.exchange.commons.util.DateConverter;
 import ch.dvbern.kibon.exchange.commons.verfuegung.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.verfuegung.KindDTO;
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
 import ch.dvbern.kibon.exchange.commons.verfuegung.ZeitabschnittDTO;
-import ch.dvbern.kibon.util.LocalDateTimeUtil;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,7 +75,7 @@ class VerfuegungConverterTest {
 			.withProperty("von", is(dto.getVon()))
 			.withProperty("bis", is(dto.getBis()))
 			.withProperty("version", is(dto.getVersion()))
-			.withProperty("verfuegtAm", is(LocalDateTimeUtil.of(dto.getVerfuegtAm())))
+			.withProperty("verfuegtAm", is(DateConverter.of(dto.getVerfuegtAm())))
 			.withProperty("betreuungsArt", is(dto.getBetreuungsArt()))
 			.withProperty("kind", matchesKindDTO(dto.getKind()))
 			.withProperty("gesuchsteller", matchesGesuchstellerDTO(dto.getGesuchsteller()))

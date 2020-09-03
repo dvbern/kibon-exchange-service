@@ -17,25 +17,37 @@
 
 package ch.dvbern.kibon.institution.service;
 
-import javax.annotation.Nonnull;
-import javax.enterprise.context.ApplicationScoped;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import ch.dvbern.kibon.exchange.commons.institution.AdresseDTO;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
-import ch.dvbern.kibon.institution.model.Adresse;
+import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
+import ch.dvbern.kibon.exchange.commons.util.DateConverter;
+import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
+import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
+import ch.dvbern.kibon.institution.model.KontaktAngaben;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ApplicationScoped
 public class InstitutionConverter {
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	ObjectMapper mapper;
 
 	@Nonnull
 	public Institution create(@Nonnull InstitutionEventDTO dto) {
 		Institution institution = new Institution();
 		institution.setId(dto.getId());
-		institution.setName(dto.getName());
-		institution.setTraegerschaft(dto.getTraegerschaft());
-
-		update(institution.getAdresse(), dto.getAdresse());
+		update(institution, dto);
 
 		return institution;
 	}
@@ -43,16 +55,78 @@ public class InstitutionConverter {
 	public void update(@Nonnull Institution institution, @Nonnull InstitutionEventDTO dto) {
 		institution.setName(dto.getName());
 		institution.setTraegerschaft(dto.getTraegerschaft());
+		institution.setBetreuungsArt(dto.getBetreuungsArt());
 
-		update(institution.getAdresse(), dto.getAdresse());
+		update(institution.getKontaktAdresse(), dto.getAdresse());
+		institution.setBetreuungsAdressen(toBetreuungsStandorte(dto.getBetreuungsAdressen()));
+
+		institution.setOeffnungsTage(mapper.valueToTree(dto.getOeffnungsTage()));
+		institution.setOffenVon(TimeConverter.deserialize(dto.getOffenVon()));
+		institution.setOffenBis(TimeConverter.deserialize(dto.getOffenBis()));
+		institution.setOeffnungsAbweichungen(dto.getOeffnungsAbweichungen());
+
+		institution.setAltersKategorien(mapper.valueToTree(dto.getAltersKategorien()));
+		institution.setSubventioniertePlaetze(dto.getSubventioniertePlaetze());
+		institution.setAnzahlPlaetze(dto.getAnzahlPlaetze());
+		institution.setAnzahlPlaetzeFirmen(dto.getAnzahlPlaetzeFirmen());
+		institution.setTimestampMutiert(DateConverter.toLocalDateTime(dto.getTimestampMutiert()));
 	}
 
-	private void update(@Nonnull Adresse adresse, @Nonnull AdresseDTO dto) {
+	private void update(@Nonnull KontaktAngaben adresse, @Nonnull KontaktAngabenDTO dto) {
+		adresse.setAnschrift(dto.getAnschrift());
 		adresse.setStrasse(dto.getStrasse());
 		adresse.setHausnummer(dto.getHausnummer());
 		adresse.setAdresszusatz(dto.getAdresszusatz());
 		adresse.setOrt(dto.getOrt());
 		adresse.setPlz(dto.getPlz());
 		adresse.setLand(dto.getLand());
+		adresse.setGemeinde(getGemeinde(dto));
+		adresse.setEmail(dto.getEmail());
+		adresse.setTelefon(dto.getTelefon());
+		adresse.setWebseite(dto.getWebseite());
+	}
+
+	@Nonnull
+	private Gemeinde getGemeinde(@Nonnull KontaktAngabenDTO dto) {
+		Gemeinde gemeinde = new Gemeinde();
+		gemeinde.setName(dto.getGemeinde().getName());
+		gemeinde.setBfsNummer(dto.getGemeinde().getBfsNummer());
+
+		return gemeinde;
+	}
+
+	@Nonnull
+	private JsonNode toBetreuungsStandorte(@Nullable List<KontaktAngabenDTO> kontaktAngaben) {
+		if (kontaktAngaben == null) {
+			return mapper.createArrayNode();
+		}
+
+		List<ObjectNode> mapped = kontaktAngaben.stream()
+			.map(this::toKontaktAngaben)
+			.collect(Collectors.toList());
+
+		return mapper.createArrayNode()
+			.addAll(mapped);
+	}
+
+	@Nonnull
+	private ObjectNode toKontaktAngaben(@Nonnull KontaktAngabenDTO dto) {
+		ObjectNode result = mapper.createObjectNode()
+			.put("anschrift", dto.getAnschrift())
+			.put("strasse", dto.getStrasse())
+			.put("hausnummer", dto.getHausnummer())
+			.put("adresszusatz", dto.getAdresszusatz())
+			.put("plz", dto.getPlz())
+			.put("ort", dto.getOrt())
+			.put("land", dto.getLand())
+			.put("email", dto.getEmail())
+			.put("telefon", dto.getTelefon())
+			.put("webseite", dto.getWebseite());
+
+		result.putObject("gemeinde")
+			.put("name", dto.getGemeinde().getName())
+			.put("bfsNummer", dto.getGemeinde().getBfsNummer());
+
+		return result;
 	}
 }

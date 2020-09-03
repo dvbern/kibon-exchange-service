@@ -17,22 +17,45 @@
 
 package ch.dvbern.kibon.institution.service;
 
+import java.util.stream.Collectors;
+
 import javax.annotation.Nonnull;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
-import ch.dvbern.kibon.institution.model.Adresse;
+import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
+import ch.dvbern.kibon.exchange.commons.util.DateConverter;
+import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
+import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
+import ch.dvbern.kibon.institution.model.KontaktAngaben;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spotify.hamcrest.jackson.JsonMatchers;
 import com.spotify.hamcrest.pojo.IsPojo;
+import org.hamcrest.Matcher;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static ch.dvbern.kibon.institution.service.InstitutionTestUtil.createInstitutionEvent;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonNull;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static com.spotify.hamcrest.pojo.IsPojo.pojo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.comparesEqualTo;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.either;
 import static org.hamcrest.core.Is.is;
 
 class InstitutionConverterTest {
 
 	private final InstitutionConverter converter = new InstitutionConverter();
+
+	@BeforeEach
+	public void setup() {
+		converter.mapper = new ObjectMapper();
+	}
 
 	@Test
 	public void testCreate() {
@@ -58,16 +81,82 @@ class InstitutionConverterTest {
 	@Nonnull
 	private IsPojo<Institution> matchesDTO(@Nonnull InstitutionEventDTO dto) {
 		return pojo(Institution.class)
-			.withProperty("id", is(dto.getId()))
-			.withProperty("name", is(dto.getName()))
-			.withProperty("traegerschaft", is(dto.getTraegerschaft()))
-			.withProperty("adresse", is(pojo(Adresse.class)
-				.withProperty("strasse", is(dto.getAdresse().getStrasse()))
-				.withProperty("hausnummer", is(dto.getAdresse().getHausnummer()))
-				.withProperty("adresszusatz", is(dto.getAdresse().getAdresszusatz()))
-				.withProperty("ort", is(dto.getAdresse().getOrt()))
-				.withProperty("plz", is(dto.getAdresse().getPlz()))
-				.withProperty("land", is(dto.getAdresse().getLand()))
-			));
+			.where(Institution::getId, is(dto.getId()))
+			.where(Institution::getName, is(dto.getName()))
+			.where(Institution::getTraegerschaft, is(dto.getTraegerschaft()))
+			.where(Institution::getBetreuungsArt, is(dto.getBetreuungsArt()))
+			.where(Institution::getKontaktAdresse, matchesKontaktAngaben(dto.getAdresse()))
+			.where(Institution::getBetreuungsAdressen, matchesBetreuungsAdressen(dto))
+			.where(Institution::getOeffnungsTage, matchesOeffnungsTage(dto))
+			.where(Institution::getOffenVon, is(TimeConverter.deserialize(dto.getOffenVon())))
+			.where(Institution::getOffenBis, is(TimeConverter.deserialize(dto.getOffenBis())))
+			.where(Institution::getOeffnungsAbweichungen, is(dto.getOeffnungsAbweichungen()))
+			.where(Institution::getAltersKategorien, matchesAlterskategorien(dto))
+			.where(Institution::isSubventioniertePlaetze, is(dto.getSubventioniertePlaetze()))
+			.where(Institution::getAnzahlPlaetze, comparesEqualTo(dto.getAnzahlPlaetze()))
+			.where(Institution::getAnzahlPlaetzeFirmen, comparesEqualTo(dto.getAnzahlPlaetzeFirmen()))
+			.where(Institution::getTimestampMutiert, is(DateConverter.toLocalDateTime(dto.getTimestampMutiert())))
+			;
+	}
+
+	@Nonnull
+	private IsPojo<KontaktAngaben> matchesKontaktAngaben(@Nonnull KontaktAngabenDTO dto) {
+		return pojo(KontaktAngaben.class)
+			.where(KontaktAngaben::getAnschrift, is(dto.getAnschrift()))
+			.where(KontaktAngaben::getStrasse, is(dto.getStrasse()))
+			.where(KontaktAngaben::getHausnummer, is(dto.getHausnummer()))
+			.where(KontaktAngaben::getAdresszusatz, is(dto.getAdresszusatz()))
+			.where(KontaktAngaben::getPlz, is(dto.getPlz()))
+			.where(KontaktAngaben::getOrt, is(dto.getOrt()))
+			.where(KontaktAngaben::getLand, is(dto.getLand()))
+			.where(KontaktAngaben::getGemeinde, pojo(Gemeinde.class)
+				.where(Gemeinde::getName, is(dto.getGemeinde().getName()))
+				.where(Gemeinde::getBfsNummer, is(dto.getGemeinde().getBfsNummer()))
+			)
+			.where(KontaktAngaben::getEmail, is(dto.getEmail()))
+			.where(KontaktAngaben::getTelefon, is(dto.getTelefon()))
+			.where(KontaktAngaben::getWebseite, is(dto.getWebseite()));
+	}
+
+	@Nonnull
+	private Matcher<JsonNode> matchesBetreuungsAdressen(@Nonnull InstitutionEventDTO dto) {
+		return is(jsonArray(contains(dto.getBetreuungsAdressen().stream()
+			.map(this::matchesKontaktAngabenNode)
+			.collect(Collectors.toList()))));
+	}
+
+	@Nonnull
+	private Matcher<JsonNode> matchesAlterskategorien(@Nonnull InstitutionEventDTO dto) {
+		return is(jsonArray(contains(dto.getAltersKategorien().stream()
+			.map(Enum::name)
+			.map(JsonMatchers::jsonText)
+			.collect(Collectors.toList()))));
+	}
+
+	@Nonnull
+	private Matcher<JsonNode> matchesOeffnungsTage(@Nonnull InstitutionEventDTO dto) {
+		return is(jsonArray(contains(dto.getOeffnungsTage().stream()
+			.map(Enum::name)
+			.map(JsonMatchers::jsonText)
+			.collect(Collectors.toList()))));
+	}
+
+	@Nonnull
+	private Matcher<JsonNode> matchesKontaktAngabenNode(@Nonnull KontaktAngabenDTO dto) {
+		return is(jsonObject()
+			.where("anschrift", is(jsonText(dto.getAnschrift())))
+			.where("strasse", is(jsonText(dto.getStrasse())))
+			.where("hausnummer", is(jsonText(dto.getHausnummer())))
+			.where("adresszusatz", either(jsonNull()).or(jsonText(dto.getAdresszusatz())))
+			.where("plz", is(jsonText(dto.getPlz())))
+			.where("ort", is(jsonText(dto.getOrt())))
+			.where("land", is(jsonText(dto.getLand())))
+			.where("gemeinde", is(jsonObject()
+				.where("name", is(jsonText(dto.getGemeinde().getName())))
+				.where("bfsNummer", is(jsonNull()))
+			))
+			.where("email", is(jsonText(dto.getEmail())))
+			.where("telefon", is(jsonText(dto.getTelefon())))
+			.where("webseite", is(jsonText(dto.getWebseite()))));
 	}
 }

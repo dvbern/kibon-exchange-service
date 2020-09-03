@@ -114,8 +114,12 @@ if (params.performRelease) {
 
 		if (branch.startsWith(masterBranchName) || branch.startsWith(developBranchName)) {
 			stage('Deploy') {
+				def deploymentConfig = branch.startsWith(masterBranchName) ?
+						'kibon-exchange-uat' :
+						'kibon-exchange-dev'
+
 				sshPublisher(publishers: [sshPublisherDesc(
-						configName: 'kibon-exchange-dev',
+						configName: deploymentConfig,
 						transfers: [sshTransfer(
 								cleanRemote: false,
 								excludes: '',

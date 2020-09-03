@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 DV Bern AG, Switzerland
+ * Copyright (C) 2020 DV Bern AG, Switzerland
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.api.verfuegung;
+package ch.dvbern.kibon.api.platzbestaetigung;
 
 import java.util.List;
 import java.util.Set;
@@ -34,13 +34,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
-import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungDTO;
-import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungenDTO;
-import ch.dvbern.kibon.institution.service.InstitutionService;
-import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
-import ch.dvbern.kibon.verfuegung.service.VerfuegungService;
-import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
+import ch.dvbern.kibon.exchange.api.common.platzbestaetigung.BetreuungAnfrageDTO;
+import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrageDTO;
+import ch.dvbern.kibon.platzbestaetigung.service.BetreuungAnfrageService;
+import ch.dvbern.kibon.platzbestaetigung.service.filter.ClientBetreuungAnfrageFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -54,20 +51,16 @@ import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/verfuegungen")
+@Path("/platzbestaetigung")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class VerfuegungenResourceImpl {
+public class PlatzbestaetigungResource {
 
-	private static final Logger LOG = LoggerFactory.getLogger(VerfuegungenResourceImpl.class);
-
-	@SuppressWarnings("checkstyle:VisibilityModifier")
-	@Inject
-	VerfuegungService verfuegungenService;
+	private static final Logger LOG = LoggerFactory.getLogger(PlatzbestaetigungResource.class);
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
-	InstitutionService institutionService;
+	BetreuungAnfrageService betreuungAnfrageService;
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
@@ -83,11 +76,11 @@ public class VerfuegungenResourceImpl {
 
 	@GET
 	@Operation(
-		summary = "Returns all kiBon Verfuegungen and corresponding institutions which were made available.",
-		description = "Returns all kiBon Verfuegungen and corresponding institutions, which were made available "
+		summary = "Returns all kiBon BetreuungAnfrage which were made available.",
+		description = "Returns all kiBon BetreuungAnfrage, which were made available "
 			+ "to the client in the kiBon application.")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
-	@APIResponse(responseCode = "200", name = "VerfuegungenDTO")
+	@APIResponse(responseCode = "200", name = "List<BetreuungAnfrageDTO>")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
 	@Transactional
@@ -95,12 +88,13 @@ public class VerfuegungenResourceImpl {
 	@Nonnull
 	@RolesAllowed("user")
 	@Timed(name = "requestTimer",
-		description = "A measure of how long it takes to load Verfuegungen",
+		description = "A measure of how long it takes to load BetreuungAnfrage",
 		unit = MetricUnits.MILLISECONDS)
-	public VerfuegungenDTO getAll(
-		@Parameter(description = "Verfuegungen are ordered by their strictly monotonically increasing ID. Use this "
-			+ "parameter to get only Verfuegungen with ID larger after_id. Useful to exclude already fetched "
-			+ "Verfuegungen.")
+	public List<BetreuungAnfrageDTO> getAll(
+		@Parameter(description = "BetreuungAnfragen are ordered by their strictly monotonically increasing ID. Use "
+			+ "this "
+			+ "parameter to get only BetreuungAnfragen with ID larger after_id. Useful to exclude already fetched "
+			+ "BetreuungAnfragen.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Limits the maximum result set of Verfuegungen to the specified number")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit,
@@ -112,40 +106,25 @@ public class VerfuegungenResourceImpl {
 		String userName = identity.getPrincipal().getName();
 
 		LOG.info(
-			"Verfuegungen accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id '{}'",
+			"BetreuungAnfragen accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id '{}'",
 			userName,
 			clientName,
 			groups,
 			limit,
 			afterId);
 
-		// "filter" parameter is ignored at the moment. Added to API to make adding restrictions easily
+		ClientBetreuungAnfrageFilter queryFilter = new ClientBetreuungAnfrageFilter(clientName, afterId, limit);
 
-		ClientVerfuegungFilter queryFilter = new ClientVerfuegungFilter(clientName, afterId, limit);
+		List<ClientBetreuungAnfrageDTO> dtos = betreuungAnfrageService.getAllForClient(queryFilter);
 
-		VerfuegungenDTO verfuegungenDTO = new VerfuegungenDTO();
-
-		List<ClientVerfuegungDTO> dtos = verfuegungenService.getAllForClient(queryFilter);
-
-		List<VerfuegungDTO> verfuegungen = dtos.stream()
+		List<BetreuungAnfrageDTO> betreuungAnfrageDTOs = dtos.stream()
 			.map(this::convert)
 			.collect(Collectors.toList());
-
-		verfuegungenDTO.setVerfuegungen(verfuegungen);
-
-		Set<String> institutionIds = verfuegungen.stream()
-			.map(VerfuegungDTO::getInstitutionId)
-			.collect(Collectors.toSet());
-
-		List<InstitutionDTO> institutionDTOs = institutionService.get(institutionIds);
-
-		verfuegungenDTO.setInstitutionen(institutionDTOs);
-
-		return verfuegungenDTO;
+		return betreuungAnfrageDTOs;
 	}
 
 	@Nonnull
-	private VerfuegungDTO convert(@Nonnull ClientVerfuegungDTO model) {
-		return objectMapper.convertValue(model, VerfuegungDTO.class);
+	private BetreuungAnfrageDTO convert(@Nonnull ClientBetreuungAnfrageDTO model) {
+		return objectMapper.convertValue(model, BetreuungAnfrageDTO.class);
 	}
 }

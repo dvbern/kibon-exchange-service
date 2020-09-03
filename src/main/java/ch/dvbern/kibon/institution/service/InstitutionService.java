@@ -18,10 +18,12 @@
 package ch.dvbern.kibon.institution.service;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -35,12 +37,15 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
-import ch.dvbern.kibon.exchange.api.institution.model.InstitutionDTO;
+import ch.dvbern.kibon.clients.model.Client;
+import ch.dvbern.kibon.clients.model.ClientId;
+import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
-import ch.dvbern.kibon.institution.model.Adresse;
-import ch.dvbern.kibon.institution.model.Adresse_;
+import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.Institution_;
+import ch.dvbern.kibon.institution.model.KontaktAngaben;
+import ch.dvbern.kibon.institution.model.KontaktAngaben_;
 
 /**
  * Service responsible for {@link Institution} handling.
@@ -75,27 +80,55 @@ public class InstitutionService {
 	}
 
 	@Nonnull
+	public List<Institution> getForFamilyPortal() {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
+		Root<Institution> root = query.from(Institution.class);
+
+		//noinspection rawtypes
+		ParameterExpression<Set> betreuungsArtParam = cb.parameter(Set.class, "betreuungsArtParam");
+		query.where(root.get(Institution_.betreuungsArt).in(betreuungsArtParam));
+
+		Set<BetreuungsangebotTyp> familyPortalSet =
+			EnumSet.of(BetreuungsangebotTyp.KITA, BetreuungsangebotTyp.TAGESFAMILIEN);
+
+		return em.createQuery(query)
+			.setParameter(betreuungsArtParam, familyPortalSet)
+			.getResultList();
+	}
+
+	@Nonnull
 	public List<InstitutionDTO> get(@Nonnull Set<String> institutionIds) {
 		if (institutionIds.isEmpty()) {
 			return Collections.emptyList();
 		}
 
+		TypedQuery<InstitutionDTO> q = getInstitutionDTOTypedQuery(institutionIds);
+
+		List<InstitutionDTO> resultList = q.getResultList();
+
+		return resultList;
+	}
+
+	@Nonnull
+	private TypedQuery<InstitutionDTO> getInstitutionDTOTypedQuery(
+		@Nonnull Set<String> institutionIds) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<InstitutionDTO> query = cb.createQuery(InstitutionDTO.class);
 		Root<Institution> root = query.from(Institution.class);
-		Path<Adresse> adresse = root.get(Institution_.adresse);
+		Path<KontaktAngaben> adresse = root.get(Institution_.kontaktAdresse);
 
 		query.select(cb.construct(
 			InstitutionDTO.class,
 			root.get(Institution_.id),
 			root.get(Institution_.name),
 			root.get(Institution_.traegerschaft),
-			adresse.get(Adresse_.strasse),
-			adresse.get(Adresse_.hausnummer),
-			adresse.get(Adresse_.adresszusatz),
-			adresse.get(Adresse_.plz),
-			adresse.get(Adresse_.ort),
-			adresse.get(Adresse_.land)
+			adresse.get(KontaktAngaben_.strasse),
+			adresse.get(KontaktAngaben_.hausnummer),
+			adresse.get(KontaktAngaben_.adresszusatz),
+			adresse.get(KontaktAngaben_.plz),
+			adresse.get(KontaktAngaben_.ort),
+			adresse.get(KontaktAngaben_.land)
 		));
 
 		//noinspection rawtypes
@@ -104,11 +137,24 @@ public class InstitutionService {
 
 		query.where(idPredicate);
 
-		TypedQuery<InstitutionDTO> q = em.createQuery(query)
+		return em.createQuery(query)
 			.setParameter(idsParam, institutionIds);
+	}
 
-		List<InstitutionDTO> resultList = q.getResultList();
+	@Nullable
+	public Client getClient(@Nonnull String institutionId, @Nonnull String clientName) {
+		if (institutionId.isBlank()) {
+			return null;
+		}
 
-		return resultList;
+		return em.find(Client.class, new ClientId(clientName, institutionId));
+	}
+
+	@Nonnull
+	public InstitutionDTO get(@Nonnull String institutionId) {
+
+		TypedQuery<InstitutionDTO> q = getInstitutionDTOTypedQuery(Collections.singleton(institutionId));
+
+		return q.getSingleResult();
 	}
 }
