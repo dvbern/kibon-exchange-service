@@ -34,8 +34,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
 @ExtendWith(EasyMockExtension.class)
-public class BetreuungAnfrageServiceTest {
-
+class BetreuungAnfrageServiceTest {
 
 	@TestSubject
 	private final BetreuungAnfrageService service = new BetreuungAnfrageService();
@@ -49,7 +48,7 @@ public class BetreuungAnfrageServiceTest {
 	private BetreuungAnfrageConverter converter;
 
 	@Test
-	public void testOnVerfuegungCreated() {
+	void testOnBetreuungAnfrageCreated() {
 		BetreuungAnfrageEventDTO dto = new BetreuungAnfrageEventDTO();
 
 		BetreuungAnfrage betreuungAnfrage = new BetreuungAnfrage();

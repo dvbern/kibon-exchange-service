@@ -23,6 +23,24 @@ CREATE TRIGGER client_active_toggle
 	ON client
 	FOR EACH ROW
 EXECUTE PROCEDURE client_active_toggle();
+
+CREATE TRIGGER betreuunganfrage_insert
+	AFTER INSERT
+	ON betreuunganfrage
+	FOR EACH ROW
+EXECUTE PROCEDURE betreuunganfrage_insert();
+
+CREATE TRIGGER clientbetreuunganfrage_insert
+	AFTER INSERT
+	ON client
+	FOR EACH ROW
+EXECUTE PROCEDURE clientbetreuunganfrage_insert();
+
+CREATE TRIGGER clientbetreuunganfrage_active_toggle
+	AFTER UPDATE
+	ON client
+	FOR EACH ROW
+EXECUTE PROCEDURE clientbetreuunganfrage_active_toggle();
 -- endregion
 
 INSERT INTO client (clientname, grantedsince, institutionid, active)
@@ -58,4 +76,14 @@ FROM generate_series(1, 100) i
 			now() - INTERVAL '5 days', 0, '2019-08-01'::DATE, '[]'::JSONB),
 		   ('KITA', '2020-07-31'::DATE, '{}'::JSONB, '[]'::JSONB, '1', 0, 'Gemeinde', '{}'::JSONB, '1.1.1.1',
 			now() - INTERVAL '7 days', 0, '2019-08-01'::DATE, '[]'::JSONB)
+	) t;
+
+INSERT INTO betreuunganfrage(refnr, institutionid, periodevon, periodebis, betreuungsart, kind, gesuchsteller,
+							 abgelehntvongesuchsteller)
+SELECT t.*
+FROM generate_series(1, 10) i
+	 CROSS JOIN LATERAL (
+	VALUES ('1.1.1.1', '1', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE),
+		   ('1.1.1.2', '2', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE),
+		   ('1.1.1.3', '3', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE)
 	) t;

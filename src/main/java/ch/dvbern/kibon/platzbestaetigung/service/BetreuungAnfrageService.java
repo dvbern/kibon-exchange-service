@@ -38,7 +38,6 @@ import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrage;
 import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrage_;
 import ch.dvbern.kibon.platzbestaetigung.service.filter.ClientBetreuungAnfrageFilter;
-import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 
 @ApplicationScoped
 public class BetreuungAnfrageService {
@@ -52,7 +51,7 @@ public class BetreuungAnfrageService {
 	BetreuungAnfrageConverter converter;
 
 	/**
-	 * Stores the verfuegung in response to the verfuegungCreated event.
+	 * Stores the BetreuungAnfrage in response to the betreuungAnfrageCreated event.
 	 */
 	@Transactional(TxType.MANDATORY)
 	public void onBetreuungAnfrageCreated(@Nonnull BetreuungAnfrageEventDTO dto) {
@@ -62,7 +61,7 @@ public class BetreuungAnfrageService {
 	}
 
 	/**
-	 * Delivers all {@link ClientVerfuegungDTO} for the given filter.
+	 * Delivers all {@link ClientBetreuungAnfrageDTO} for the given filter.
 	 */
 	@Transactional(TxType.MANDATORY)
 	public List<ClientBetreuungAnfrageDTO> getAllForClient(@Nonnull ClientBetreuungAnfrageFilter filter) {

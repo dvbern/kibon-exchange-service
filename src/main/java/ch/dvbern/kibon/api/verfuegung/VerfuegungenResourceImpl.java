@@ -87,9 +87,10 @@ public class VerfuegungenResourceImpl {
 		description = "Returns all kiBon Verfuegungen and corresponding institutions, which were made available "
 			+ "to the client in the kiBon application.")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
-	@APIResponse(responseCode = "200", name = "VerfuegungenDTO")
+	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
+	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
 	@Transactional
 	@NoCache
 	@Nonnull

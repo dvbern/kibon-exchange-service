@@ -21,3 +21,5 @@ components:
       description: Access denied
     NotFound:
       description: Requested resource does not exist
+    ServerError:
+      description: Internal server error
