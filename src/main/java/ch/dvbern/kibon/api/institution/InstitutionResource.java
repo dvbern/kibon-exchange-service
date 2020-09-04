@@ -46,6 +46,8 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
@@ -82,18 +84,20 @@ public class InstitutionResource {
 	@GET
 	@Path("/familyportal")
 	@Operation(
-		summary = "Institutions for family portal Bern",
-		description = "Returns a list of institutions with additional data as required for the family portal Bern."
+		summary = "Institutionen für das Familienportal Bern",
+		description = "Returniert eine Liste aller Kitas und Tagesfamilien Organisationen, welche in kiBon erfasst "
+			+ "wurden."
 	)
 	@SecurityRequirement(name = "OAuth2", scopes = "familyportal")
-	@APIResponse(responseCode = "200", name = "FamilyPortalDTO")
+	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
+	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
 	@Transactional
 	@NoCache
 	@Nonnull
 	@RolesAllowed("familyportal")
-	@Timed(name = "stubTimer",
+	@Timed(name = "familyportalTimer",
 		description = "A measure of how long it takes to load FamilyPortalDTO",
 		unit = MetricUnits.MILLISECONDS)
 	public FamilyPortalDTO getForFamilyPortal() {
@@ -108,13 +112,14 @@ public class InstitutionResource {
 	@GET
 	@Path("{id}")
 	@Operation(
-		summary = "Returns institution for the give id.",
-		description = "Returns institution for the give id to the client application.")
+		summary = "Institutions Daten",
+		description = "Returniert Namen und Adresse einer Institution.")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
-	@APIResponse(responseCode = "200", name = "InstitutionDTO")
+	@APIResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = InstitutionDTO.class)))
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
 	@APIResponse(responseCode = "404", ref = "#/components/responses/NotFound")
+	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
 	@Transactional
 	@NoCache
 	@Nonnull
@@ -123,8 +128,7 @@ public class InstitutionResource {
 		description = "A measure of how long it takes to load an Institution",
 		unit = MetricUnits.MILLISECONDS)
 	public Response get(
-		@Parameter(description = "Institutions are identified with their IDs. Use this "
-			+ "parameter to get the Institution with given id.")
+		@Parameter(description = "ID der angeforderten Institution.")
 		@PathParam("id") @Nonnull String id) {
 
 		String clientName = jsonWebToken.getClaim("clientId");

@@ -20,6 +20,7 @@ package ch.dvbern.kibon.util;
 public final class ConstantsUtil {
 
 	public static final int TEXT_AREA_SIZE = 4000;
+	public static final int SHORT_COLUMN_SIZE = 100;
 
 	private ConstantsUtil() {
 	}

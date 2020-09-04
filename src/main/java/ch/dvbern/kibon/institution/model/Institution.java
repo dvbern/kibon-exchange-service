@@ -18,6 +18,7 @@
 package ch.dvbern.kibon.institution.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
@@ -30,15 +31,20 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.util.ConstantsUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.hibernate.annotations.Type;
 
+@Table(indexes = @Index(name = "institution_idx1", columnList = "betreuungsArt, status"))
 @Entity
 public class Institution {
 
@@ -54,7 +60,22 @@ public class Institution {
 
 	@Nonnull
 	@Enumerated(EnumType.STRING)
+	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
 	private @NotNull BetreuungsangebotTyp betreuungsArt = BetreuungsangebotTyp.KITA;
+
+	@JsonIgnore
+	@Nonnull
+	@Enumerated(EnumType.STRING)
+	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
+	private @NotNull InstitutionStatus status = InstitutionStatus.AKTIV;
+
+	@JsonIgnore
+	@Nullable
+	private LocalDate betreuungsGutscheineAb = null;
+
+	@JsonIgnore
+	@Nullable
+	private LocalDate betreuungsGutscheineBis = null;
 
 	@Embedded
 	@Nonnull
@@ -171,6 +192,33 @@ public class Institution {
 
 	public void setBetreuungsArt(@Nonnull BetreuungsangebotTyp betreuungsArt) {
 		this.betreuungsArt = betreuungsArt;
+	}
+
+	@Nonnull
+	public InstitutionStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(@Nonnull InstitutionStatus status) {
+		this.status = status;
+	}
+
+	@Nullable
+	public LocalDate getBetreuungsGutscheineAb() {
+		return betreuungsGutscheineAb;
+	}
+
+	public void setBetreuungsGutscheineAb(@Nullable LocalDate betreuungsGutscheineAb) {
+		this.betreuungsGutscheineAb = betreuungsGutscheineAb;
+	}
+
+	@Nullable
+	public LocalDate getBetreuungsGutscheineBis() {
+		return betreuungsGutscheineBis;
+	}
+
+	public void setBetreuungsGutscheineBis(@Nullable LocalDate betreuungsGutscheineBis) {
+		this.betreuungsGutscheineBis = betreuungsGutscheineBis;
 	}
 
 	@Nonnull

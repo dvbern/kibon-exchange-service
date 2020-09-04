@@ -87,15 +87,20 @@ VALUES ('kitAdmin', now(), '1', TRUE),
 INSERT INTO institution(id, name, traegerschaft, anschrift, strasse, hausnummer, adresszusatz, plz, ort, land,
 						betreuungsart, bfsnummer, gemeinde_name, email, telefon, webseite, betreuungsadressen,
 						oeffnungstage, offenvon, offenbis, oeffnungsabweichungen, alterskategorien,
-						subventionierteplaetze, anzahlplaetze, anzahlplaetzefirmen, timestampmutiert)
+						subventionierteplaetze, anzahlplaetze, anzahlplaetzefirmen, timestampmutiert,
+						status, betreuungsgutscheineab, betreuungsgutscheinebis)
 VALUES ('1', 'DV Kids', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3006', 'Bern', 'CH',
-		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now()),
+		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now(),
+		'AKTIV', NULL, NULL),
 	   ('2', 'DV Juniors', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
-		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now()),
+		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now(),
+		'DELETED', NULL, NULL),
 	   ('3', 'DV Teens', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
-		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now()),
+		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now(),
+		'AKTIV', NULL, NULL),
 	   ('4', 'DV Tweens', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
-		'TAGESSCHULE', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now());
+		'TAGESSCHULE', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL,
+		now(), 'AKTIV', NULL, NULL);
 
 INSERT INTO verfuegung (betreuungsart, bis, gesuchsteller, ignoriertezeitabschnitte, institutionid, gemeindebfsnr,
 						gemeindename, kind, refnr, verfuegtam, version, von, zeitabschnitte)

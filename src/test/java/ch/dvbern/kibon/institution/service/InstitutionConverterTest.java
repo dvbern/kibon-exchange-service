@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
+import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
 import ch.dvbern.kibon.exchange.commons.util.DateConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
@@ -85,6 +86,9 @@ class InstitutionConverterTest {
 			.where(Institution::getName, is(dto.getName()))
 			.where(Institution::getTraegerschaft, is(dto.getTraegerschaft()))
 			.where(Institution::getBetreuungsArt, is(dto.getBetreuungsArt()))
+			.where(Institution::getStatus, is(dto.getStatus() == null ? InstitutionStatus.AKTIV : dto.getStatus()))
+			.where(Institution::getBetreuungsGutscheineAb, is(dto.getBetreuungsGutscheineAb()))
+			.where(Institution::getBetreuungsGutscheineBis, is(dto.getBetreuungsGutscheineBis()))
 			.where(Institution::getKontaktAdresse, matchesKontaktAngaben(dto.getAdresse()))
 			.where(Institution::getBetreuungsAdressen, matchesBetreuungsAdressen(dto))
 			.where(Institution::getOeffnungsTage, matchesOeffnungsTage(dto))

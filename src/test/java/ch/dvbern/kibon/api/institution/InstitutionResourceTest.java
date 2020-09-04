@@ -19,6 +19,7 @@ package ch.dvbern.kibon.api.institution;
 
 import javax.ws.rs.core.Response.Status;
 
+import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.testutils.TestcontainersEnvironment;
 import io.quarkus.test.common.QuarkusTestResource;
@@ -35,6 +36,7 @@ import static org.hamcrest.Matchers.either;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 @QuarkusTestResource(TestcontainersEnvironment.class)
 @QuarkusTest
@@ -127,6 +129,26 @@ class InstitutionResourceTest {
 							jsonText(BetreuungsangebotTyp.KITA.name())
 						)
 					))
+				)))
+			));
+	}
+
+	@Test
+	void testGetFamilyPortalOnlyReturnsAKTIV() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getFamilyPortalAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.get("/institutions/familyportal")
+			.then()
+			.assertThat()
+			.statusCode(Status.OK.getStatusCode())
+			.body(isJsonStringMatching(jsonObject()
+				.where("institutionen", is(jsonArray(
+					everyItem(jsonObject()
+						// in import-test.dev, institution with ID 2 has status DELETED and should not be in the output
+						.where("id", not(jsonText("2")))
+					)
 				)))
 			));
 	}
