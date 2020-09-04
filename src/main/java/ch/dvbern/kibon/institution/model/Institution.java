@@ -69,9 +69,11 @@ public class Institution {
 	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
 	private @NotNull InstitutionStatus status = InstitutionStatus.AKTIV;
 
+	@JsonIgnore
 	@Nullable
 	private LocalDate betreuungsGutscheineAb = null;
 
+	@JsonIgnore
 	@Nullable
 	private LocalDate betreuungsGutscheineBis = null;
 
