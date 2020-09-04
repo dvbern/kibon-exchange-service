@@ -26,7 +26,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
-import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
 import ch.dvbern.kibon.exchange.commons.util.DateConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
@@ -56,8 +55,12 @@ public class InstitutionConverter {
 	public void update(@Nonnull Institution institution, @Nonnull InstitutionEventDTO dto) {
 		institution.setName(dto.getName());
 		institution.setTraegerschaft(dto.getTraegerschaft());
-		institution.setBetreuungsArt(dto.getBetreuungsArt());
-		institution.setStatus(dto.getStatus() == null ? InstitutionStatus.AKTIV : dto.getStatus());
+		if (dto.getBetreuungsArt() != null) {
+			institution.setBetreuungsArt(dto.getBetreuungsArt());
+		}
+		if (dto.getStatus() != null) {
+			institution.setStatus(dto.getStatus());
+		}
 		institution.setBetreuungsGutscheineAb(dto.getBetreuungsGutscheineAb());
 		institution.setBetreuungsGutscheineBis(dto.getBetreuungsGutscheineBis());
 
@@ -73,7 +76,9 @@ public class InstitutionConverter {
 		institution.setSubventioniertePlaetze(dto.getSubventioniertePlaetze());
 		institution.setAnzahlPlaetze(dto.getAnzahlPlaetze());
 		institution.setAnzahlPlaetzeFirmen(dto.getAnzahlPlaetzeFirmen());
-		institution.setTimestampMutiert(DateConverter.toLocalDateTime(dto.getTimestampMutiert()));
+		if (dto.getTimestampMutiert() != null) {
+			institution.setTimestampMutiert(DateConverter.toLocalDateTime(dto.getTimestampMutiert()));
+		}
 	}
 
 	private void update(@Nonnull KontaktAngaben adresse, @Nonnull KontaktAngabenDTO dto) {
