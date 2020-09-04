@@ -86,9 +86,10 @@ public class InstitutionResource {
 		description = "Returns a list of institutions with additional data as required for the family portal Bern."
 	)
 	@SecurityRequirement(name = "OAuth2", scopes = "familyportal")
-	@APIResponse(responseCode = "200", name = "FamilyPortalDTO")
+	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
+	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
 	@Transactional
 	@NoCache
 	@Nonnull
@@ -111,10 +112,11 @@ public class InstitutionResource {
 		summary = "Returns institution for the give id.",
 		description = "Returns institution for the give id to the client application.")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
-	@APIResponse(responseCode = "200", name = "InstitutionDTO")
+	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
 	@APIResponse(responseCode = "404", ref = "#/components/responses/NotFound")
+	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
 	@Transactional
 	@NoCache
 	@Nonnull

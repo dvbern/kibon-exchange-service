@@ -41,6 +41,7 @@ import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
+import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.Institution_;
@@ -87,13 +88,19 @@ public class InstitutionService {
 
 		//noinspection rawtypes
 		ParameterExpression<Set> betreuungsArtParam = cb.parameter(Set.class, "betreuungsArtParam");
-		query.where(root.get(Institution_.betreuungsArt).in(betreuungsArtParam));
+		Predicate betreuungArtPredicate = root.get(Institution_.betreuungsArt).in(betreuungsArtParam);
+
+		ParameterExpression<InstitutionStatus> statusParam = cb.parameter(InstitutionStatus.class, "statusParam");
+		Predicate statusPredicate = cb.equal(root.get(Institution_.status), statusParam);
+
+		query.where(betreuungArtPredicate, statusPredicate);
 
 		Set<BetreuungsangebotTyp> familyPortalSet =
 			EnumSet.of(BetreuungsangebotTyp.KITA, BetreuungsangebotTyp.TAGESFAMILIEN);
 
 		return em.createQuery(query)
 			.setParameter(betreuungsArtParam, familyPortalSet)
+			.setParameter(statusParam, InstitutionStatus.AKTIV)
 			.getResultList();
 	}
 

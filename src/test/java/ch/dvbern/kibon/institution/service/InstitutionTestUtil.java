@@ -29,6 +29,7 @@ import javax.annotation.Nonnull;
 import ch.dvbern.kibon.exchange.commons.institution.AltersKategorie;
 import ch.dvbern.kibon.exchange.commons.institution.GemeindeDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
+import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.exchange.commons.util.DateConverter;
@@ -86,6 +87,9 @@ public final class InstitutionTestUtil {
 			BetreuungsangebotTyp.TAGESFAMILIEN,
 			adresse,
 			Arrays.asList(fakeKontaktAngabenDTO(), fakeKontaktAngabenDTO()),
+			InstitutionStatus.AKTIV,
+			null,
+			null,
 			Arrays.asList(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY),
 			TimeConverter.serialize(LocalTime.of(7, 30)),
 			TimeConverter.serialize(LocalTime.of(19, 0)),

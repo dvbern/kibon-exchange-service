@@ -20,6 +20,7 @@ package ch.dvbern.kibon.api.institution.familyportal;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import ch.dvbern.kibon.exchange.api.common.verfuegung.BetreuungsAngebot;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 public class FamilyPortalInstitutionDTO implements Serializable {
 
@@ -54,23 +56,36 @@ public class FamilyPortalInstitutionDTO implements Serializable {
 	@NotNull
 	private String name = "";
 
+	@Schema(description = "Kontaktangaben, welche in kiBon hinterlegt wurden.")
 	@Nonnull
 	@NotNull
 	@Valid
 	private KontaktAngabenDTO kontaktAdresse = new KontaktAngabenDTO();
 
+	@Schema(description = "Betreuungsstandorte - oft identisch mit den Kontaktangaben")
 	@Nonnull
 	@NotNull
 	@Valid
 	private List<KontaktAngabenDTO> betreuungsAdressen = new ArrayList<>();
 
+	@Schema(description = "Beginn des Betreuungsgutschein Angebots")
+	@Nullable
+	private LocalDate betreuungsGutscheineAb = null;
+
+	@Schema(description = "Ende des Betreuungsgutschein Angebots")
+	@Nullable
+	private LocalDate betreuungsGutscheineBis = null;
+
+	@Schema(description = "Wochentage, an denen üblicherweise geöffnet ist.")
 	@Nonnull
 	@NotNull
 	private List<DayOfWeek> oeffnungsTage = new ArrayList<>();
 
+	@Schema(description = "Start der täglichen Betreuung")
 	@Nullable
 	private LocalTime offenVon = null;
 
+	@Schema(description = "Ende der täglichen Betreuung")
 	@Nullable
 	private LocalTime offenBis = null;
 
@@ -81,11 +96,14 @@ public class FamilyPortalInstitutionDTO implements Serializable {
 	@NotNull
 	private List<AltersKategorie> altersKategorien = new ArrayList<>();
 
+	@Schema(description = "TRUE, falls einige Plätze nach dem bisherigen Gebührensystem verrechnet werden")
 	private boolean subventioniertePlaetze = false;
 
+	@Schema(description = "Total Plätze der Insitution")
 	@Nullable
 	private BigDecimal anzahlPlaetze = null;
 
+	@Schema(description = "Anzahl Plätze, welche für Firmen reserviert sind")
 	@Nullable
 	private BigDecimal anzahlPlaetzeFirmen = null;
 
@@ -145,6 +163,24 @@ public class FamilyPortalInstitutionDTO implements Serializable {
 
 	public void setBetreuungsAdressen(@Nonnull List<KontaktAngabenDTO> betreuungsAdressen) {
 		this.betreuungsAdressen = betreuungsAdressen;
+	}
+
+	@Nullable
+	public LocalDate getBetreuungsGutscheineAb() {
+		return betreuungsGutscheineAb;
+	}
+
+	public void setBetreuungsGutscheineAb(@Nullable LocalDate betreuungsGutscheineAb) {
+		this.betreuungsGutscheineAb = betreuungsGutscheineAb;
+	}
+
+	@Nullable
+	public LocalDate getBetreuungsGutscheineBis() {
+		return betreuungsGutscheineBis;
+	}
+
+	public void setBetreuungsGutscheineBis(@Nullable LocalDate betreuungsGutscheineBis) {
+		this.betreuungsGutscheineBis = betreuungsGutscheineBis;
 	}
 
 	@Nonnull
