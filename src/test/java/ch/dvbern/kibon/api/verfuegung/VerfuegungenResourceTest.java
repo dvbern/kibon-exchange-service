@@ -39,7 +39,7 @@ import static org.hamcrest.Matchers.not;
 
 @QuarkusTestResource(TestcontainersEnvironment.class)
 @QuarkusTest
-class VerfuegungenResourceImplTest {
+class VerfuegungenResourceTest {
 
 	@Test
 	public void testGetAllEndpoint() {

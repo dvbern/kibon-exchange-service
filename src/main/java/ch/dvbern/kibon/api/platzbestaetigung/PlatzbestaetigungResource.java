@@ -35,6 +35,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import ch.dvbern.kibon.exchange.api.common.platzbestaetigung.BetreuungAnfrageDTO;
+import ch.dvbern.kibon.exchange.api.common.platzbestaetigung.BetreuungAnfragenDTO;
 import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.platzbestaetigung.service.BetreuungAnfrageService;
 import ch.dvbern.kibon.platzbestaetigung.service.filter.ClientBetreuungAnfrageFilter;
@@ -76,13 +77,15 @@ public class PlatzbestaetigungResource {
 
 	@GET
 	@Operation(
-		summary = "Returns all kiBon BetreuungAnfrage which were made available.",
-		description = "Returns all kiBon BetreuungAnfrage, which were made available "
-			+ "to the client in the kiBon application.")
+		summary = "Returniert Betreuung-Anfragen",
+		description = "Wenn ein Betreuungs-Gesuch bei einer Institution in kiBon eingereicht wird, muss diese den "
+			+ "Betreuungs-Platz des Kindes bestätigen.\n\nDiese Schnittstelle kann genutzt werden um alle "
+			+ "Betreuungs-Anfragen zu laden, welche die Institutionen des Clients betreffen.")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
-	@APIResponse(responseCode = "200", name = "List<BetreuungAnfrageDTO>")
+	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
+	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
 	@Transactional
 	@NoCache
 	@Nonnull
@@ -90,15 +93,14 @@ public class PlatzbestaetigungResource {
 	@Timed(name = "requestTimer",
 		description = "A measure of how long it takes to load BetreuungAnfrage",
 		unit = MetricUnits.MILLISECONDS)
-	public List<BetreuungAnfrageDTO> getAll(
-		@Parameter(description = "BetreuungAnfragen are ordered by their strictly monotonically increasing ID. Use "
-			+ "this "
-			+ "parameter to get only BetreuungAnfragen with ID larger after_id. Useful to exclude already fetched "
-			+ "BetreuungAnfragen.")
+	public BetreuungAnfragenDTO getAll(
+		@Parameter(description = "Erlaubt es, nur neue BetreuungAnfragen zu laden.\n\nJede BetreuungAnfragen hat eine "
+			+ "monoton steigende ID. Ein Client kann deshalb die grösste ID bereits eingelesener BetreuungAnfragen als"
+			+ " `after_id` Parameter setzen, um nur die neu verfügbaren BetreuungAnfragen zu erhalten.")
 		@QueryParam("after_id") @Nullable Long afterId,
-		@Parameter(description = "Limits the maximum result set of Verfuegungen to the specified number")
+		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit,
-		@Parameter(description = "Extension point for additional filtering, e.g. by institution. Currently not used.")
+		@Parameter(description = "Erweiterung für zusätzliche Filter - wird momentan nicht verwendet")
 		@QueryParam("$filter") @Nullable String filter) {
 
 		String clientName = jsonWebToken.getClaim("clientId");
@@ -120,7 +122,11 @@ public class PlatzbestaetigungResource {
 		List<BetreuungAnfrageDTO> betreuungAnfrageDTOs = dtos.stream()
 			.map(this::convert)
 			.collect(Collectors.toList());
-		return betreuungAnfrageDTOs;
+
+		BetreuungAnfragenDTO result = new BetreuungAnfragenDTO();
+		result.setAnfragen(betreuungAnfrageDTOs);
+
+		return result;
 	}
 
 	@Nonnull
