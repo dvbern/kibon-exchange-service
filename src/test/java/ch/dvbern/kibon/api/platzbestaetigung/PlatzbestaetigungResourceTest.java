@@ -48,10 +48,6 @@ import static org.hamcrest.Matchers.not;
 @QuarkusTest
 class PlatzbestaetigungResourceTest {
 
-	//	@SuppressWarnings("checkstyle:VisibilityModifier")
-	//	@Inject
-	//	ObjectMapper objectMapper;
-
 	@Test
 	void testGetAllEndpoint() {
 		given()
