@@ -84,16 +84,17 @@ CREATE FUNCTION betreuunganfrage_insert() RETURNS TRIGGER
 	SECURITY DEFINER
 	LANGUAGE plpgsql
 AS
-$$
-BEGIN
-	INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id, since)
-		(SELECT nextval('clientbetreuunganfrage_id_seq'), c.active, c.clientname, c.institutionid, new.id,
-				c.grantedsince
-		 FROM client c
-		 WHERE c.institutionid = new.institutionid);
-	RETURN new;
-END;
-$$;
+'
+	BEGIN
+		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id,
+											since)
+			(SELECT nextval(''clientbetreuunganfrage_id_seq''), c.active, c.clientname, c.institutionid, new.id,
+					c.grantedsince
+			 FROM client c
+			 WHERE c.institutionid = new.institutionid);
+		RETURN new;
+	END;
+';
 
 CREATE TRIGGER betreuunganfrage_insert
 	AFTER INSERT
@@ -108,18 +109,19 @@ CREATE FUNCTION clientbetreuunganfrage_insert() RETURNS TRIGGER
 	SECURITY DEFINER
 	LANGUAGE plpgsql
 AS
-$$
-BEGIN
-	INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id, since)
-		(SELECT nextval('clientbetreuunganfrage_id_seq'), new.active, new.clientname, new.institutionid, ba.id,
-				new
-					.grantedsince
-		 FROM betreuunganfrage ba
-		 WHERE ba.institutionid = new.institutionid
-		 ORDER BY new.grantedsince, ba.id);
-	RETURN new;
-END;
-$$;
+'
+	BEGIN
+		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id,
+											since)
+			(SELECT nextval(''clientbetreuunganfrage_id_seq''), new.active, new.clientname, new.institutionid, ba.id,
+					new
+						.grantedsince
+			 FROM betreuunganfrage ba
+			 WHERE ba.institutionid = new.institutionid
+			 ORDER BY new.grantedsince, ba.id);
+		RETURN new;
+	END;
+';
 
 CREATE TRIGGER clientbetreuunganfrage_insert
 	AFTER INSERT
@@ -134,14 +136,14 @@ CREATE FUNCTION clientbetreuunganfrage_active_toggle() RETURNS TRIGGER
 	SECURITY DEFINER
 	LANGUAGE plpgsql
 AS
-$$
-BEGIN
-	UPDATE clientbetreuunganfrage
-	SET active = new.active
-	WHERE client_clientname = new.clientname AND client_institutionid = new.institutionid;
-	RETURN new;
-END;
-$$;
+'
+	BEGIN
+		UPDATE clientbetreuunganfrage
+		SET active = new.active
+		WHERE client_clientname = new.clientname AND client_institutionid = new.institutionid;
+		RETURN new;
+	END;
+';
 
 CREATE TRIGGER clientbetreuunganfrage_active_toggle
 	AFTER UPDATE
