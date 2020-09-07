@@ -55,7 +55,14 @@ public class InstitutionConverter {
 	public void update(@Nonnull Institution institution, @Nonnull InstitutionEventDTO dto) {
 		institution.setName(dto.getName());
 		institution.setTraegerschaft(dto.getTraegerschaft());
-		institution.setBetreuungsArt(dto.getBetreuungsArt());
+		if (dto.getBetreuungsArt() != null) {
+			institution.setBetreuungsArt(dto.getBetreuungsArt());
+		}
+		if (dto.getStatus() != null) {
+			institution.setStatus(dto.getStatus());
+		}
+		institution.setBetreuungsGutscheineAb(dto.getBetreuungsGutscheineAb());
+		institution.setBetreuungsGutscheineBis(dto.getBetreuungsGutscheineBis());
 
 		update(institution.getKontaktAdresse(), dto.getAdresse());
 		institution.setBetreuungsAdressen(toBetreuungsStandorte(dto.getBetreuungsAdressen()));
@@ -69,7 +76,9 @@ public class InstitutionConverter {
 		institution.setSubventioniertePlaetze(dto.getSubventioniertePlaetze());
 		institution.setAnzahlPlaetze(dto.getAnzahlPlaetze());
 		institution.setAnzahlPlaetzeFirmen(dto.getAnzahlPlaetzeFirmen());
-		institution.setTimestampMutiert(DateConverter.toLocalDateTime(dto.getTimestampMutiert()));
+		if (dto.getTimestampMutiert() != null) {
+			institution.setTimestampMutiert(DateConverter.toLocalDateTime(dto.getTimestampMutiert()));
+		}
 	}
 
 	private void update(@Nonnull KontaktAngaben adresse, @Nonnull KontaktAngabenDTO dto) {

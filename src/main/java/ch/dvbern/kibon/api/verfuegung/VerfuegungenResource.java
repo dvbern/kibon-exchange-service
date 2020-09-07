@@ -57,9 +57,9 @@ import org.slf4j.LoggerFactory;
 @Path("/verfuegungen")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class VerfuegungenResourceImpl {
+public class VerfuegungenResource {
 
-	private static final Logger LOG = LoggerFactory.getLogger(VerfuegungenResourceImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(VerfuegungenResource.class);
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
@@ -83,9 +83,8 @@ public class VerfuegungenResourceImpl {
 
 	@GET
 	@Operation(
-		summary = "Returns all kiBon Verfuegungen and corresponding institutions which were made available.",
-		description = "Returns all kiBon Verfuegungen and corresponding institutions, which were made available "
-			+ "to the client in the kiBon application.")
+		summary = "Returniert verfügte Betreuungsgutscheine und die davon betroffenen Institutionen.",
+		description = "Returniert alle kiBon Verfuegungen und die dazugehörigen Institutionen, für welche der Client in kiBon berechtigt wurde.")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
@@ -99,13 +98,13 @@ public class VerfuegungenResourceImpl {
 		description = "A measure of how long it takes to load Verfuegungen",
 		unit = MetricUnits.MILLISECONDS)
 	public VerfuegungenDTO getAll(
-		@Parameter(description = "Verfuegungen are ordered by their strictly monotonically increasing ID. Use this "
-			+ "parameter to get only Verfuegungen with ID larger after_id. Useful to exclude already fetched "
-			+ "Verfuegungen.")
+		@Parameter(description = "Erlaubt es, nur neue Verfügungen zu laden.\n\nJede Verfügung hat eine "
+			+ "monoton steigende ID. Ein Client kann deshalb die grösste ID bereits eingelesener Verfügung als"
+			+ " `after_id` Parameter setzen, um nur die neu verfügbaren Verfügung zu erhalten.")
 		@QueryParam("after_id") @Nullable Long afterId,
-		@Parameter(description = "Limits the maximum result set of Verfuegungen to the specified number")
+		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit,
-		@Parameter(description = "Extension point for additional filtering, e.g. by institution. Currently not used.")
+		@Parameter(description = "Erweiterung für zusätzliche Filter - wird momentan nicht verwendet")
 		@QueryParam("$filter") @Nullable String filter) {
 
 		String clientName = jsonWebToken.getClaim("clientId");

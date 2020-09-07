@@ -12,14 +12,22 @@ components:
         clientCredentials:
           tokenUrl: /../auth/realms/kibon/protocol/openid-connect/token
           scopes:
-            user: allow access to verfuegugen
-            familyportal: allow accessing institutions with dataset for family portal Bern
+            user: Gestattet Zugriff auf die APIs für Verfügungen und Platzbestätigungen
+            familyportal: Erlaubt den Zugriff auf Institutionen für das Familienportal des Kanton Bern.
   responses:
     Unauthorized:
-      description: Authentication information is missing or invalid
+      description: Die Zugriffsdaten sind nicht gültig
+      content:
+        text/plain: { }
     Forbidden:
-      description: Access denied
+      description: Der Zugriff wurde verweigert
+      content:
+        text/plain: { }
     NotFound:
-      description: Requested resource does not exist
+      description: Die angeforderte Ressource existiert nicht
+      content:
+        text/plain: { }
     ServerError:
-      description: Internal server error
+      description: Interner Server Fehler
+      content:
+        text/plain: { }
