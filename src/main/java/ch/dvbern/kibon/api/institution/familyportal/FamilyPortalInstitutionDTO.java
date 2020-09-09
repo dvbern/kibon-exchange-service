@@ -20,6 +20,7 @@ package ch.dvbern.kibon.api.institution.familyportal;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -66,6 +67,14 @@ public class FamilyPortalInstitutionDTO implements Serializable {
 	@NotNull
 	@Valid
 	private List<KontaktAngabenDTO> betreuungsAdressen = new ArrayList<>();
+
+	@Schema(description = "Beginn des Betreuungsgutschein Angebots")
+	@Nullable
+	private LocalDate betreuungsGutscheineAb = null;
+
+	@Schema(description = "Ende des Betreuungsgutschein Angebots")
+	@Nullable
+	private LocalDate betreuungsGutscheineBis = null;
 
 	@Schema(description = "Wochentage, an denen üblicherweise geöffnet ist.")
 	@Nonnull
@@ -154,6 +163,24 @@ public class FamilyPortalInstitutionDTO implements Serializable {
 
 	public void setBetreuungsAdressen(@Nonnull List<KontaktAngabenDTO> betreuungsAdressen) {
 		this.betreuungsAdressen = betreuungsAdressen;
+	}
+
+	@Nullable
+	public LocalDate getBetreuungsGutscheineAb() {
+		return betreuungsGutscheineAb;
+	}
+
+	public void setBetreuungsGutscheineAb(@Nullable LocalDate betreuungsGutscheineAb) {
+		this.betreuungsGutscheineAb = betreuungsGutscheineAb;
+	}
+
+	@Nullable
+	public LocalDate getBetreuungsGutscheineBis() {
+		return betreuungsGutscheineBis;
+	}
+
+	public void setBetreuungsGutscheineBis(@Nullable LocalDate betreuungsGutscheineBis) {
+		this.betreuungsGutscheineBis = betreuungsGutscheineBis;
 	}
 
 	@Nonnull
