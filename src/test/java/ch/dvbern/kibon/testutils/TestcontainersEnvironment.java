@@ -18,7 +18,9 @@
 package ch.dvbern.kibon.testutils;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -44,6 +46,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleManager {
 
+	private static final String CONFLUENT_PLATFORM_VERSION = "5.5.1";
+
 	private static final String DB_SERVICE = "db_1";
 	private static final int DB_PORT = 5432;
 
@@ -51,7 +55,7 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 	private static final int KEYCLOAK_PORT = 8080;
 
 	@Container
-	private final KafkaContainer kafka = new KafkaContainer("5.5.1");
+	private final KafkaContainer kafka = new KafkaContainer(CONFLUENT_PLATFORM_VERSION);
 
 	@SuppressWarnings("rawtypes")
 	@Container
@@ -59,6 +63,16 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 		new DockerComposeContainer(new File("src/test/resources/compose-test.yml"))
 			.withExposedService(DB_SERVICE, DB_PORT)
 			.withExposedService(KEYCLOAK_SERVICE, KEYCLOAK_PORT);
+
+	@Container
+	private final SchemaRegistryContainer schemaRegistry = new SchemaRegistryContainer(CONFLUENT_PLATFORM_VERSION);
+
+	private static final List<String> SCHEMA_REGISTRY_URL_PROPERTIES = Arrays.asList(
+		"mp.messaging.incoming.VerfuegungEvents.schema.registry.url",
+		"mp.messaging.incoming.InstitutionEvents.schema.registry.url",
+		"mp.messaging.incoming.BetreuungAnfrageEvents.schema.registry.url",
+		"mp.messaging.outgoing.PlatzbestaetigungBetreuungEvents.schema.registry.url"
+	);
 
 	private static AuthzClient authzClient = null;
 	private static AuthzClient authzClientFambe = null;
@@ -77,6 +91,7 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 	public Map<String, String> start() {
 		ENVIRONMENT.start();
 		kafka.start();
+		schemaRegistry.withKafka(kafka).start();
 
 		String dbHost = ENVIRONMENT.getServiceHost(DB_SERVICE, DB_PORT);
 		Integer dbPort = ENVIRONMENT.getServicePort(DB_SERVICE, DB_PORT);
@@ -91,6 +106,8 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 		systemProps.put("kafka.bootstrap.servers", bootstrapServers);
 		String keycloakURL = "http://" + keycloakHost + ':' + keycloakPort + "/auth";
 		systemProps.put("quarkus.oidc.auth-server-url", keycloakURL + "/realms/kibon");
+
+		SCHEMA_REGISTRY_URL_PROPERTIES.forEach(url -> systemProps.put(url, schemaRegistry.getSchemaRegistryUrl()));
 
 		authzClient =
 			createKeycloakClientConfiguration(keycloakURL, "kitAdmin", "657d6aef-bdc3-40e9-9992-024810d2b24b");
