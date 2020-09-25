@@ -34,6 +34,7 @@ import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -89,9 +90,16 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 
 	@Override
 	public Map<String, String> start() {
+		Network network = Network.newNetwork();
 		ENVIRONMENT.start();
-		kafka.start();
-		schemaRegistry.withKafka(kafka).start();
+		kafka
+			.withNetwork(network)
+			.withNetworkAliases("kafka")
+			.start();
+		schemaRegistry
+			.withNetwork(network)
+			.withNetworkAliases("schema-registry")
+			.start();
 
 		String dbHost = ENVIRONMENT.getServiceHost(DB_SERVICE, DB_PORT);
 		Integer dbPort = ENVIRONMENT.getServicePort(DB_SERVICE, DB_PORT);
@@ -102,7 +110,7 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 		Integer keycloakPort = ENVIRONMENT.getServicePort(KEYCLOAK_SERVICE, KEYCLOAK_PORT);
 
 		Map<String, String> systemProps = new HashMap<>();
-		systemProps.put("quarkus.datasource.url", "jdbc:postgresql://" + dbHost + ':' + dbPort + "/kibon-exchange");
+		systemProps.put("quarkus.datasource.jdbc.url", "jdbc:postgresql://" + dbHost + ':' + dbPort + "/kibon-exchange");
 		systemProps.put("kafka.bootstrap.servers", bootstrapServers);
 		String keycloakURL = "http://" + keycloakHost + ':' + keycloakPort + "/auth";
 		systemProps.put("quarkus.oidc.auth-server-url", keycloakURL + "/realms/kibon");
