@@ -17,15 +17,13 @@
 
 package ch.dvbern.kibon.platzbestaetigung.facade;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
 import ch.dvbern.kibon.kafka.MessageProcessor;
+import io.smallrye.reactive.messaging.annotations.Blocking;
 import io.smallrye.reactive.messaging.kafka.KafkaRecord;
 import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
 import org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy;
@@ -45,9 +43,9 @@ public class BetreuungAnfrageKafkaEventConsumer {
 
 	@Incoming("BetreuungAnfrageEvents")
 	@Acknowledgment(Strategy.MANUAL)
-	public CompletionStage<Void> onMessage(@Nonnull KafkaRecord<String, BetreuungAnfrageEventDTO> message) {
-
-		return CompletableFuture.runAsync(() -> processor.process(message, eventHandler))
-			.thenCompose(f -> message.ack());
+	@Blocking
+	public void onMessage(@Nonnull KafkaRecord<String, BetreuungAnfrageEventDTO> message) {
+		processor.process(message, eventHandler);
+		message.ack();
 	}
 }
