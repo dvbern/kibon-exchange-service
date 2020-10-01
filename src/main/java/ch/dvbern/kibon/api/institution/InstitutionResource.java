@@ -40,6 +40,7 @@ import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.service.InstitutionService;
+import ch.dvbern.kibon.util.OpenApiTag;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -51,6 +52,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +85,7 @@ public class InstitutionResource {
 	 */
 	@GET
 	@Path("/familyportal")
+	@Tag(name = OpenApiTag.FAMILIEN_PORTAL)
 	@Operation(
 		summary = "Institutionen für das Familienportal Bern",
 		description = "Returniert eine Liste aller Kitas und Tagesfamilien Organisationen, welche in kiBon erfasst "
@@ -111,6 +114,8 @@ public class InstitutionResource {
 
 	@GET
 	@Path("{id}")
+	@Tag(name = OpenApiTag.PLATZ_BESTAETIGUNG)
+	@Tag(name = OpenApiTag.TAGES_SCHULEN)
 	@Operation(
 		summary = "Institutions Daten",
 		description = "Returniert Namen und Adresse einer Institution.")
@@ -123,7 +128,7 @@ public class InstitutionResource {
 	@Transactional
 	@NoCache
 	@Nonnull
-	@RolesAllowed("user")
+	@RolesAllowed({"user", "tagesschule"})
 	@Timed(name = "requestTimer",
 		description = "A measure of how long it takes to load an Institution",
 		unit = MetricUnits.MILLISECONDS)
