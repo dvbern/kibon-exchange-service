@@ -20,6 +20,7 @@ package ch.dvbern.kibon.api.tagesschule;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,14 +45,15 @@ import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TarifDTO;
 @ApplicationScoped
 public class TagesschulenMockResponses {
 
-	public static final String INSTITUTION_ID = UUID.randomUUID().toString();
+	private static final String INSTITUTION_ID = UUID.randomUUID().toString();
+	private static final LocalDateTime EVENT_TIMESTAMP = LocalDateTime.now().minusDays(3);
 
-	public static final TagesschuleKindDTO KIND_DTO =
+	private static final TagesschuleKindDTO KIND_DTO =
 		new TagesschuleKindDTO("Simon", "Wälti", LocalDate.of(2014, 4, 13), Geschlecht.MAENNLICH);
 
-	public static final AdresseDTO ADRESSE_DTO = new AdresseDTO("Testweg", "10", null, "3000", "Bern", "CH");
+	private static final AdresseDTO ADRESSE_DTO = new AdresseDTO("Testweg", "10", null, "3000", "Bern", "CH");
 
-	public static final TagesschuleAntragstellerDTO ANTRAGSTELLER_DTO = new TagesschuleAntragstellerDTO(
+	private static final TagesschuleAntragstellerDTO ANTRAGSTELLER_DTO = new TagesschuleAntragstellerDTO(
 		"Dagmar",
 		"Wälti",
 		"test@mailbucket.dvbern.ch",
@@ -99,8 +101,10 @@ public class TagesschulenMockResponses {
 	@Nonnull
 	public TagesschuleAnmeldungDTO createAnmeldung1(@Nonnull String refnr) {
 		TagesschuleAnmeldungDTO dto = new TagesschuleAnmeldungDTO();
+		dto.setId(1L);
 		dto.setInstitutionId(INSTITUTION_ID);
 		dto.setRefnr(refnr);
+		dto.setEventTimestamp(EVENT_TIMESTAMP);
 		dto.setPeriodeVon(LocalDate.of(2020, 8, 1));
 		dto.setPeriodeBis(LocalDate.of(2021, 7, 31));
 		dto.setEintrittsdatum(LocalDate.of(2020, 11, 1));
@@ -123,8 +127,10 @@ public class TagesschulenMockResponses {
 	@Nonnull
 	public TagesschuleAnmeldungDTO createAnmeldung2(@Nonnull String refnr) {
 		TagesschuleAnmeldungDTO dto = new TagesschuleAnmeldungDTO();
+		dto.setId(2L);
 		dto.setInstitutionId(INSTITUTION_ID);
 		dto.setRefnr(refnr);
+		dto.setEventTimestamp(EVENT_TIMESTAMP.plusMinutes(10));
 		dto.setPeriodeVon(LocalDate.of(2020, 8, 1));
 		dto.setPeriodeBis(LocalDate.of(2021, 7, 31));
 		dto.setEintrittsdatum(LocalDate.of(2020, 8, 1));
@@ -153,6 +159,7 @@ public class TagesschulenMockResponses {
 	public TagesschuleTarifeDTO createTarif1(@Nonnull String refnr) {
 		TagesschuleTarifeDTO dto = new TagesschuleTarifeDTO();
 		dto.setRefnr(refnr);
+		dto.setEventTimestamp(LocalDateTime.now());
 		TarifDTO tarif1 = createTarif1();
 		tarif1.setVon(LocalDate.of(2020, 11, 1));
 		tarif1.setBis(LocalDate.of(2020, 12, 31));
@@ -173,6 +180,7 @@ public class TagesschulenMockResponses {
 	public TagesschuleTarifeDTO createTarif2(@Nonnull String refnr) {
 		TagesschuleTarifeDTO dto = new TagesschuleTarifeDTO();
 		dto.setRefnr(refnr);
+		dto.setEventTimestamp(EVENT_TIMESTAMP.plusDays(2));
 		dto.getTarifePaedagogisch().add(createTarif1());
 		dto.getTarifeNichtPaedagogisch().add(createTarif2());
 		dto.setFinanzielleSituationAkzeptiert(true);
