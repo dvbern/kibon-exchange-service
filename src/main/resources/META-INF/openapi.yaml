@@ -14,6 +14,7 @@ components:
           scopes:
             user: Gestattet Zugriff auf die APIs für Verfügungen und Platzbestätigungen
             familyportal: Erlaubt den Zugriff auf Institutionen für das Familienportal des Kanton Bern.
+            tagesschule: Gestattet Zugriff auf die APIs für Tagesschulen
   responses:
     Unauthorized:
       description: Die Zugriffsdaten sind nicht gültig

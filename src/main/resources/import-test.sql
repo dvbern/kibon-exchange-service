@@ -5,6 +5,7 @@
 -- Unfortunately, Hibernates MultipleLinesSqlCommandExtractor does not really support $$ quoating, thus string quotes
 -- are used here. https://stackoverflow.com/a/50380323
 
+-- region Verfuegung
 -- region new verfuegung trigger
 CREATE FUNCTION verfuegung_insert() RETURNS TRIGGER
 	SECURITY DEFINER
@@ -75,7 +76,82 @@ CREATE TRIGGER client_active_toggle
 	FOR EACH ROW
 EXECUTE PROCEDURE client_active_toggle();
 -- endregion
+-- endregion
 
+-- region Platzbestaetigung
+
+CREATE FUNCTION betreuunganfrage_insert() RETURNS TRIGGER
+	SECURITY DEFINER
+	LANGUAGE plpgsql
+AS
+'
+	BEGIN
+		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id,
+											since)
+			(SELECT nextval(''clientbetreuunganfrage_id_seq''), c.active, c.clientname, c.institutionid, new.id,
+					c.grantedsince
+			 FROM client c
+			 WHERE c.institutionid = new.institutionid);
+		RETURN new;
+	END;
+';
+
+CREATE TRIGGER betreuunganfrage_insert
+	AFTER INSERT
+	ON betreuunganfrage
+	FOR EACH ROW
+EXECUTE PROCEDURE betreuunganfrage_insert();
+-- endregion
+
+-- region new client trigger
+
+CREATE FUNCTION clientbetreuunganfrage_insert() RETURNS TRIGGER
+	SECURITY DEFINER
+	LANGUAGE plpgsql
+AS
+'
+	BEGIN
+		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id,
+											since)
+			(SELECT nextval(''clientbetreuunganfrage_id_seq''), new.active, new.clientname, new.institutionid, ba.id,
+					new
+						.grantedsince
+			 FROM betreuunganfrage ba
+			 WHERE ba.institutionid = new.institutionid
+			 ORDER BY new.grantedsince, ba.id);
+		RETURN new;
+	END;
+';
+
+CREATE TRIGGER clientbetreuunganfrage_insert
+	AFTER INSERT
+	ON client
+	FOR EACH ROW
+EXECUTE PROCEDURE clientbetreuunganfrage_insert();
+-- endregion
+
+-- region toggle active flag
+
+CREATE FUNCTION clientbetreuunganfrage_active_toggle() RETURNS TRIGGER
+	SECURITY DEFINER
+	LANGUAGE plpgsql
+AS
+'
+	BEGIN
+		UPDATE clientbetreuunganfrage
+		SET active = new.active
+		WHERE client_clientname = new.clientname AND client_institutionid = new.institutionid;
+		RETURN new;
+	END;
+';
+
+CREATE TRIGGER clientbetreuunganfrage_active_toggle
+	AFTER UPDATE
+	ON client
+	FOR EACH ROW
+EXECUTE PROCEDURE clientbetreuunganfrage_active_toggle();
+-- endregion
+-- endregion
 
 INSERT INTO client (clientname, grantedsince, institutionid, active)
 VALUES ('kitAdmin', now(), '1', TRUE),
@@ -115,4 +191,14 @@ FROM generate_series(1, 100) i
 			now() - INTERVAL '5 days', 0, '2019-08-01'::DATE, '[]'::JSONB),
 		   ('KITA', '2020-07-31'::DATE, '{}'::JSONB, '[]'::JSONB, '1', 0, 'Gemeinde', '{}'::JSONB, '1.1.1.1',
 			now() - INTERVAL '7 days', 0, '2019-08-01'::DATE, '[]'::JSONB)
+	) t;
+
+INSERT INTO betreuunganfrage(refnr, institutionid, periodevon, periodebis, betreuungsart, kind, gesuchsteller,
+							 abgelehntvongesuchsteller)
+SELECT t.*
+FROM generate_series(1, 10) i
+	 CROSS JOIN LATERAL (
+	VALUES ('1.1.1.1', '1', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE),
+		   ('1.1.1.2', '2', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE),
+		   ('1.1.1.3', '3', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE)
 	) t;

@@ -38,6 +38,7 @@ import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungDTO;
 import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungenDTO;
 import ch.dvbern.kibon.institution.service.InstitutionService;
+import ch.dvbern.kibon.util.OpenApiTag;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.service.VerfuegungService;
 import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
@@ -50,11 +51,13 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/verfuegungen")
+@Tag(name = OpenApiTag.BETREUUNGS_GUTSCHEINE)
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class VerfuegungenResource {
@@ -84,7 +87,8 @@ public class VerfuegungenResource {
 	@GET
 	@Operation(
 		summary = "Returniert verfügte Betreuungsgutscheine und die davon betroffenen Institutionen.",
-		description = "Returniert alle kiBon Verfuegungen und die dazugehörigen Institutionen, für welche der Client in kiBon berechtigt wurde.")
+		description = "Returniert alle kiBon Verfuegungen und die dazugehörigen Institutionen, für welche der Client "
+			+ "in kiBon berechtigt wurde.")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
