@@ -18,7 +18,9 @@
 package ch.dvbern.kibon.api.tagesschule;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -142,16 +144,23 @@ public class TagesschulenResource {
 			afterId);
 
 		TagesschuleAnmeldungenDTO anmeldungenDTO = new TagesschuleAnmeldungenDTO();
-		anmeldungenDTO.setAnmeldungen(Arrays.asList(
-			mockResponses.createAnmeldung1(REF_NR_1),
-			mockResponses.createAnmeldung2(REF_NR_2)
-		));
 
-		anmeldungenDTO.setModule(Arrays.asList(
-			TagesschulenMockResponses.MODUL_MORGEN,
-			TagesschulenMockResponses.MODUL_MITTAG,
-			TagesschulenMockResponses.MODUL_NACHMITTAG
-		));
+		Long maxSize = Optional.ofNullable(limit)
+			.map(Long::valueOf)
+			.orElse(Long.MAX_VALUE);
+
+		Stream.of(mockResponses.createAnmeldung1(REF_NR_1), mockResponses.createAnmeldung2(REF_NR_2))
+			.filter(a -> afterId == null || a.getId() > afterId)
+			.limit(maxSize)
+			.forEach(a -> anmeldungenDTO.getAnmeldungen().add(a));
+
+		if (!anmeldungenDTO.getAnmeldungen().isEmpty()) {
+			anmeldungenDTO.setModule(Arrays.asList(
+				TagesschulenMockResponses.MODUL_MORGEN,
+				TagesschulenMockResponses.MODUL_MITTAG,
+				TagesschulenMockResponses.MODUL_NACHMITTAG
+			));
+		}
 
 		return anmeldungenDTO;
 	}

@@ -81,7 +81,7 @@ public class BetreuungAnfrage {
 
 	@Nonnull
 	@Column(nullable = false, updatable = false)
-	private @NotNull boolean abgelehntVonGesuchsteller = false;
+	private @NotNull Boolean abgelehntVonGesuchsteller = false;
 
 
 	@SuppressWarnings("checkstyle:CyclomaticComplexity")
