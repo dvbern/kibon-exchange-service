@@ -3,35 +3,26 @@ version: '2'
 services:
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:5.5.1
-    user: "1000"
+    image: confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION}
     networks:
-      - kibon_exchange_backbone
+      - kibon-exchange
     ports:
       - "2181:2181"
-    volumes:
-      - ./zookeeper/data:/var/lib/zookeeper/data
-      - ./zookeeper/log:/var/lib/zookeeper/log
-      - ./zookeeper/jvmlogs:/var/log/kafka
     environment:
       TZ: "Europe/Zurich"
       ZOOKEEPER_CLIENT_PORT: 2181
 
   kafka:
-    image: confluentinc/cp-kafka:5.5.1
-    # make sure to match the UID:GID of the host (due to volume binding)
-    user: "1000"
+    image: confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION}
     networks:
-      - kibon_exchange_backbone
+      - kibon-exchange
     depends_on:
       - zookeeper
     ports:
       - "9092:9092"
-    volumes:
-      - ./kafka/data:/var/lib/kafka/data
-      - ./kafka/jvmlogs:/var/log/kafka
     environment:
       TZ: "Europe/Zurich"
+      KAFKA_LOG_DIRS: "/tmp/logs"
       KAFKA_LOG_RETENTION_HOURS: -1
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://${KAFKA_ADDR}:9092
@@ -40,10 +31,10 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:5.5.1
+    image: confluentinc/cp-schema-registry:${CONFLUENT_PLATFORM_VERSION}
     hostname: schema-registry
     networks:
-      - kibon_exchange_backbone
+      - kibon-exchange
     depends_on:
       - zookeeper
       - kafka
@@ -56,31 +47,38 @@ services:
       SCHEMA_REGISTRY_AVRO_COMPATIBILITY_LEVEL: 'full_transitive'
       SCHEMA_REGISTRY_DEBUG: 'true'
 
+  db:
+    image: postgres:11-alpine
+    networks:
+      - kibon-exchange
+    ports:
+      - "${DB_PORT}:5432"
+    environment:
+      TZ: "Europe/Zurich"
+      POSTGRES_USER: ${PG_EXCHANGE_SERVICE_USER}
+      POSTGRES_PASSWORD: ${PG_EXCHANGE_SERVICE_PW}
+      POSTGRES_DB: ${PG_EXCHANGE_SERVICE_DB}
+
   keycloak:
-    image: quay.io/keycloak/keycloak:7.0.0
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
+    networks:
+      - kibon-exchange
     ports:
       - "8180:8080"
-    networks:
-      - kibon_exchange_backbone
+      - "8543:8443"
     volumes:
-      - ./keycloak/kibon_realm.json:/tmp/kibon_realm.json:ro
-      - ./keycloak/set-secrets.sh:/opt/jboss/startup-scripts/set-secrets.sh:ro
+      - ${CONF_DIR}/keycloak/kibon_realm.json:/tmp/kibon_realm.json
+      - ${CONF_DIR}/keycloak/set-secrets.sh:/opt/jboss/startup-scripts/set-secrets.sh
+    command: "-Dkeycloak.profile.feature.upload_scripts=enabled"
     environment:
       TZ: "Europe/Zurich"
       KEYCLOAK_USER: ${KEYCLOAK_USER}
       KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
-      DB_VENDOR: "postgres"
-      DB_ADDR: ${DB_ADDR}
-      DB_PORT: ${DB_PORT}
-      DB_DATABASE: "keycloak"
-      DB_USER: ${KEYCLOAK_DB_USER}
-      DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
-      PROXY_ADDRESS_FORWARDING: "true"
-      # should be enabled on productive systems
-      #      KEYCLOAK_ALWAYS_HTTPS: "true"
+      # we map the realm configuration to /tmp/kibon_realm.json, but set-secrets.sh adds the secrets in
+      # /opt/jboss/kibon_realm.json, because otherwise we modifiy the input file, e.g. the file on the localhost
       KEYCLOAK_IMPORT: "/opt/jboss/kibon_realm.json"
       KITADMIN_SECRET: ${KITADMIN_SECRET}
       KIBON_EXCHANGE_SERVICE_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
 
 networks:
-  kibon_exchange_backbone:
+  kibon-exchange:
