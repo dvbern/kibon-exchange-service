@@ -17,11 +17,11 @@
 
 package ch.dvbern.kibon.testutils;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
@@ -32,8 +32,8 @@ import com.google.common.collect.ImmutableMap;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
-import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -47,25 +47,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleManager {
 
 	private static final String CONFLUENT_PLATFORM_VERSION = "5.5.1";
+	private static final String KEYCLOAK_VERSION = "11.0.2";
 
-	private static final String DB_SERVICE = "db_1";
-	private static final int DB_PORT = 5432;
-
-	private static final String KEYCLOAK_SERVICE = "keycloak_1";
 	private static final int KEYCLOAK_PORT = 8080;
-
-	@Container
-	private final KafkaContainer kafka = new KafkaContainer(CONFLUENT_PLATFORM_VERSION);
-
-	@SuppressWarnings("rawtypes")
-	@Container
-	public static final DockerComposeContainer ENVIRONMENT =
-		new DockerComposeContainer(new File("src/test/resources/compose-test.yml"))
-			.withExposedService(DB_SERVICE, DB_PORT)
-			.withExposedService(KEYCLOAK_SERVICE, KEYCLOAK_PORT);
-
-	@Container
-	private final SchemaRegistryContainer schemaRegistry = new SchemaRegistryContainer(CONFLUENT_PLATFORM_VERSION);
 
 	private static final List<String> SCHEMA_REGISTRY_URL_PROPERTIES = Arrays.asList(
 		"mp.messaging.incoming.VerfuegungEvents.schema.registry.url",
@@ -76,6 +60,19 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 
 	private static AuthzClient authzClient = null;
 	private static AuthzClient authzClientFambe = null;
+
+	@Container
+	private final KafkaContainer kafka = new KafkaContainer(CONFLUENT_PLATFORM_VERSION);
+
+	@Container
+	private final SchemaRegistryContainer schemaRegistry = new SchemaRegistryContainer(CONFLUENT_PLATFORM_VERSION);
+
+	@SuppressWarnings("rawtypes")
+	@Container
+	private final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:11-alpine");
+
+	@Container
+	private final KeycloakContainer keycloak = new KeycloakContainer(KEYCLOAK_VERSION);
 
 	@Nonnull
 	public static String getAccessToken() {
@@ -89,29 +86,45 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 
 	@Override
 	public Map<String, String> start() {
-		ENVIRONMENT.start();
+		String adminPassword = UUID.randomUUID().toString();
+		String dummyPassword = "TEST"; // as in src/test/resources/kibon_realm.json
+
+		keycloak
+			.withExposedPorts(KEYCLOAK_PORT)
+			.withAdminUser("admin")
+			.withAdminPassword(adminPassword)
+			.start();
+
+		String dbName = "kibon-exchange";
+		String dbUser = "kibonExchange";
+		String dbPassword = UUID.randomUUID().toString();
+
+		postgres
+			.withDatabaseName(dbName)
+			.withUsername(dbUser)
+			.withPassword(dbPassword)
+			.withEnv("TZ", "Europe/Zurich")
+			.start();
+
 		kafka.start();
-		schemaRegistry.withKafka(kafka).start();
 
-		String dbHost = ENVIRONMENT.getServiceHost(DB_SERVICE, DB_PORT);
-		Integer dbPort = ENVIRONMENT.getServicePort(DB_SERVICE, DB_PORT);
-
-		String bootstrapServers = kafka.getBootstrapServers();
-
-		String keycloakHost = ENVIRONMENT.getServiceHost(KEYCLOAK_SERVICE, KEYCLOAK_PORT);
-		Integer keycloakPort = ENVIRONMENT.getServicePort(KEYCLOAK_SERVICE, KEYCLOAK_PORT);
+		schemaRegistry
+			.withKafka(kafka)
+			.start();
 
 		Map<String, String> systemProps = new HashMap<>();
-		systemProps.put("quarkus.datasource.url", "jdbc:postgresql://" + dbHost + ':' + dbPort + "/kibon-exchange");
-		systemProps.put("kafka.bootstrap.servers", bootstrapServers);
-		String keycloakURL = "http://" + keycloakHost + ':' + keycloakPort + "/auth";
+		systemProps.put("quarkus.datasource.url", postgres.getJdbcUrl());
+		systemProps.put("quarkus.datasource.username", dbUser);
+		systemProps.put("quarkus.datasource.password", dbPassword);
+		systemProps.put("kafka.bootstrap.servers", kafka.getBootstrapServers());
+		String keycloakURL = "http://" + keycloak.getHost() + ':' + keycloak.getMappedPort(KEYCLOAK_PORT) + "/auth";
 		systemProps.put("quarkus.oidc.auth-server-url", keycloakURL + "/realms/kibon");
+		systemProps.put("quarkus.oidc.credentials.secret", dummyPassword);
 
 		SCHEMA_REGISTRY_URL_PROPERTIES.forEach(url -> systemProps.put(url, schemaRegistry.getSchemaRegistryUrl()));
 
-		authzClient =
-			createKeycloakClientConfiguration(keycloakURL, "kitAdmin", "657d6aef-bdc3-40e9-9992-024810d2b24b");
-		authzClientFambe = createKeycloakClientConfiguration(keycloakURL, "fambe", "FamilyPortal-PW");
+		authzClient = createKeycloakClientConfiguration(keycloakURL, "kitAdmin", dummyPassword);
+		authzClientFambe = createKeycloakClientConfiguration(keycloakURL, "fambe", dummyPassword);
 
 		return systemProps;
 	}
@@ -124,14 +137,16 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 	}
 
 	/**
-	 * The {@link #stop} method is called before the application is destored. If we stop Kafka in {@link #stop}, then
+	 * The {@link #stop} method is called before the application is destroyed. If we stop Kafka in {@link #stop}, then
 	 * the Vert.X Kafka client keeps trying to reconnect to Kafka until it finally times out (after about 90s).
 	 * <p>
 	 * Thus we listen to the @Destroyed event to stop Kafka after the application quit.
 	 */
 	public void terminate(@Observes @Destroyed(ApplicationScoped.class) Object event) {
+		schemaRegistry.stop();
 		kafka.stop();
-		ENVIRONMENT.stop();
+		keycloak.stop();
+		postgres.stop();
 	}
 
 	@Nonnull

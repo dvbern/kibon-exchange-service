@@ -55,7 +55,7 @@ When changing the ports, don't forget to update `src/main/resources/application.
 
 | Property | Default Value | Comment |
 | --- | --- | --- |
-| quarkus.keycloak.auth-server-url | `http://localhost:8180/auth` | Keycloak Server |
+| quarkus.keycloak.auth-server-url | `http://localhost:8180/auth` | Keycloak server |
 | quarkus.datasource.url | jdbc:postgresql://localhost:15432/kibon-exchange | Postgres database |
 | kafka.bootstrap.servers | localhost:9092 | Kafka server |
 | quarkus.http.port |8380| Application Port, e.g. `http://localhost:8380/api/v1/verfuegungen` |
