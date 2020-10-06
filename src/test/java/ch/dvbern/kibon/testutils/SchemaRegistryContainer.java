@@ -22,7 +22,6 @@ import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
@@ -40,14 +39,8 @@ public class SchemaRegistryContainer extends GenericContainer<SchemaRegistryCont
 			.withEnv("SCHEMA_REGISTRY_HOST_NAME", "schema-registry")
 			.withEnv("SCHEMA_REGISTRY_LISTENERS", "http://0.0.0.0:" + SCHEMA_REGISTRY_INTERNAL_PORT)
 			.withEnv("SCHEMA_REGISTRY_AVRO_COMPATIBILITY_LEVEL", "full_transitive")
+			.withEnv("SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS", "PLAINTEXT://kafka:9092")
 			.waitingFor(Wait.forHttp("/subjects"));
-	}
-
-	@Nonnull
-	public SchemaRegistryContainer withKafka(@Nonnull KafkaContainer kafkaContainer) {
-		String bootstrapServer = "PLAINTEXT://" + kafkaContainer.getNetworkAliases().get(0) + ":9092";
-		return withNetwork(kafkaContainer.getNetwork())
-			.withEnv("SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS", bootstrapServer);
 	}
 
 	@Nonnull

@@ -33,6 +33,7 @@ import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -106,14 +107,20 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 			.withEnv("TZ", "Europe/Zurich")
 			.start();
 
-		kafka.start();
+		Network network = Network.newNetwork();
+
+		kafka
+			.withNetwork(network)
+			.withNetworkAliases("kafka")
+			.start();
 
 		schemaRegistry
-			.withKafka(kafka)
+			.withNetwork(network)
+			.withNetworkAliases("schema-registry")
 			.start();
 
 		Map<String, String> systemProps = new HashMap<>();
-		systemProps.put("quarkus.datasource.url", postgres.getJdbcUrl());
+		systemProps.put("quarkus.datasource.jdbc.url", postgres.getJdbcUrl());
 		systemProps.put("quarkus.datasource.username", dbUser);
 		systemProps.put("quarkus.datasource.password", dbPassword);
 		systemProps.put("kafka.bootstrap.servers", kafka.getBootstrapServers());

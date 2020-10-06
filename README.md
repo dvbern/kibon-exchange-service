@@ -56,7 +56,7 @@ When changing the ports, don't forget to update `src/main/resources/application.
 | Property | Default Value | Comment |
 | --- | --- | --- |
 | quarkus.keycloak.auth-server-url | `http://localhost:8180/auth` | Keycloak server |
-| quarkus.datasource.url | jdbc:postgresql://localhost:15432/kibon-exchange | Postgres database |
+| quarkus.datasource.jdbc.url | jdbc:postgresql://localhost:15432/kibon-exchange | Postgres database |
 | kafka.bootstrap.servers | localhost:9092 | Kafka server |
 | quarkus.http.port |8380| Application Port, e.g. `http://localhost:8380/api/v1/verfuegungen` |
 
@@ -109,7 +109,7 @@ export QUARKUS_OIDC_AUTH_SERVER_URL=http://keycloak:8080/auth/realms/kibon
 export DB_PORT=5432
 # gets the IP address for interface enp0s31f6
 HOST_IP=$(ifconfig enp0s31f6 | grep "inet " | awk '{print $2}')
-export QUARKUS_DATASOURCE_URL=jdbc:postgresql://${HOST_IP}:${DB_PORT}/kibon-exchange
+export QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://${HOST_IP}:${DB_PORT}/kibon-exchange
 export QUARKUS_DATASOURCE_PASSWORD=CHANGE_ME
 
 # applies environment variables from `.env` file, with overrides as exported above, and uses the `docker-compose.prod.yml` setup.

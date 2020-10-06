@@ -17,19 +17,19 @@
 
 package ch.dvbern.kibon.platzbestaetigung.facade;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
+import ch.dvbern.kibon.kafka.IncomingEvent;
 import ch.dvbern.kibon.kafka.MessageProcessor;
-import io.smallrye.reactive.messaging.kafka.KafkaRecord;
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy;
+import io.smallrye.reactive.messaging.annotations.Blocking;
+import io.smallrye.reactive.messaging.kafka.IncomingKafkaRecord;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
 
 @SuppressWarnings("unused")
 @ApplicationScoped
@@ -44,10 +44,17 @@ public class BetreuungAnfrageKafkaEventConsumer {
 	MessageProcessor processor;
 
 	@Incoming("BetreuungAnfrageEvents")
-	@Acknowledgment(Strategy.MANUAL)
-	public CompletionStage<Void> onMessage(@Nonnull KafkaRecord<String, BetreuungAnfrageEventDTO> message) {
+	@Outgoing("BetreuungAnfrageEvents-internal")
+	@Nullable
+	public Message<IncomingEvent<BetreuungAnfrageEventDTO>> wrap(
+		@Nonnull IncomingKafkaRecord<String, BetreuungAnfrageEventDTO> msg) {
 
-		return CompletableFuture.runAsync(() -> processor.process(message, eventHandler))
-			.thenCompose(f -> message.ack());
+		return processor.toIncomingEvent(msg);
+	}
+
+	@Incoming("BetreuungAnfrageEvents-internal")
+	@Blocking
+	public void onMessage(@Nonnull IncomingEvent<BetreuungAnfrageEventDTO> event) {
+		processor.process(event, eventHandler);
 	}
 }
