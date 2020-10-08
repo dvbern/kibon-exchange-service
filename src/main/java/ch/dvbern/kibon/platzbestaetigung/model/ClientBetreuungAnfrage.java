@@ -17,8 +17,6 @@
 
 package ch.dvbern.kibon.platzbestaetigung.model;
 
-import java.time.LocalDateTime;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
@@ -45,7 +43,7 @@ import org.hibernate.annotations.Immutable;
  * {@link Client} table. Furher we get the client keycloak name and the institution for filtering from the linked Client
  * entries, again allowing filtering without any joins.</p>
  */
-@Table(indexes = @Index(name = "clientbetreuunganfrage_idx1", columnList = "client_clientname, active, since, id"))
+@Table(indexes = @Index(name = "clientbetreuunganfrage_idx1", columnList = "client_clientname, active, id"))
 @Entity
 @Immutable
 public class ClientBetreuungAnfrage {
@@ -72,10 +70,6 @@ public class ClientBetreuungAnfrage {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(foreignKey = @ForeignKey(name = "betreuunganfrage_fk"), nullable = false, updatable = false)
 	private @NotNull BetreuungAnfrage betreuungAnfrage = new BetreuungAnfrage();
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotNull LocalDateTime since = LocalDateTime.now();
 
 	@Nonnull
 	@Column(nullable = false, updatable = true)
@@ -127,15 +121,6 @@ public class ClientBetreuungAnfrage {
 
 	public void setBetreuungAnfrage(@Nonnull BetreuungAnfrage betreuungAnfrage) {
 		this.betreuungAnfrage = betreuungAnfrage;
-	}
-
-	@Nonnull
-	public LocalDateTime getSince() {
-		return since;
-	}
-
-	public void setSince(@Nonnull LocalDateTime since) {
-		this.since = since;
 	}
 
 	@Nonnull

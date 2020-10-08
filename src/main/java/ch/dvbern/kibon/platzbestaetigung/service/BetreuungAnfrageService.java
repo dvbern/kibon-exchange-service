@@ -86,7 +86,7 @@ public class BetreuungAnfrageService {
 
 		filter.setPredicate(query, root, cb);
 
-		query.orderBy(cb.asc(root.get(ClientBetreuungAnfrage_.since)), cb.asc(root.get(ClientBetreuungAnfrage_.id)));
+		query.orderBy(cb.asc(root.get(ClientBetreuungAnfrage_.id)));
 
 		TypedQuery<ClientBetreuungAnfrageDTO> q = em.createQuery(query);
 
