@@ -86,11 +86,8 @@ CREATE FUNCTION betreuunganfrage_insert() RETURNS TRIGGER
 AS
 '
 	BEGIN
-		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id,
-											since)
-			(SELECT nextval(''clientbetreuunganfrage_id_seq''), c.active, c.clientname, c.institutionid, new.id,
-					c.grantedsince
-			 FROM client c
+		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id)
+			(SELECT nextval(''clientbetreuunganfrage_id_seq''), c.active, c.clientname, c.institutionid, new.id
 			 WHERE c.institutionid = new.institutionid);
 		RETURN new;
 	END;
@@ -111,14 +108,11 @@ CREATE FUNCTION clientbetreuunganfrage_insert() RETURNS TRIGGER
 AS
 '
 	BEGIN
-		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id,
-											since)
-			(SELECT nextval(''clientbetreuunganfrage_id_seq''), new.active, new.clientname, new.institutionid, ba.id,
-					new
-						.grantedsince
+		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id)
+			(SELECT nextval(''clientbetreuunganfrage_id_seq''), new.active, new.clientname, new.institutionid, ba.id
 			 FROM betreuunganfrage ba
 			 WHERE ba.institutionid = new.institutionid
-			 ORDER BY new.grantedsince, ba.id);
+			 ORDER BY ba.id);
 		RETURN new;
 	END;
 ';
