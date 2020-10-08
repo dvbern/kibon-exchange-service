@@ -88,6 +88,7 @@ AS
 	BEGIN
 		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id)
 			(SELECT nextval(''clientbetreuunganfrage_id_seq''), c.active, c.clientname, c.institutionid, new.id
+			 FROM client c
 			 WHERE c.institutionid = new.institutionid);
 		RETURN new;
 	END;
