@@ -68,7 +68,7 @@ class VerfuegungServiceQuarkusTest {
 		);
 
 		// deactivate the client kitAdmin for institutionId 1
-		InstitutionClientEventDTO dto = new InstitutionClientEventDTO("1", "kitAdmin", "EXCHANGE_SERVICE_USER");
+		InstitutionClientEventDTO dto = new InstitutionClientEventDTO("1", "kitAdmin", "EXCHANGE_SERVICE_USER", null, null);
 		tx.newTransaction(() -> clientService.onClientRemoved(dto));
 
 		// there should be no more results for insitutionId 1
