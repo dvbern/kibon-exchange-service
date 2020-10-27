@@ -17,6 +17,8 @@
 
 package ch.dvbern.kibon.platzbestaetigung.facade;
 
+import java.time.LocalDateTime;
+
 import javax.annotation.Nonnull;
 
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
@@ -42,8 +44,9 @@ public class BetreuungAnfrageEventHandlerTest extends EventHandlerTest<Betreuung
 	@Test
 	public void testHandleVerfuegungVerfuegtEvent() {
 		BetreuungAnfrageEventDTO dto = new BetreuungAnfrageEventDTO();
+		LocalDateTime eventTime = LocalDateTime.now();
 
-		betreuungAnfrageService.onBetreuungAnfrageCreated(dto);
+		betreuungAnfrageService.onBetreuungAnfrageCreated(dto, eventTime);
 		expectLastCall();
 
 		expectEventProcessing("BetreuungAnfrageAdded", dto);

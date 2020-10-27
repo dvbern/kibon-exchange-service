@@ -84,11 +84,11 @@ FROM generate_series(1, 100) i
 	) t;
 
 INSERT INTO betreuunganfrage(refnr, institutionid, periodevon, periodebis, betreuungsart, kind, gesuchsteller,
-							 abgelehntvongesuchsteller)
+							 abgelehntvongesuchsteller, eventtimestamp)
 SELECT t.*
 FROM generate_series(1, 10) i
 	 CROSS JOIN LATERAL (
-	VALUES ('1.1.1.1', '1', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE),
-		   ('1.1.1.2', '2', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE),
-		   ('1.1.1.3', '3', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE)
+	VALUES ('1.1.1.1', '1', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE, now()),
+		   ('1.1.1.2', '2', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE, now()),
+		   ('1.1.1.3', '3', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE, now())
 	) t;

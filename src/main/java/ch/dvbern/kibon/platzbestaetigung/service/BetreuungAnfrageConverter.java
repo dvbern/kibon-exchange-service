@@ -17,6 +17,8 @@
 
 package ch.dvbern.kibon.platzbestaetigung.service;
 
+import java.time.LocalDateTime;
+
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -36,7 +38,7 @@ public class BetreuungAnfrageConverter {
 	ObjectMapper mapper;
 
 	@Nonnull
-	public BetreuungAnfrage create(@Nonnull BetreuungAnfrageEventDTO dto) {
+	public BetreuungAnfrage create(@Nonnull BetreuungAnfrageEventDTO dto, @Nonnull LocalDateTime eventTimestamp) {
 		BetreuungAnfrage betreuungAnfrage = new BetreuungAnfrage();
 		betreuungAnfrage.setRefnr(dto.getRefnr());
 		betreuungAnfrage.setInstitutionId(dto.getInstitutionId());
@@ -46,6 +48,8 @@ public class BetreuungAnfrageConverter {
 		betreuungAnfrage.setBetreuungsArt(dto.getBetreuungsArt());
 		betreuungAnfrage.setKind(toKind(dto.getKind()));
 		betreuungAnfrage.setGesuchsteller(toGesuchsteller(dto.getGesuchsteller()));
+		betreuungAnfrage.setEventTimestamp(eventTimestamp);
+
 		return betreuungAnfrage;
 	}
 
