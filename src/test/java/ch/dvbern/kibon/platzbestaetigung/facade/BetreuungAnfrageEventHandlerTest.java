@@ -29,6 +29,8 @@ import org.easymock.MockType;
 import org.easymock.TestSubject;
 import org.junit.jupiter.api.Test;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expectLastCall;
 
 @SuppressWarnings("JUnitTestMethodWithNoAssertions")
@@ -44,9 +46,9 @@ public class BetreuungAnfrageEventHandlerTest extends EventHandlerTest<Betreuung
 	@Test
 	public void testHandleVerfuegungVerfuegtEvent() {
 		BetreuungAnfrageEventDTO dto = new BetreuungAnfrageEventDTO();
-		LocalDateTime eventTime = LocalDateTime.now();
 
-		betreuungAnfrageService.onBetreuungAnfrageCreated(dto, eventTime);
+		//noinspection ConstantConditions
+		betreuungAnfrageService.onBetreuungAnfrageCreated(eq(dto), anyObject(LocalDateTime.class));
 		expectLastCall();
 
 		expectEventProcessing("BetreuungAnfrageAdded", dto);
