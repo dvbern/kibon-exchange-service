@@ -191,7 +191,7 @@ class ClientServiceTest {
 
 	@Nonnull
 	private InstitutionClientEventDTO createDTO() {
-		return new InstitutionClientEventDTO("1", "foo", "bar");
+		return new InstitutionClientEventDTO("1", "foo", "bar", null, null);
 	}
 
 	@Nonnull

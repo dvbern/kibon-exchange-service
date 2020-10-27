@@ -18,6 +18,7 @@
 package ch.dvbern.kibon.platzbestaetigung.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.annotation.Nonnull;
 
@@ -53,9 +54,20 @@ public class ClientBetreuungAnfrageDTO {
 	@Nonnull
 	private final Boolean abgelehntVonGesuchsteller;
 
-	public ClientBetreuungAnfrageDTO(@Nonnull Long id, @Nonnull String refnr, @Nonnull String institutionId,
-		@Nonnull LocalDate periodeVon, @Nonnull LocalDate periodeBis, @Nonnull BetreuungsangebotTyp betreuungsArt,
-		@Nonnull JsonNode kind, @Nonnull JsonNode gesuchsteller, @Nonnull Boolean abgelehntVonGesuchsteller) {
+	@Nonnull
+	private final LocalDateTime eventTimestamp;
+
+	public ClientBetreuungAnfrageDTO(
+		@Nonnull Long id,
+		@Nonnull String refnr,
+		@Nonnull String institutionId,
+		@Nonnull LocalDate periodeVon,
+		@Nonnull LocalDate periodeBis,
+		@Nonnull BetreuungsangebotTyp betreuungsArt,
+		@Nonnull JsonNode kind,
+		@Nonnull JsonNode gesuchsteller,
+		@Nonnull Boolean abgelehntVonGesuchsteller,
+		@Nonnull LocalDateTime eventTimestamp) {
 		this.id = id;
 		this.refnr = refnr;
 		this.institutionId = institutionId;
@@ -65,6 +77,7 @@ public class ClientBetreuungAnfrageDTO {
 		this.kind = kind;
 		this.gesuchsteller = gesuchsteller;
 		this.abgelehntVonGesuchsteller = abgelehntVonGesuchsteller;
+		this.eventTimestamp = eventTimestamp;
 	}
 
 	@Nonnull
@@ -110,5 +123,10 @@ public class ClientBetreuungAnfrageDTO {
 	@Nonnull
 	public Boolean getAbgelehntVonGesuchsteller() {
 		return abgelehntVonGesuchsteller;
+	}
+
+	@Nonnull
+	public LocalDateTime getEventTimestamp() {
+		return eventTimestamp;
 	}
 }

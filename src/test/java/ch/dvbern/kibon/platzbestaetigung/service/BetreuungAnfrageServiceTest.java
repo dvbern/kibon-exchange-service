@@ -17,6 +17,8 @@
 
 package ch.dvbern.kibon.platzbestaetigung.service;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.EntityManager;
 
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
@@ -50,16 +52,17 @@ class BetreuungAnfrageServiceTest {
 	@Test
 	void testOnBetreuungAnfrageCreated() {
 		BetreuungAnfrageEventDTO dto = new BetreuungAnfrageEventDTO();
+		LocalDateTime eventTime = LocalDateTime.now();
 
 		BetreuungAnfrage betreuungAnfrage = new BetreuungAnfrage();
-		expect(converter.create(dto)).andReturn(betreuungAnfrage);
+		expect(converter.create(dto, eventTime)).andReturn(betreuungAnfrage);
 
 		em.persist(betreuungAnfrage);
 		expectLastCall();
 
 		replay(em, converter);
 
-		service.onBetreuungAnfrageCreated(dto);
+		service.onBetreuungAnfrageCreated(dto, eventTime);
 
 		verify(em, converter);
 	}
