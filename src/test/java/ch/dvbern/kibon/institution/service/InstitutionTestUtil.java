@@ -32,7 +32,7 @@ import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
-import ch.dvbern.kibon.exchange.commons.util.DateConverter;
+import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
@@ -98,7 +98,7 @@ public final class InstitutionTestUtil {
 			true,
 			BigDecimal.valueOf(13.23),
 			BigDecimal.valueOf(7.13),
-			DateConverter.fromLocalDateTime(LocalDateTime.now())
+			TimestampConverter.fromLocalDateTime(LocalDateTime.now())
 		);
 	}
 

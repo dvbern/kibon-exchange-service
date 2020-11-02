@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static ch.dvbern.kibon.kafka.EventType.CLIENT_ADDED;
+import static ch.dvbern.kibon.kafka.EventType.CLIENT_MODIFIED;
 import static ch.dvbern.kibon.kafka.EventType.CLIENT_REMOVED;
 
 @ApplicationScoped
@@ -57,8 +58,8 @@ public class ClientEventHandler extends BaseEventHandler<InstitutionClientEventD
 			return;
 		}
 
-		if (CLIENT_ADDED == eventType) {
-			clientService.onClientAdded(dto, eventTime);
+		if (CLIENT_ADDED == eventType || CLIENT_MODIFIED == eventType) {
+			clientService.onClientAddedorModified(dto, eventTime);
 		} else if (CLIENT_REMOVED == eventType) {
 			clientService.onClientRemoved(dto);
 		} else {

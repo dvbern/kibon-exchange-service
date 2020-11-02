@@ -17,6 +17,7 @@
 
 package ch.dvbern.kibon.clients.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -50,12 +51,22 @@ public class Client {
 	@Column(nullable = false, updatable = true)
 	private @NotNull Boolean active = true;
 
+	@Nullable
+	@Column(nullable = true, updatable = true)
+	private @NotNull LocalDate gueltigAb;
+
+	@Nullable
+	@Column(nullable = true, updatable = true)
+	private @NotNull LocalDate gueltigBis;
+
 	public Client() {
 	}
 
-	public Client(@Nonnull ClientId id, @Nonnull LocalDateTime grantedSince) {
+	public Client(@Nonnull ClientId id, @Nonnull LocalDateTime grantedSince, @Nullable LocalDate gueltigAb, @Nullable LocalDate gueltigBis) {
 		this.id = id;
 		this.grantedSince = grantedSince;
+		this.gueltigAb = gueltigAb;
+		this.gueltigBis = gueltigBis;
 	}
 
 	@Override
@@ -85,6 +96,8 @@ public class Client {
 			.add("id=" + id)
 			.add("grantedSince=" + grantedSince)
 			.add("active=" + active)
+			.add("gueltigAb=" + getGueltigAb())
+			.add("gueltigBis=" + getGueltigBis())
 			.toString();
 	}
 
@@ -113,5 +126,23 @@ public class Client {
 
 	public void setActive(@Nonnull Boolean active) {
 		this.active = active;
+	}
+
+	@Nullable
+	public LocalDate getGueltigAb() {
+		return gueltigAb;
+	}
+
+	public void setGueltigAb(@Nullable LocalDate gueltigAb) {
+		this.gueltigAb = gueltigAb;
+	}
+
+	@Nullable
+	public LocalDate getGueltigBis() {
+		return gueltigBis;
+	}
+
+	public void setGueltigBis(@Nullable LocalDate gueltigBis) {
+		this.gueltigBis = gueltigBis;
 	}
 }

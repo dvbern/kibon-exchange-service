@@ -51,28 +51,27 @@ public class ClientService {
 	}
 
 	/**
-	 * Stores the client in response to the clientAdded event.<br>
-	 * If the client is already stored, it is not stored again but set to active in case it was inactive.
+	 * Stores the client in response to the ClientAdded or ClientModified event.<br>
+	 * If the client is already stored, it is not stored again but set to active and reset the gueltigkeit in case it was inactive.
+	 * If the client is modified but not present it create it again
+	 * If the client is modified and already exist we have to active it if its not the case and update the gueltigkeit
 	 */
 	@Transactional(TxType.MANDATORY)
-	public void onClientAdded(@Nonnull InstitutionClientEventDTO dto, @Nonnull LocalDateTime eventTime) {
+	public void onClientAddedorModified(@Nonnull InstitutionClientEventDTO dto, @Nonnull LocalDateTime eventTime) {
 		Optional<Client> existingClient = find(toClientId(dto));
 
 		if (existingClient.isPresent()) {
-			reactivateClient(existingClient.get());
+			reactivateClientAndSetGueltigkeit(existingClient.get(), dto);
 		} else {
-			em.persist(new Client(toClientId(dto), eventTime));
+			em.persist(new Client(toClientId(dto), eventTime, dto.getGueltigAb(), dto.getGueltigBis()));
 		}
 	}
 
-	private void reactivateClient(@Nonnull Client existing) {
-		if (existing.getActive()) {
-			LOG.warn("Cannot reactivate already active client {}", existing);
-		} else {
-			// reactivate
-			existing.setActive(true);
-			em.merge(existing);
-		}
+	private void reactivateClientAndSetGueltigkeit(@Nonnull Client existing, @Nonnull InstitutionClientEventDTO dto) {
+		existing.setActive(true);
+		existing.setGueltigAb(dto.getGueltigAb());
+		existing.setGueltigBis(dto.getGueltigBis());
+		em.merge(existing);
 	}
 
 	/**

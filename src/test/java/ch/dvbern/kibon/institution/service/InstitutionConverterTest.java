@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
-import ch.dvbern.kibon.exchange.commons.util.DateConverter;
+import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
@@ -99,7 +99,7 @@ class InstitutionConverterTest {
 			.where(Institution::isSubventioniertePlaetze, is(dto.getSubventioniertePlaetze()))
 			.where(Institution::getAnzahlPlaetze, comparesEqualTo(dto.getAnzahlPlaetze()))
 			.where(Institution::getAnzahlPlaetzeFirmen, comparesEqualTo(dto.getAnzahlPlaetzeFirmen()))
-			.where(Institution::getTimestampMutiert, is(DateConverter.toLocalDateTime(dto.getTimestampMutiert())))
+			.where(Institution::getTimestampMutiert, is(TimestampConverter.toLocalDateTime(dto.getTimestampMutiert())))
 			;
 	}
 
