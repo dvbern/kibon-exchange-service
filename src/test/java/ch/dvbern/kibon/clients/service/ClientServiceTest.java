@@ -70,7 +70,7 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.onClientAdded(dto, LocalDateTime.now());
+		service.onClientAddedorModified(dto, LocalDateTime.now());
 
 		verify(em);
 	}
@@ -88,7 +88,7 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.onClientAdded(dto, expectedClient.getGrantedSince());
+		service.onClientAddedorModified(dto, expectedClient.getGrantedSince());
 
 		verify(em);
 	}
@@ -109,7 +109,7 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.onClientAdded(dto, eventTime);
+		service.onClientAddedorModified(dto, eventTime);
 
 		verify(em);
 	}
@@ -133,7 +133,7 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.onClientAdded(dto, LocalDateTime.now());
+		service.onClientAddedorModified(dto, LocalDateTime.now());
 
 		verify(em);
 	}
