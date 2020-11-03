@@ -62,7 +62,11 @@ public class Client {
 	public Client() {
 	}
 
-	public Client(@Nonnull ClientId id, @Nonnull LocalDateTime grantedSince, @Nullable LocalDate gueltigAb, @Nullable LocalDate gueltigBis) {
+	public Client(
+		@Nonnull ClientId id,
+		@Nonnull LocalDateTime grantedSince,
+		@Nullable LocalDate gueltigAb,
+		@Nullable LocalDate gueltigBis) {
 		this.id = id;
 		this.grantedSince = grantedSince;
 		this.gueltigAb = gueltigAb;
@@ -144,5 +148,13 @@ public class Client {
 
 	public void setGueltigBis(@Nullable LocalDate gueltigBis) {
 		this.gueltigBis = gueltigBis;
+	}
+
+	public boolean isGueltig() {
+		LocalDate today = LocalDate.now();
+		if (gueltigAb != null && today.isBefore(gueltigAb)) {
+			return false;
+		}
+		return gueltigBis == null || !today.isAfter(gueltigBis);
 	}
 }
