@@ -53,11 +53,11 @@ public class Client {
 
 	@Nullable
 	@Column(nullable = true, updatable = true)
-	private @NotNull LocalDate gueltigAb;
+	private LocalDate gueltigAb;
 
 	@Nullable
 	@Column(nullable = true, updatable = true)
-	private @NotNull LocalDate gueltigBis;
+	private LocalDate gueltigBis;
 
 	public Client() {
 	}
