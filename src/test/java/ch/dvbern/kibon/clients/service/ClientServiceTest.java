@@ -61,21 +61,6 @@ class ClientServiceTest {
 	private EntityManager em;
 
 	@Test
-	public void testOnClientAdded_shouldIgnoreActiveClient() {
-		InstitutionClientEventDTO dto = createDTO();
-
-		Client existingClient = toClient(dto);
-		expect(em.find(Client.class, toClientId(dto)))
-			.andReturn(existingClient);
-
-		replay(em);
-
-		service.onClientAddedorModified(dto, LocalDateTime.now());
-
-		verify(em);
-	}
-
-	@Test
 	public void testOnClientAdded_shouldAddNewClient() {
 		InstitutionClientEventDTO dto = createDTO();
 
