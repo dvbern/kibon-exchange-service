@@ -190,7 +190,7 @@ public class PlatzbestaetigungResource {
 		String institutionId = betreuungEventDTO.getInstitutionId();
 		Optional<Client> client = clientService.findActive(new ClientId(clientName, institutionId));
 
-		if (client.isEmpty() || !client.get().isGueltig()) {
+		if (client.isEmpty()) {
 			return Uni.createFrom().item(Response.status(Status.FORBIDDEN).build());
 		}
 

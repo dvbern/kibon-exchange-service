@@ -149,12 +149,4 @@ public class Client {
 	public void setGueltigBis(@Nullable LocalDate gueltigBis) {
 		this.gueltigBis = gueltigBis;
 	}
-
-	public boolean isGueltig() {
-		LocalDate today = LocalDate.now();
-		if (gueltigAb != null && today.isBefore(gueltigAb)) {
-			return false;
-		}
-		return gueltigBis == null || !today.isAfter(gueltigBis);
-	}
 }
