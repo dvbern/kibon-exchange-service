@@ -163,7 +163,7 @@ public class PlatzbestaetigungResource {
 	@Operation(summary = "Eine Betreuung-Anfrage in kiBon bestätigen",
 		description = "Diese Schnittstelle ermöglicht eine automatisierte Bestätigung einer Betreuung-Anfrage.")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
-	@APIResponse(responseCode = "200")
+	@APIResponse(responseCode = "200", content = {})
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
 	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
