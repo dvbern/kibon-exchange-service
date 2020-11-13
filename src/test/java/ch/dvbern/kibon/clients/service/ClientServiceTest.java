@@ -61,6 +61,21 @@ class ClientServiceTest {
 	private EntityManager em;
 
 	@Test
+	public void testOnClientAdded_shouldIgnoreActiveClient() {
+		InstitutionClientEventDTO dto = createDTO();
+
+		Client existingClient = toClient(dto);
+		expect(em.find(Client.class, toClientId(dto)))
+			.andReturn(existingClient);
+
+		replay(em);
+
+		service.onClientAdded(dto, LocalDateTime.now());
+
+		verify(em);
+	}
+
+	@Test
 	public void testOnClientAdded_shouldAddNewClient() {
 		InstitutionClientEventDTO dto = createDTO();
 
@@ -73,7 +88,7 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.onClientAddedorModified(dto, expectedClient.getGrantedSince());
+		service.onClientAdded(dto, expectedClient.getGrantedSince());
 
 		verify(em);
 	}
@@ -94,7 +109,7 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.onClientAddedorModified(dto, eventTime);
+		service.onClientAdded(dto, eventTime);
 
 		verify(em);
 	}
@@ -118,7 +133,7 @@ class ClientServiceTest {
 
 		replay(em);
 
-		service.onClientAddedorModified(dto, LocalDateTime.now());
+		service.onClientAdded(dto, LocalDateTime.now());
 
 		verify(em);
 	}

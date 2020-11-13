@@ -79,6 +79,6 @@ class VerfuegungServiceQuarkusTest {
 		);
 
 		// restore client (to make sure following integration tests get the expected DB setup)
-		tx.newTransaction(() -> clientService.onClientAddedorModified(dto, LocalDateTime.now()));
+		tx.newTransaction(() -> clientService.onClientAdded(dto, LocalDateTime.now()));
 	}
 }

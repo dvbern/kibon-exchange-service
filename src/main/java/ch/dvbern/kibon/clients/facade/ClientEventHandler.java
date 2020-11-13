@@ -58,8 +58,10 @@ public class ClientEventHandler extends BaseEventHandler<InstitutionClientEventD
 			return;
 		}
 
-		if (CLIENT_ADDED == eventType || CLIENT_MODIFIED == eventType) {
-			clientService.onClientAddedorModified(dto, eventTime);
+		if (CLIENT_ADDED == eventType) {
+			clientService.onClientAdded(dto, eventTime);
+		} else if (CLIENT_MODIFIED == eventType) {
+			clientService.onClientModified(dto);
 		} else if (CLIENT_REMOVED == eventType) {
 			clientService.onClientRemoved(dto);
 		} else {

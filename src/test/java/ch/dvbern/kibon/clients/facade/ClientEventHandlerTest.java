@@ -45,7 +45,7 @@ class ClientEventHandlerTest extends EventHandlerTest<InstitutionClientEventDTO>
 	public void testHandleClientAddedEvent() {
 		InstitutionClientEventDTO dto = expectedDTO();
 
-		clientService.onClientAddedorModified(eq(dto), anyObject());
+		clientService.onClientAdded(eq(dto), anyObject());
 		expectLastCall();
 
 		expectEventProcessing("ClientAdded", dto);
