@@ -17,6 +17,7 @@
 
 package ch.dvbern.kibon.platzbestaetigung.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -54,8 +55,8 @@ public class BetreuungAnfrageService {
 	 * Stores the BetreuungAnfrage in response to the betreuungAnfrageCreated event.
 	 */
 	@Transactional(TxType.MANDATORY)
-	public void onBetreuungAnfrageCreated(@Nonnull BetreuungAnfrageEventDTO dto) {
-		BetreuungAnfrage betreuungAnfrage = converter.create(dto);
+	public void onBetreuungAnfrageCreated(@Nonnull BetreuungAnfrageEventDTO dto, @Nonnull LocalDateTime eventTime) {
+		BetreuungAnfrage betreuungAnfrage = converter.create(dto, eventTime);
 
 		em.persist(betreuungAnfrage);
 	}
@@ -81,12 +82,13 @@ public class BetreuungAnfrageService {
 			betreuungAnfrage.get(BetreuungAnfrage_.betreuungsArt),
 			betreuungAnfrage.get(BetreuungAnfrage_.kind),
 			betreuungAnfrage.get(BetreuungAnfrage_.gesuchsteller),
-			betreuungAnfrage.get(BetreuungAnfrage_.abgelehntVonGesuchsteller)
+			betreuungAnfrage.get(BetreuungAnfrage_.abgelehntVonGesuchsteller),
+			betreuungAnfrage.get(BetreuungAnfrage_.eventTimestamp)
 		));
 
 		filter.setPredicate(query, root, cb);
 
-		query.orderBy(cb.asc(root.get(ClientBetreuungAnfrage_.since)), cb.asc(root.get(ClientBetreuungAnfrage_.id)));
+		query.orderBy(cb.asc(root.get(ClientBetreuungAnfrage_.id)));
 
 		TypedQuery<ClientBetreuungAnfrageDTO> q = em.createQuery(query);
 

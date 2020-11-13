@@ -86,10 +86,8 @@ CREATE FUNCTION betreuunganfrage_insert() RETURNS TRIGGER
 AS
 '
 	BEGIN
-		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id,
-											since)
-			(SELECT nextval(''clientbetreuunganfrage_id_seq''), c.active, c.clientname, c.institutionid, new.id,
-					c.grantedsince
+		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id)
+			(SELECT nextval(''clientbetreuunganfrage_id_seq''), c.active, c.clientname, c.institutionid, new.id
 			 FROM client c
 			 WHERE c.institutionid = new.institutionid);
 		RETURN new;
@@ -111,14 +109,11 @@ CREATE FUNCTION clientbetreuunganfrage_insert() RETURNS TRIGGER
 AS
 '
 	BEGIN
-		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id,
-											since)
-			(SELECT nextval(''clientbetreuunganfrage_id_seq''), new.active, new.clientname, new.institutionid, ba.id,
-					new
-						.grantedsince
+		INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id)
+			(SELECT nextval(''clientbetreuunganfrage_id_seq''), new.active, new.clientname, new.institutionid, ba.id
 			 FROM betreuunganfrage ba
 			 WHERE ba.institutionid = new.institutionid
-			 ORDER BY new.grantedsince, ba.id);
+			 ORDER BY ba.id);
 		RETURN new;
 	END;
 ';
@@ -194,11 +189,11 @@ FROM generate_series(1, 100) i
 	) t;
 
 INSERT INTO betreuunganfrage(refnr, institutionid, periodevon, periodebis, betreuungsart, kind, gesuchsteller,
-							 abgelehntvongesuchsteller)
+							 abgelehntvongesuchsteller, eventtimestamp)
 SELECT t.*
 FROM generate_series(1, 10) i
 	 CROSS JOIN LATERAL (
-	VALUES ('1.1.1.1', '1', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE),
-		   ('1.1.1.2', '2', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE),
-		   ('1.1.1.3', '3', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE)
+	VALUES ('1.1.1.1', '1', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE, now()),
+		   ('1.1.1.2', '2', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE, now()),
+		   ('1.1.1.3', '3', '2019-08-01'::DATE, '2020-07-31'::DATE, 'KITA', '{}'::JSONB, '{}'::JSONB, FALSE, now())
 	) t;

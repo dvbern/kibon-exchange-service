@@ -195,7 +195,7 @@ public class PlatzbestaetigungResource {
 		}
 
 		LOG.debug("generating message");
-		CompletionStage<Response> acked = platzbestaetigungProducer.process(betreuungEventDTO)
+		CompletionStage<Response> acked = platzbestaetigungProducer.process(betreuungEventDTO, client.get())
 			.thenApply(Void -> {
 				LOG.debug("received ack");
 				return Response.ok().build();

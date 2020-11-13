@@ -17,6 +17,8 @@
 
 package ch.dvbern.kibon.platzbestaetigung.facade;
 
+import java.time.LocalDateTime;
+
 import javax.annotation.Nonnull;
 
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
@@ -27,6 +29,8 @@ import org.easymock.MockType;
 import org.easymock.TestSubject;
 import org.junit.jupiter.api.Test;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expectLastCall;
 
 @SuppressWarnings("JUnitTestMethodWithNoAssertions")
@@ -43,7 +47,8 @@ public class BetreuungAnfrageEventHandlerTest extends EventHandlerTest<Betreuung
 	public void testHandleVerfuegungVerfuegtEvent() {
 		BetreuungAnfrageEventDTO dto = new BetreuungAnfrageEventDTO();
 
-		betreuungAnfrageService.onBetreuungAnfrageCreated(dto);
+		//noinspection ConstantConditions
+		betreuungAnfrageService.onBetreuungAnfrageCreated(eq(dto), anyObject(LocalDateTime.class));
 		expectLastCall();
 
 		expectEventProcessing("BetreuungAnfrageAdded", dto);

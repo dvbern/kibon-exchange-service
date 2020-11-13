@@ -27,7 +27,7 @@ import javax.inject.Inject;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
-import ch.dvbern.kibon.exchange.commons.util.DateConverter;
+import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
@@ -77,7 +77,7 @@ public class InstitutionConverter {
 		institution.setAnzahlPlaetze(dto.getAnzahlPlaetze());
 		institution.setAnzahlPlaetzeFirmen(dto.getAnzahlPlaetzeFirmen());
 		if (dto.getTimestampMutiert() != null) {
-			institution.setTimestampMutiert(DateConverter.toLocalDateTime(dto.getTimestampMutiert()));
+			institution.setTimestampMutiert(TimestampConverter.toLocalDateTime(dto.getTimestampMutiert()));
 		}
 	}
 

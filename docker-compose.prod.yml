@@ -3,25 +3,23 @@ version: '2'
 services:
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:5.5.1
-    # make sure to match the UID:GID of the host (due to volume binding)
-    user: "1000"
+    image: confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION}
+    user: ${HOST_USER}
     networks:
       - kibon_exchange_backbone
     ports:
       - "2181:2181"
     volumes:
-      - ./zookeeper/data:/var/lib/zookeeper/data
-      - ./zookeeper/log:/var/lib/zookeeper/log
-      - ./zookeeper/jvmlogs:/var/log/kafka
+      - ${CONF_DIR}/zookeeper/data:/var/lib/zookeeper/data
+      - ${CONF_DIR}/zookeeper/log:/var/lib/zookeeper/log
+      - ${CONF_DIR}/zookeeper/jvmlogs:/var/log/kafka
     environment:
       TZ: "Europe/Zurich"
       ZOOKEEPER_CLIENT_PORT: 2181
 
   kafka:
-    image: confluentinc/cp-kafka:5.5.1
-    # make sure to match the UID:GID of the host (due to volume binding)
-    user: "1000"
+    image: confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION}
+    user: ${HOST_USER}
     networks:
       - kibon_exchange_backbone
     depends_on:
@@ -29,8 +27,8 @@ services:
     ports:
       - "9092:9092"
     volumes:
-      - ./kafka/data:/var/lib/kafka/data
-      - ./kafka/jvmlogs:/var/log/kafka
+      - ${CONF_DIR}/kafka/data:/var/lib/kafka/data
+      - ${CONF_DIR}/kafka/jvmlogs:/var/log/kafka
     environment:
       TZ: "Europe/Zurich"
       KAFKA_LOG_RETENTION_HOURS: -1
@@ -41,7 +39,8 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:5.5.1
+    image: confluentinc/cp-schema-registry:${CONFLUENT_PLATFORM_VERSION}
+    user: ${HOST_USER}
     hostname: schema-registry
     networks:
       - kibon_exchange_backbone
@@ -58,14 +57,13 @@ services:
       SCHEMA_REGISTRY_DEBUG: 'true'
 
   keycloak:
-    # Unfortunatley, scriptimport does not work with keyclaok > 7.0.0 - https://issues.redhat.com/browse/KEYCLOAK-12198
-    # use keycloak 7.0.0 to initialise the database, then upgrade to 10.0.0
-    image: quay.io/keycloak/keycloak:10.0.2
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
     networks:
       - kibon_exchange_backbone
     volumes:
-      - ./keycloak/kibon_realm.json:/tmp/kibon_realm.json:ro
-      - ./keycloak/set-secrets.sh:/opt/jboss/startup-scripts/set-secrets.sh:ro
+      - ${CONF_DIR}/keycloak/kibon_realm.json:/tmp/kibon_realm.json:ro
+      - ${CONF_DIR}/keycloak/set-secrets.sh:/opt/jboss/startup-scripts/set-secrets.sh:ro
+    command: "-Dkeycloak.profile.feature.upload_scripts=enabled"
     environment:
       TZ: "Europe/Zurich"
       KEYCLOAK_USER: ${KEYCLOAK_USER}
@@ -73,12 +71,11 @@ services:
       DB_VENDOR: "postgres"
       DB_ADDR: ${DB_ADDR}
       DB_PORT: ${DB_PORT}
-      DB_DATABASE: "keycloak"
-      DB_USER: ${KEYCLOAK_DB_USER}
-      DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      DB_DATABASE: ${PG_KEYCLOAK_DB}
+      DB_USER: ${PG_KEYCLOAK_USER}
+      DB_PASSWORD: ${PG_KEYCLOAK_PW}
       PROXY_ADDRESS_FORWARDING: "true"
-      # should be enabled on productive systems
-      #      KEYCLOAK_ALWAYS_HTTPS: "true"
+      KEYCLOAK_ALWAYS_HTTPS: ${KEYCLOAK_ALWAYS_HTTPS}
       KEYCLOAK_IMPORT: "/opt/jboss/kibon_realm.json"
       KITADMIN_SECRET: ${KITADMIN_SECRET}
       KIBON_EXCHANGE_SERVICE_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
@@ -91,22 +88,22 @@ services:
       - kafka
       - keycloak
     volumes:
-      - ./service/certs/key.pem:/key.pem:ro
-      - ./service/certs/cert.pem:/cert.pem:ro
+      - ${CONF_DIR}/service/certs/key.pem:/key.pem:ro
+      - ${CONF_DIR}/service/certs/cert.pem:/cert.pem:ro
     environment:
       TZ: "Europe/Zurich"
-      GROUP_ID: "v1"
+      GROUP_ID: ${GROUP_ID}
       KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_ADDR}:9092"
-      QUARKUS_DATASOURCE_URL: "jdbc:postgresql://${DB_ADDR}:${DB_PORT}/kibon-exchange"
+      QUARKUS_DATASOURCE_JDBC_URL: ${QUARKUS_DATASOURCE_JDBC_URL}
+      QUARKUS_DATASOURCE_USERNAME: ${QUARKUS_DATASOURCE_USERNAME}
       QUARKUS_DATASOURCE_PASSWORD: ${QUARKUS_DATASOURCE_PASSWORD}
-      # this requires a trusted certificate: change to public URL passing through netscaler
-      QUARKUS_OIDC_AUTH_SERVER_URL: "http://keycloak:8080/auth/realms/kibon"
+      QUARKUS_OIDC_AUTH_SERVER_URL: ${QUARKUS_OIDC_AUTH_SERVER_URL}
       # we have to wait until keycloak is up and running
       QUARKUS_OIDC_CONNECTION_DELAY: "30s"
       QUARKUS_OIDC_CREDENTIALS_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
-      QUARKUS_LOG_SENTRY: "true"
-      QUARKUS_LOG_SENTRY_DSN:
-      QUARKUS_LOG_SENTRY_ENVIRONMENT:
+      QUARKUS_LOG_SENTRY: ${QUARKUS_LOG_SENTRY}
+      QUARKUS_LOG_SENTRY_DSN: ${QUARKUS_LOG_SENTRY_DSN}
+      QUARKUS_LOG_SENTRY_ENVIRONMENT: ${QUARKUS_LOG_SENTRY_ENVIRONMENT}
 
   nginx:
     image: docker.dvbern.ch/kibon/exchange-nginx:${VERSION}
@@ -117,8 +114,8 @@ services:
     ports:
       - "443:443"
     volumes:
-      - ./nginx/certs/key.pem:/etc/nginx/certs/key.pem:ro
-      - ./nginx/certs/cert.pem:/etc/nginx/certs/cert.pem:ro
+      - ${CONF_DIR}/nginx/certs/key.pem:/etc/nginx/certs/key.pem:ro
+      - ${CONF_DIR}/nginx/certs/cert.pem:/etc/nginx/certs/cert.pem:ro
 
 networks:
   kibon_exchange_backbone:

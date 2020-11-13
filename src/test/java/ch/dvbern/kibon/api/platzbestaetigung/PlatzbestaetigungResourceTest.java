@@ -184,7 +184,7 @@ class PlatzbestaetigungResourceTest {
 	@Nonnull
 	private BetreuungZeitabschnittDTO createInvalidZeitabschitt() {
 		BetreuungZeitabschnittDTO invalid = new BetreuungZeitabschnittDTO();
-		invalid.setAnzahlMonatlicheHauptmahlzeiten(-1);
+		invalid.setAnzahlHauptmahlzeiten(new BigDecimal(-1));
 
 		return invalid;
 	}

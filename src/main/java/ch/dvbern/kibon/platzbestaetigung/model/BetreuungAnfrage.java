@@ -18,6 +18,7 @@
 package ch.dvbern.kibon.platzbestaetigung.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
@@ -83,6 +84,10 @@ public class BetreuungAnfrage {
 	@Column(nullable = false, updatable = false)
 	private @NotNull Boolean abgelehntVonGesuchsteller = false;
 
+	@Nonnull
+	@Column(updatable = false)
+	private @NotNull LocalDateTime eventTimestamp = LocalDateTime.now();
+
 
 	@SuppressWarnings("checkstyle:CyclomaticComplexity")
 	@Override
@@ -104,7 +109,8 @@ public class BetreuungAnfrage {
 			getPeriodeBis().equals(that.getPeriodeBis()) &&
 			getPeriodeVon().equals(that.getPeriodeVon()) &&
 			getBetreuungsArt() == that.getBetreuungsArt() &&
-			isAbgelehntVonGesuchsteller() == that.isAbgelehntVonGesuchsteller();
+			isAbgelehntVonGesuchsteller() == that.isAbgelehntVonGesuchsteller() &&
+			getEventTimestamp().equals(that.getEventTimestamp());
 	}
 
 	@Override
@@ -115,7 +121,8 @@ public class BetreuungAnfrage {
 			getPeriodeVon(),
 			getPeriodeBis(),
 			getBetreuungsArt(),
-			isAbgelehntVonGesuchsteller());
+			isAbgelehntVonGesuchsteller(),
+			getEventTimestamp());
 	}
 
 	@Nonnull
@@ -198,4 +205,12 @@ public class BetreuungAnfrage {
 		this.abgelehntVonGesuchsteller = abgelehntVonGesuchsteller;
 	}
 
+	@Nonnull
+	public LocalDateTime getEventTimestamp() {
+		return eventTimestamp;
+	}
+
+	public void setEventTimestamp(@Nonnull LocalDateTime eventTime) {
+		this.eventTimestamp = eventTime;
+	}
 }

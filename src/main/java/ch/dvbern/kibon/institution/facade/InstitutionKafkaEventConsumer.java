@@ -17,19 +17,19 @@
 
 package ch.dvbern.kibon.institution.facade;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
+import ch.dvbern.kibon.kafka.IncomingEvent;
 import ch.dvbern.kibon.kafka.MessageProcessor;
-import io.smallrye.reactive.messaging.kafka.KafkaRecord;
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy;
+import io.smallrye.reactive.messaging.annotations.Blocking;
+import io.smallrye.reactive.messaging.kafka.IncomingKafkaRecord;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
 
 @SuppressWarnings("unused")
 @ApplicationScoped
@@ -44,10 +44,17 @@ public class InstitutionKafkaEventConsumer {
 	MessageProcessor processor;
 
 	@Incoming("InstitutionEvents")
-	@Acknowledgment(Strategy.MANUAL)
-	public CompletionStage<Void> onMessage(@Nonnull KafkaRecord<String, InstitutionEventDTO> message) {
+	@Outgoing("InstitutionEvents-internal")
+	@Nullable
+	public Message<IncomingEvent<InstitutionEventDTO>> wrap(
+		@Nonnull IncomingKafkaRecord<String, InstitutionEventDTO> msg) {
 
-		return CompletableFuture.runAsync(() -> processor.process(message, eventHandler))
-			.thenCompose(f -> message.ack());
+		return processor.toIncomingEvent(msg);
+	}
+
+	@Incoming("InstitutionEvents-internal")
+	@Blocking
+	public void onMessage(@Nonnull IncomingEvent<InstitutionEventDTO> event) {
+		processor.process(event, eventHandler);
 	}
 }

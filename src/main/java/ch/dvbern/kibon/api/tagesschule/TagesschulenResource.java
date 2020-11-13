@@ -246,7 +246,7 @@ public class TagesschulenResource {
 	}
 
 	@Nonnull
-	private Response mockResponse(@PathParam("refnr") @NotEmpty String refnr) {
+	private Response mockResponse(@Nonnull String refnr) {
 		if (REF_NR_1.equals(refnr) || REF_NR_2.equals(refnr)) {
 			return Response.ok().build();
 		}

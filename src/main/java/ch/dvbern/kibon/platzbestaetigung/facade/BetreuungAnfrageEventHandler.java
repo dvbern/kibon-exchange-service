@@ -50,7 +50,7 @@ public class BetreuungAnfrageEventHandler extends BaseEventHandler<BetreuungAnfr
 		@Nonnull BetreuungAnfrageEventDTO dto) {
 
 		if (BETREUUNG_ANFRAGE_ADDED == eventType) {
-			betreuungAnfrageService.onBetreuungAnfrageCreated(dto);
+			betreuungAnfrageService.onBetreuungAnfrageCreated(dto, eventTime);
 		} else {
 			LOG.warn("Unimplemented event type '{}' with id '{}'", eventType, eventId);
 		}

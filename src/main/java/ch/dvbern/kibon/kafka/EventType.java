@@ -27,6 +27,7 @@ import javax.annotation.Nonnull;
 public enum EventType {
 	CLIENT_ADDED("ClientAdded"),
 	CLIENT_REMOVED("ClientRemoved"),
+	CLIENT_MODIFIED("ClientModified"),
 	INSTITUTION_CHANGED("InstitutionChanged"),
 	VERFUEGUNG_VERFUEGT("VerfuegungVerfuegt"),
 	BETREUUNG_ANFRAGE_ADDED("BetreuungAnfrageAdded");

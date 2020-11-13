@@ -23,14 +23,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 
-import ch.dvbern.kibon.exchange.commons.util.DateConverter;
+import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.util.EventUtil;
-import io.smallrye.reactive.messaging.kafka.KafkaRecord;
+import io.smallrye.reactive.messaging.kafka.IncomingKafkaRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
+import org.eclipse.microprofile.reactive.messaging.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,39 +41,53 @@ public class MessageProcessor {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MessageProcessor.class);
 
-	@Transactional
-	@SuppressWarnings("PMD.AvoidCatchingThrowable")
-	public <T, H extends BaseEventHandler<T>> void process(
-		@Nonnull KafkaRecord<String, T> message,
-		@Nonnull H handler) {
+	/**
+	 * For some reason there is a method signature missing for @Blocking, posts-processing acknowledgement and
+	 * Message parameters.
+	 * <br>
+	 * This construct wraps the original KafkaMessage to extract the metadata, such that wee can finally use a simple
+	 * payload-only method signature.
+	 * <br>
+	 * <a href="https://github.com/smallrye/smallrye-reactive-messaging/issues/628#issuecomment-652800542">see</a>
+	 */
+	@Nullable
+	public <T> Message<IncomingEvent<T>> toIncomingEvent(@Nonnull IncomingKafkaRecord<String, T> message) {
+		String key = message.getKey();
+		Headers headers = message.getHeaders();
 
-		try {
-			String key = message.getKey();
-			Headers headers = message.getHeaders();
+		Optional<String> eventIdOpt = getHeaderValue(headers, EventUtil.MESSAGE_HEADER_EVENT_ID);
+		if (eventIdOpt.isEmpty()) {
+			LOG.warn("Skipping Kafka message with key = {}, eventId header was missing", key);
 
-			Optional<String> eventIdOpt = getHeaderValue(headers, EventUtil.MESSAGE_HEADER_EVENT_ID);
-			if (eventIdOpt.isEmpty()) {
-				LOG.warn("Skipping Kafka message with key = {}, eventId header was missing", key);
-
-				return;
-			}
-
-			Optional<String> eventTypeOpt = getHeaderValue(headers, EventUtil.MESSAGE_HEADER_EVENT_TYPE);
-			if (eventTypeOpt.isEmpty()) {
-				LOG.warn("Skipping Kafka message with key = {}, eventType header was missing", key);
-
-				return;
-			}
-
-			UUID eventId = UUID.fromString(eventIdOpt.get());
-			LocalDateTime eventTime = DateConverter.of(message.getTimestamp());
-
-			T eventDTO = message.getPayload();
-
-			handler.onEvent(key, eventId, eventTime, eventTypeOpt.get(), eventDTO);
-		} catch (Throwable t) {
-			LOG.error("Error in message processing", t);
+			return null;
 		}
+
+		Optional<String> eventTypeOpt = getHeaderValue(headers, EventUtil.MESSAGE_HEADER_EVENT_TYPE);
+		if (eventTypeOpt.isEmpty()) {
+			LOG.warn("Skipping Kafka message with key = {}, eventType header was missing", key);
+
+			return null;
+		}
+
+		UUID eventId = UUID.fromString(eventIdOpt.get());
+		LocalDateTime eventTime = TimestampConverter.of(message.getTimestamp());
+
+		T eventDTO = message.getPayload();
+
+		IncomingEvent<T> incomingEvent = new IncomingEvent<>(key, eventId, eventTime, eventTypeOpt.get(), eventDTO);
+
+		return message.withPayload(incomingEvent);
+	}
+
+	@Transactional
+	public <T, H extends BaseEventHandler<T>> void process(@Nonnull IncomingEvent<T> event, @Nonnull H handler) {
+
+		handler.onEvent(
+			event.getKey(),
+			event.getEventId(),
+			event.getEventTime(),
+			event.getEventType(),
+			event.getPayload());
 	}
 
 	@Nonnull
