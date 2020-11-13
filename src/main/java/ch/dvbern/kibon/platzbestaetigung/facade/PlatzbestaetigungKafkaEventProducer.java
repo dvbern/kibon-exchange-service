@@ -9,6 +9,7 @@ import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungEventDTO;
 import io.smallrye.reactive.messaging.kafka.KafkaRecord;
 import io.smallrye.reactive.messaging.kafka.OutgoingKafkaRecordMetadata;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import static ch.dvbern.kibon.exchange.commons.util.EventUtil.MESSAGE_HEADER_EVENT_ID;
 import static ch.dvbern.kibon.exchange.commons.util.EventUtil.MESSAGE_HEADER_EVENT_TYPE;
+import static ch.dvbern.kibon.exchange.commons.util.EventUtil.MESSAGE_HEADER_CLIENT_NAME;
 
 @ApplicationScoped
 public class PlatzbestaetigungKafkaEventProducer {
@@ -40,7 +42,7 @@ public class PlatzbestaetigungKafkaEventProducer {
 	 * by Kafka, or which will completeExceptionally upon NACK, channel cancellation/termination or queue overlflow.
 	 */
 	@Nonnull
-	public CompletionStage<Void> process(@Nonnull BetreuungEventDTO betreuungEventDTO) {
+	public CompletionStage<Void> process(@Nonnull BetreuungEventDTO betreuungEventDTO, @Nonnull Client client) {
 		String key = betreuungEventDTO.getRefnr();
 		String eventType = "PlatzbestaetigungBetreuung";
 
@@ -49,6 +51,7 @@ public class PlatzbestaetigungKafkaEventProducer {
 			.withHeaders(new RecordHeaders()
 				.add(MESSAGE_HEADER_EVENT_ID, UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
 				.add(MESSAGE_HEADER_EVENT_TYPE, eventType.getBytes(StandardCharsets.UTF_8))
+				.add(MESSAGE_HEADER_CLIENT_NAME, client.getId().getClientName().getBytes(StandardCharsets.UTF_8))
 			)
 			.build();
 

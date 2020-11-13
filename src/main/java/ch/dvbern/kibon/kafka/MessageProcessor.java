@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 
-import ch.dvbern.kibon.exchange.commons.util.DateConverter;
+import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.util.EventUtil;
 import io.smallrye.reactive.messaging.kafka.IncomingKafkaRecord;
 import org.apache.kafka.common.header.Header;
@@ -70,7 +70,7 @@ public class MessageProcessor {
 		}
 
 		UUID eventId = UUID.fromString(eventIdOpt.get());
-		LocalDateTime eventTime = DateConverter.of(message.getTimestamp());
+		LocalDateTime eventTime = TimestampConverter.of(message.getTimestamp());
 
 		T eventDTO = message.getPayload();
 
