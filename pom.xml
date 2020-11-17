@@ -171,6 +171,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <!-- IntelliJ 2020.2.3 tries to pull in org.junit:junit-vintage-engine when running tests from editor,
+             but the group id is wrong: pull correct artifact manually -->
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <scope>test</scope>
