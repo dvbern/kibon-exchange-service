@@ -116,7 +116,7 @@ public class ClientService {
 	}
 
 	@Nonnull
-	private Optional<Client> find(@Nonnull ClientId id) {
+	public Optional<Client> find(@Nonnull ClientId id) {
 		return Optional.ofNullable(em.find(Client.class, id));
 	}
 
@@ -124,5 +124,10 @@ public class ClientService {
 	public Optional<Client> findActive(@Nonnull ClientId id) {
 		return find(id)
 			.filter(Client::getActive);
+	}
+
+	@Nonnull
+	public Client get(@Nonnull ClientId id) {
+		return find(id).orElseThrow();
 	}
 }

@@ -20,16 +20,20 @@ package ch.dvbern.kibon.api.verfuegung;
 import javax.ws.rs.core.Response.Status;
 
 import ch.dvbern.kibon.testutils.TestcontainersEnvironment;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 
+import static com.spotify.hamcrest.jackson.IsJsonText.jsonText;
 import static com.spotify.hamcrest.jackson.JsonMatchers.isJsonStringMatching;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonInt;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.greaterThan;
@@ -39,7 +43,7 @@ import static org.hamcrest.Matchers.not;
 
 @QuarkusTestResource(TestcontainersEnvironment.class)
 @QuarkusTest
-class VerfuegungenResourceTest {
+class VerfuegungenResourceQuarkusTest {
 
 	@Test
 	public void testGetAllEndpoint() {
@@ -112,5 +116,34 @@ class VerfuegungenResourceTest {
 			.then()
 			.assertThat()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode());
+	}
+
+	/**
+	 * The test setup is based on import-test.sql:
+	 * - There should be 300 Verfuegungen (without Zeitabschnitte) with unlimited gueltigkeit
+	 * - There should be 100 Verfuegungen with 12 Zeitabschnitte each, for months Aug 2020 to July 2021.
+	 * - Since client is only allowed access from 2021-01-01, all (existing) Zeitabschnitte must be for 2021.
+	 */
+	@Test
+	public void testGetAllFiltersByGueltigkeit() {
+		Matcher<JsonNode> zeitabschnittInsideGueltigkeit = jsonObject()
+			.where("von", is(jsonText(containsString("2021-"))))
+			.where("bis", is(jsonText(containsString("2021-"))));
+
+		Matcher<JsonNode> zeitabschnitteInGueltigkeit = jsonArray(everyItem(zeitabschnittInsideGueltigkeit));
+
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.get("/verfuegungen")
+			.then()
+			.assertThat()
+			.statusCode(Status.OK.getStatusCode())
+			.body(isJsonStringMatching(jsonObject()
+				.where("verfuegungen", is(jsonArray(everyItem(jsonObject()
+					.where("zeitabschnitte", zeitabschnitteInGueltigkeit)
+					.where("ignorierteZeitabschnitte", zeitabschnitteInGueltigkeit)
+				))))));
 	}
 }

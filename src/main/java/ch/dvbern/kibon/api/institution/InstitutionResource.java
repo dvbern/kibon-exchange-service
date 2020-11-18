@@ -19,6 +19,7 @@ package ch.dvbern.kibon.api.institution;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -37,6 +38,8 @@ import javax.ws.rs.core.Response.Status;
 import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalDTO;
 import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalInstitutionDTO;
 import ch.dvbern.kibon.clients.model.Client;
+import ch.dvbern.kibon.clients.model.ClientId;
+import ch.dvbern.kibon.clients.service.ClientService;
 import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.service.InstitutionService;
@@ -66,6 +69,10 @@ public class InstitutionResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	InstitutionService institutionService;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	ClientService clientService;
 
 	@SuppressWarnings({ "checkstyle:VisibilityModifier", "CdiInjectionPointsInspection" })
 	@Inject
@@ -147,14 +154,14 @@ public class InstitutionResource {
 			groups,
 			id);
 
-		Client client = institutionService.getClient(id, clientName);
+		Optional<Client> client = clientService.find(new ClientId(clientName, id));
 
-		if (client == null) {
+		if (client.isEmpty()) {
 			// Institution not found for given client
 			return Response.status(Status.NOT_FOUND).build();
 		}
 
-		if (!client.getActive()) {
+		if (!client.get().getActive()) {
 			// Client not active (forbidden) for given institution
 			return Response.status(Status.FORBIDDEN).build();
 		}

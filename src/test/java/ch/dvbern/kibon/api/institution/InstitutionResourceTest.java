@@ -146,8 +146,8 @@ class InstitutionResourceTest {
 			.body(isJsonStringMatching(jsonObject()
 				.where("institutionen", is(jsonArray(
 					everyItem(jsonObject()
-						// in import-test.dev, institution with ID 2 has status DELETED and should not be in the output
-						.where("id", not(jsonText("2")))
+						// in import-test.dev, institution with ID 3 has status DELETED and should not be in the output
+						.where("id", not(jsonText("3")))
 					)
 				)))
 			));

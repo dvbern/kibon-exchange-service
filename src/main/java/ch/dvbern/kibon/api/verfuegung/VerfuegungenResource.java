@@ -17,8 +17,12 @@
 
 package ch.dvbern.kibon.api.verfuegung;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -34,9 +38,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import ch.dvbern.kibon.clients.model.Client;
+import ch.dvbern.kibon.clients.model.ClientId;
+import ch.dvbern.kibon.clients.service.ClientService;
 import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungDTO;
 import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungenDTO;
+import ch.dvbern.kibon.exchange.api.common.verfuegung.ZeitabschnittDTO;
 import ch.dvbern.kibon.institution.service.InstitutionService;
 import ch.dvbern.kibon.util.OpenApiTag;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
@@ -71,6 +79,10 @@ public class VerfuegungenResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	InstitutionService institutionService;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	ClientService clientService;
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
@@ -141,6 +153,8 @@ public class VerfuegungenResource {
 			.map(VerfuegungDTO::getInstitutionId)
 			.collect(Collectors.toSet());
 
+		removeZeitabschnitteOutsideGueltigkeit(clientName, verfuegungenDTO, institutionIds);
+
 		List<InstitutionDTO> institutionDTOs = institutionService.get(institutionIds);
 
 		verfuegungenDTO.setInstitutionen(institutionDTOs);
@@ -151,5 +165,45 @@ public class VerfuegungenResource {
 	@Nonnull
 	private VerfuegungDTO convert(@Nonnull ClientVerfuegungDTO model) {
 		return objectMapper.convertValue(model, VerfuegungDTO.class);
+	}
+
+	private void removeZeitabschnitteOutsideGueltigkeit(
+		@Nonnull String clientName,
+		@Nonnull VerfuegungenDTO verfuegungenDTO,
+		@Nonnull Set<String> institutionIds) {
+
+		Map<String, Predicate<ZeitabschnittDTO>> gueltigkeitPredicates = institutionIds.stream()
+			.collect(Collectors.toMap(Function.identity(), id -> {
+				Client client = clientService.get(new ClientId(clientName, id));
+
+				return outsideGueltigkeitPredicate(client);
+			}));
+
+		verfuegungenDTO.getVerfuegungen()
+			.forEach(v -> {
+				Predicate<ZeitabschnittDTO> predicate = gueltigkeitPredicates.get(v.getInstitutionId());
+				removeZeitabschnitteOutsideGueltigkeit(predicate, v);
+			});
+	}
+
+	@Nonnull
+	private Predicate<ZeitabschnittDTO> outsideGueltigkeitPredicate(@Nonnull Client client) {
+		LocalDate clientAb = client.getGueltigAb();
+		LocalDate clientBis = client.getGueltigBis();
+
+		Predicate<ZeitabschnittDTO> isBefore =
+			z -> clientAb != null && z.getBis().isBefore(clientAb);
+		Predicate<ZeitabschnittDTO> isAfter =
+			z -> clientBis != null && z.getVon().isAfter(clientBis);
+
+		return isBefore.or(isAfter);
+	}
+
+	private void removeZeitabschnitteOutsideGueltigkeit(
+		@Nonnull Predicate<ZeitabschnittDTO> predicate,
+		@Nonnull VerfuegungDTO dto) {
+
+		dto.getZeitabschnitte().removeIf(predicate);
+		dto.getIgnorierteZeitabschnitte().removeIf(predicate);
 	}
 }

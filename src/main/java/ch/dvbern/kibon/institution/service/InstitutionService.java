@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -37,8 +36,6 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
-import ch.dvbern.kibon.clients.model.Client;
-import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
@@ -146,15 +143,6 @@ public class InstitutionService {
 
 		return em.createQuery(query)
 			.setParameter(idsParam, institutionIds);
-	}
-
-	@Nullable
-	public Client getClient(@Nonnull String institutionId, @Nonnull String clientName) {
-		if (institutionId.isBlank()) {
-			return null;
-		}
-
-		return em.find(Client.class, new ClientId(clientName, institutionId));
 	}
 
 	@Nonnull

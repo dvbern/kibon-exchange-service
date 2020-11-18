@@ -85,6 +85,11 @@ class VerfuegungServiceQuarkusTest {
 		);
 	}
 
+	/**
+	 * Test setup (import-test.sql) contains 300 Verfuegungen for institution 1 and 100 Verfuegungen for institution 2.
+	 * Client gueltigkeit of institution 1 is controlled through the input parameters.
+	 * Client gueltigkeit of institution 2 is set to [2021-01-01, NULL).
+	 */
 	@ParameterizedTest
 	@CsvSource(value = {
 		"NULL, NULL, 400",
