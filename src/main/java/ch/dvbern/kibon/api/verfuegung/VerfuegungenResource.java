@@ -167,7 +167,7 @@ public class VerfuegungenResource {
 		return objectMapper.convertValue(model, VerfuegungDTO.class);
 	}
 
-	private void removeZeitabschnitteOutsideGueltigkeit(
+	void removeZeitabschnitteOutsideGueltigkeit(
 		@Nonnull String clientName,
 		@Nonnull VerfuegungenDTO verfuegungenDTO,
 		@Nonnull Set<String> institutionIds) {
@@ -180,9 +180,11 @@ public class VerfuegungenResource {
 			}));
 
 		verfuegungenDTO.getVerfuegungen()
-			.forEach(v -> {
+			.removeIf(v -> {
 				Predicate<ZeitabschnittDTO> predicate = gueltigkeitPredicates.get(v.getInstitutionId());
 				removeZeitabschnitteOutsideGueltigkeit(predicate, v);
+
+				return v.getZeitabschnitte().isEmpty() && v.getIgnorierteZeitabschnitte().isEmpty();
 			});
 	}
 
