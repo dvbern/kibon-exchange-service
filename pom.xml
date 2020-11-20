@@ -132,7 +132,7 @@
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
             <artifactId>kibon-exchange-api</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.vladmihalcea</groupId>

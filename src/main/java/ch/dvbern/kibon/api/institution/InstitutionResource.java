@@ -19,7 +19,6 @@ package ch.dvbern.kibon.api.institution;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -40,7 +39,7 @@ import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalInstitutionDTO;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.clients.service.ClientService;
-import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
+import ch.dvbern.kibon.exchange.api.common.institution.ClientInstitutionDTO;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.service.InstitutionService;
 import ch.dvbern.kibon.util.OpenApiTag;
@@ -127,7 +126,8 @@ public class InstitutionResource {
 		summary = "Institutions Daten",
 		description = "Returniert Namen und Adresse einer Institution.")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
-	@APIResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = InstitutionDTO.class)))
+	@APIResponse(responseCode = "200",
+		content = @Content(schema = @Schema(implementation = ClientInstitutionDTO.class)))
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
 	@APIResponse(responseCode = "404", ref = "#/components/responses/NotFound")
@@ -154,20 +154,22 @@ public class InstitutionResource {
 			groups,
 			id);
 
-		Optional<Client> client = clientService.find(new ClientId(clientName, id));
-
-		if (client.isEmpty()) {
+		Response response = clientService.find(new ClientId(clientName, id))
+			.map(this::toClientResponse)
 			// Institution not found for given client
-			return Response.status(Status.NOT_FOUND).build();
-		}
+			.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 
-		if (!client.get().getActive()) {
+		return response;
+	}
+
+	@Nonnull
+	private Response toClientResponse(@Nonnull Client client) {
+		if (!client.getActive()) {
 			// Client not active (forbidden) for given institution
 			return Response.status(Status.FORBIDDEN).build();
 		}
 
-		// Get InstitutionDTO
-		InstitutionDTO institutionDTO = institutionService.get(id);
+		ClientInstitutionDTO institutionDTO = institutionService.get(client);
 
 		return Response.ok(institutionDTO).build();
 	}
