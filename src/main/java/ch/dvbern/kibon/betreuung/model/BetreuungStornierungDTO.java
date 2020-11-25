@@ -15,17 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.util;
+package ch.dvbern.kibon.betreuung.model;
 
-@SuppressWarnings("PMD.ClassNamingConventions")
-public final class OpenApiTag {
+import javax.annotation.Nonnull;
 
-	public static final String BETREUUNGS_GUTSCHEINE = "Betreuungsgutscheine";
-	public static final String PLATZ_BESTAETIGUNG = "Platzbestätigung";
-	public static final String FAMILIEN_PORTAL = "Familienportal Bern";
-	public static final String TAGES_SCHULEN = "Tagesschulen";
-	public static final String BETREUUNGEN = "Betreuungen";
+public class BetreuungStornierungDTO {
 
-	private OpenApiTag() {
+	@Nonnull
+	private final String fallNummer;
+
+	public BetreuungStornierungDTO(
+		@Nonnull String fallNummer
+	) {
+		this.fallNummer = fallNummer;
 	}
+
+	@Nonnull
+	public String getFallNummer() {
+		return this.fallNummer;
+	}
+
 }
