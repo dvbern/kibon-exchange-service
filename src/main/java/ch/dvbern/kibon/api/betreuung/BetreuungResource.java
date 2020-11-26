@@ -17,7 +17,9 @@
 
 package ch.dvbern.kibon.api.betreuung;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletionStage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.security.RolesAllowed;
@@ -25,15 +27,24 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
-import ch.dvbern.kibon.betreuung.model.BetreuungStornierungDTO;
+import ch.dvbern.kibon.betreuung.facade.BetreuungStornierungAnfrageKafkaEventProducer;
+import ch.dvbern.kibon.betreuung.model.BetreuungStornierungAnfrageDTO;
 import ch.dvbern.kibon.betreuung.service.BetreuungStornierungAnfrageService;
+import ch.dvbern.kibon.clients.model.Client;
+import ch.dvbern.kibon.clients.model.ClientId;
+import ch.dvbern.kibon.clients.service.ClientService;
 import ch.dvbern.kibon.util.OpenApiTag;
 import io.quarkus.security.identity.SecurityIdentity;
+import io.smallrye.mutiny.Uni;
+import org.apache.http.protocol.ResponseConnControl;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Timed;
@@ -64,6 +75,14 @@ public class BetreuungResource {
 	@Inject
 	BetreuungStornierungAnfrageService betreuungStornierungAnfrageService;
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	ClientService clientService;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	BetreuungStornierungAnfrageKafkaEventProducer stornierungAnfrageKafkaEventProducer;
+
 
 	@POST
 	@Operation(summary = "Eine Betreuung in kiBon stornieren",
@@ -80,7 +99,7 @@ public class BetreuungResource {
 	@Timed(name = "betreuungStornierenTimer",
 		description = "A measure of how long it takes to process a Stornieranfrage",
 		unit = MetricUnits.MILLISECONDS)
-	public void sendBetreuungStornierungToKafka(@Nonnull @NotNull @Valid BetreuungStornierungDTO betreuungStornierungDTO) {
+	public Uni<Response> sendBetreuungStornierungToKafka(@Nonnull @NotNull @Valid BetreuungStornierungAnfrageDTO betreuungStornierungDTO) {
 		String clientName = jsonWebToken.getClaim("clientId");
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
@@ -90,6 +109,28 @@ public class BetreuungResource {
 			userName,
 			clientName,
 			groups);
+
+		String institutionId = betreuungStornierungDTO.getInstitutionId();
+		Optional<Client> client = clientService.findActive(new ClientId(clientName, institutionId));
+
+		if(client.isEmpty()) {
+			return Uni.createFrom().item(Response.status(Status.FORBIDDEN).build());
+		}
+
+		LOG.debug("Generating message");
+
+		CompletionStage<Response> acked =
+			stornierungAnfrageKafkaEventProducer.process(betreuungStornierungDTO.getFallNummer(), client.get())
+			.thenApply(Void -> {
+				LOG.debug("received ack");
+				return Response.ok().build();
+			})
+			.exceptionally(error -> {
+				LOG.error("failed", error);
+				return Response.serverError().build();
+			});
+
+		return Uni.createFrom().completionStage(acked);
 
 	}
 }

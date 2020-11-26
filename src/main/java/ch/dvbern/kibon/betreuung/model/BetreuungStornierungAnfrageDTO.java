@@ -19,20 +19,28 @@ package ch.dvbern.kibon.betreuung.model;
 
 import javax.annotation.Nonnull;
 
-public class BetreuungStornierungDTO {
+public class BetreuungStornierungAnfrageDTO {
 
 	@Nonnull
 	private final String fallNummer;
 
-	public BetreuungStornierungDTO(
-		@Nonnull String fallNummer
+	@Nonnull
+	private final String institutionId;
+
+	public BetreuungStornierungAnfrageDTO(
+		@Nonnull String fallNummer,
+		@Nonnull String institutionId
 	) {
 		this.fallNummer = fallNummer;
+		this.institutionId = institutionId;
 	}
 
 	@Nonnull
 	public String getFallNummer() {
 		return this.fallNummer;
 	}
+
+	@Nonnull
+	public String getInstitutionId() { return this.institutionId; }
 
 }
