@@ -29,7 +29,7 @@ public class BetreuungStornierungAnfrageKafkaEventProducer {
 	private static final Logger LOG = LoggerFactory.getLogger(BetreuungStornierungAnfrageKafkaEventProducer.class);
 
 	@Inject
-	@Channel("BetreuungStorneriungAnfrageEvents")
+	@Channel("BetreuungStornierungEvents")
 	Emitter<String> betreuungStornierungEvent;
 
 	@Nonnull
