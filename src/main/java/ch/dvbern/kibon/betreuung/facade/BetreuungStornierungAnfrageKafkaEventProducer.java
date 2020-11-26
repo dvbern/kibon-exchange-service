@@ -9,6 +9,7 @@ import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import ch.dvbern.kibon.betreuung.model.BetreuungStornierungAnfrage;
 import ch.dvbern.kibon.clients.model.Client;
 import io.smallrye.reactive.messaging.kafka.KafkaRecord;
 import io.smallrye.reactive.messaging.kafka.OutgoingKafkaRecordMetadata;
@@ -33,11 +34,12 @@ public class BetreuungStornierungAnfrageKafkaEventProducer {
 	Emitter<String> betreuungStornierungEvent;
 
 	@Nonnull
-	public CompletionStage<Void> process(@Nonnull String refNr, @Nonnull Client client) {
+	public CompletionStage<Void> process(@Nonnull BetreuungStornierungAnfrage betreuungStornierungAnfrage, @Nonnull Client client) {
 		String eventType = "BetreuungStornierungAnfrage";
+		String key = betreuungStornierungAnfrage.getRefnr();
 
 		OutgoingKafkaRecordMetadata metadata = OutgoingKafkaRecordMetadata.builder()
-			.withKey(refNr)
+			.withKey(key)
 			.withHeaders(new RecordHeaders()
 				.add(MESSAGE_HEADER_EVENT_ID, UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
 				.add(MESSAGE_HEADER_EVENT_TYPE, eventType.getBytes(StandardCharsets.UTF_8))
@@ -53,7 +55,7 @@ public class BetreuungStornierungAnfrageKafkaEventProducer {
 		// in the payload-parameter method of EmitterImpl, to block the REST request until an ACK is received.
 		CompletableFuture<Void> future = new CompletableFuture<>();
 
-		Message<String> message = KafkaRecord.of(refNr, refNr)
+		Message<String> message = KafkaRecord.of(key, key)
 			.addMetadata(metadata)
 			.withAck(() -> {
 				LOG.info("ACK BetreuungStornierungEvent");
@@ -69,7 +71,7 @@ public class BetreuungStornierungAnfrageKafkaEventProducer {
 		try {
 			betreuungStornierungEvent.send(message);
 		} catch (Exception e) {
-			LOG.error("Emitter failed sending BetreuungStornierung with refNr. {} to Kafka", refNr, e);
+			LOG.error("Emitter failed sending BetreuungStornierung with refNr. {} to Kafka", key, e);
 			future.completeExceptionally(e);
 		}
 

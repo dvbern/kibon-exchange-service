@@ -17,9 +17,17 @@
 
 package ch.dvbern.kibon.betreuung.service;
 
+import java.time.LocalDateTime;
+
+import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
+
+import ch.dvbern.kibon.betreuung.model.BetreuungStornierungAnfrage;
+import ch.dvbern.kibon.betreuung.model.BetreuungStornierungAnfrageDTO;
 
 @ApplicationScoped
 public class BetreuungStornierungAnfrageService {
@@ -28,5 +36,20 @@ public class BetreuungStornierungAnfrageService {
 	@Inject
 	EntityManager em;
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	BetreuungStornierungAnfrageConverter converter;
 
+
+	/**
+	 * Stores the BetreuungAnfrage in response to the betreuung/stornieren POST request.
+	 */
+	@Transactional(TxType.REQUIRED)
+	public BetreuungStornierungAnfrage onBetreuungStornierungAnfrageReceived(@Nonnull BetreuungStornierungAnfrageDTO dto) {
+		BetreuungStornierungAnfrage betreuungStornierungAnfrage = converter.create(dto, LocalDateTime.now());
+
+		em.persist(betreuungStornierungAnfrage);
+
+		return betreuungStornierungAnfrage;
+	}
 }

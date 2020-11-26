@@ -36,6 +36,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import ch.dvbern.kibon.betreuung.facade.BetreuungStornierungAnfrageKafkaEventProducer;
+import ch.dvbern.kibon.betreuung.model.BetreuungStornierungAnfrage;
 import ch.dvbern.kibon.betreuung.model.BetreuungStornierungAnfrageDTO;
 import ch.dvbern.kibon.betreuung.service.BetreuungStornierungAnfrageService;
 import ch.dvbern.kibon.clients.model.Client;
@@ -83,7 +84,6 @@ public class BetreuungResource {
 	@Inject
 	BetreuungStornierungAnfrageKafkaEventProducer stornierungAnfrageKafkaEventProducer;
 
-
 	@POST
 	@Operation(summary = "Eine Betreuung in kiBon stornieren",
 		description = "Diese Schnittstelle ermöglicht eine automatisierte Stornierung einer Betreuung in kiBon")
@@ -99,7 +99,8 @@ public class BetreuungResource {
 	@Timed(name = "betreuungStornierenTimer",
 		description = "A measure of how long it takes to process a Stornieranfrage",
 		unit = MetricUnits.MILLISECONDS)
-	public Uni<Response> sendBetreuungStornierungToKafka(@Nonnull @NotNull @Valid BetreuungStornierungAnfrageDTO betreuungStornierungDTO) {
+	public Uni<Response> sendBetreuungStornierungToKafka(
+		@Nonnull @NotNull @Valid BetreuungStornierungAnfrageDTO betreuungStornierungDTO) {
 		String clientName = jsonWebToken.getClaim("clientId");
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
@@ -113,22 +114,27 @@ public class BetreuungResource {
 		String institutionId = betreuungStornierungDTO.getInstitutionId();
 		Optional<Client> client = clientService.findActive(new ClientId(clientName, institutionId));
 
-		if(client.isEmpty()) {
+		if (client.isEmpty()) {
 			return Uni.createFrom().item(Response.status(Status.FORBIDDEN).build());
 		}
+
+		LOG.debug("Persisting anfrage");
+
+		BetreuungStornierungAnfrage betreuungStornierungAnfrage =
+			betreuungStornierungAnfrageService.onBetreuungStornierungAnfrageReceived(betreuungStornierungDTO);
 
 		LOG.debug("Generating message");
 
 		CompletionStage<Response> acked =
-			stornierungAnfrageKafkaEventProducer.process(betreuungStornierungDTO.getFallNummer(), client.get())
-			.thenApply(Void -> {
-				LOG.debug("received ack");
-				return Response.ok().build();
-			})
-			.exceptionally(error -> {
-				LOG.error("failed", error);
-				return Response.serverError().build();
-			});
+			stornierungAnfrageKafkaEventProducer.process(betreuungStornierungAnfrage, client.get())
+				.thenApply(Void -> {
+					LOG.debug("received ack");
+					return Response.ok().build();
+				})
+				.exceptionally(error -> {
+					LOG.error("failed", error);
+					return Response.serverError().build();
+				});
 
 		return Uni.createFrom().completionStage(acked);
 
