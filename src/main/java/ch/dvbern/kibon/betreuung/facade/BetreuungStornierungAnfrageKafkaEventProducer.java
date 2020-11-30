@@ -31,7 +31,7 @@ public class BetreuungStornierungAnfrageKafkaEventProducer {
 
 	@Inject
 	@Channel("BetreuungStornierungEvents")
-	Emitter<String> betreuungStornierungEvent;
+	private Emitter<String> betreuungStornierungEvent;
 
 	@Nonnull
 	public CompletionStage<Void> process(@Nonnull BetreuungStornierungAnfrage betreuungStornierungAnfrage, @Nonnull Client client) {
@@ -76,5 +76,13 @@ public class BetreuungStornierungAnfrageKafkaEventProducer {
 		}
 
 		return future;
+	}
+
+	public void setBetreuungStornierungEvent(Emitter<String> emitter) {
+		this.betreuungStornierungEvent = emitter;
+	}
+
+	public Emitter<String> getBetruungStornierungEvent() {
+		return this.betreuungStornierungEvent;
 	}
 }
