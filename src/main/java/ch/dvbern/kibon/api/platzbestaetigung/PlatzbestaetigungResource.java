@@ -69,7 +69,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/platzbestaetigung")
-@Tag(name = OpenApiTag.PLATZ_BESTAETIGUNG)
+@Tag(name = OpenApiTag.BETREUUNGEN)
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class PlatzbestaetigungResource {
@@ -104,8 +104,14 @@ public class PlatzbestaetigungResource {
 	@Operation(
 		summary = "Returniert Betreuung-Anfragen",
 		description = "Wenn ein Betreuungs-Gesuch bei einer Institution in kiBon eingereicht wird, muss diese den "
-			+ "Betreuungs-Platz des Kindes bestätigen.\n\nDiese Schnittstelle kann genutzt werden um alle "
-			+ "Betreuungs-Anfragen zu laden, welche die Institutionen des Clients betreffen.")
+			+ "Betreuungs-Platz des Kindes bestätigen."
+			+ "\n\n"
+			+ "Diese Schnittstelle kann genutzt werden um alle Betreuungs-Anfragen zu laden, welche die Institutionen "
+			+ "des Clients betreffen."
+			+ "\n\n"
+			+ "Betreuungs-Anfragen bleiben immer erhalten - egal ob die Betreuung unterdessen bereits bestätigt wurde."
+			+ "\n\n"
+			+ "Möchte die Instution die Betreuung ablehnen, so muss sie das weiterhin in kiBon machen.")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
@@ -119,9 +125,10 @@ public class PlatzbestaetigungResource {
 		description = "A measure of how long it takes to load BetreuungAnfrage",
 		unit = MetricUnits.MILLISECONDS)
 	public BetreuungAnfragenDTO getAll(
-		@Parameter(description = "Erlaubt es, nur neue BetreuungAnfragen zu laden.\n\nJede BetreuungAnfragen hat eine "
-			+ "monoton steigende ID. Ein Client kann deshalb die grösste ID bereits eingelesener BetreuungAnfragen als"
-			+ " `after_id` Parameter setzen, um nur die neu verfügbaren BetreuungAnfragen zu erhalten.")
+		@Parameter(description = "Erlaubt es, nur neue BetreuungAnfragen zu laden.\n\n"
+			+ "Jede BetreuungAnfragen hat eine monoton steigende ID. Ein Client kann deshalb die grösste ID bereits "
+			+ "eingelesener BetreuungAnfragen als `after_id` Parameter setzen, um nur die neu verfügbaren "
+			+ "BetreuungAnfragen zu erhalten.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit,
@@ -160,10 +167,40 @@ public class PlatzbestaetigungResource {
 	}
 
 	@POST
-	@Operation(summary = "Eine Betreuung-Anfrage in kiBon bestätigen",
-		description = "Diese Schnittstelle ermöglicht eine automatisierte Bestätigung einer Betreuung-Anfrage.")
+	@Operation(summary = "Eine Betreuung-Anfrage in kiBon bestätigen oder Betreuungen mutieren.",
+		description = "Diese Schnittstelle hat zwei Funktionen:\n"
+			+ "1. Automatisierte Bestätigung einer Betreuung-Anfrage.\n"
+			+ "2. Mutieren einer Betreuung."
+			+ "\n\n"
+			+ "kiBon entscheidet selbst, basierend auf dem aktuellen Zustand der Betreuung in kiBon, welche Aktion "
+			+ "ausgelöst wird. Gibt es eine offene Betreuungs-Anfrage, dann werden die übergebenen Daten verwendet, "
+			+ "um die Betreuung zu bestätigen. Dadurch erhält die Gemeinde die benötigten Angaben der Institution, um "
+			+ "über den Antrag zu verfügen."
+			+ "\n\n"
+			+ "Ansonsten werden die Daten mit der bereits vorhandenen Betreuung verglichen. Hat es Abweichungen, wird "
+			+ "eine Mutationsmeldung erstellt, damit durch manuelle Aktion der Gemeinden die Betreuung mutiert werden "
+			+ "kann.\n"
+			+ "Mutation werden beispielsweise benötigt wenn sich die Betreuungskosten, das Pensum oder der "
+			+ "Betreuungszeitraum (Eintritt/Austritt) ändert."
+			+ "\n\n"
+			+ "### Berücksichtigte Daten\n"
+			+ "- Die Stadt Bern geht etwas weiter als der Kanton und übernimmt auch Vergünstigungen für die "
+			+ "Mahlzeiten. "
+			+ "Dazu müssen Institution der Stadt Bern jedoch die verrechneten Kosten ausweisen und melden.\n"
+			+ "- Zeitabschnitte für 2020 werden ignoriert, sofern es sich um eine Mutation handelt. "
+			+ "Dies wurde beschlossen, um die bereits versendeten Rechnungen für 2020 nicht zu verändern. "
+			+ "Es gibt nämlich verschiedene Ansätze für die Berechnung von dem Betreuungspensum und den Kosten. "
+			+ "Beispielsweise, wenn sich innerhalb eines Monats das Pensum ändert, oder beim Umgang mit "
+			+ "Kindergartenkinder.\n"
+			+ "Bei Betreuung-Anfrage Betätigungen werden aber alle Daten importiert: Da es sich um die erste "
+			+ "Betreuungsmeldung handelt, kann es auch noch keine Gutscheine geben, so dass die Rechnung an die Eltern"
+			+ " sowieso aktualisiert werden muss.\n"
+			+ "- Institutionsadmins können in kiBon definieren, für welchen Zeitraum eine API Client Software Zugriff "
+			+ "auf die Daten erhalten soll. Beim Import werden nur Zeitabschnitte innerhalb des berechtigten Zeitraums"
+			+ " berücksichtigt."
+	)
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
-	@APIResponse(responseCode = "200")
+	@APIResponse(responseCode = "200", content = {})
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
 	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
