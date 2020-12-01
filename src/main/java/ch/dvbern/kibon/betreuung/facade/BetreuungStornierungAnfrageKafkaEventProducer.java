@@ -48,7 +48,7 @@ public class BetreuungStornierungAnfrageKafkaEventProducer {
 
 	@Inject
 	@Channel("BetreuungStornierungEvents")
-	private Emitter<String> betreuungStornierungEvent;
+	Emitter<String> betreuungStornierungEvent;
 
 	@Nonnull
 	public CompletionStage<Void> process(@Nonnull BetreuungStornierungAnfrage betreuungStornierungAnfrage, @Nonnull Client client) {
