@@ -114,7 +114,7 @@ public class InstitutionResource {
 
 	@GET
 	@Path("{id}")
-	@Tag(name = OpenApiTag.PLATZ_BESTAETIGUNG)
+	@Tag(name = OpenApiTag.BETREUUNGEN)
 	@Tag(name = OpenApiTag.TAGES_SCHULEN)
 	@Operation(
 		summary = "Institutions Daten",

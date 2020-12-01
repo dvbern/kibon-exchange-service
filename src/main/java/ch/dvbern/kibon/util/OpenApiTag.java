@@ -21,7 +21,7 @@ package ch.dvbern.kibon.util;
 public final class OpenApiTag {
 
 	public static final String BETREUUNGS_GUTSCHEINE = "Betreuungsgutscheine";
-	public static final String PLATZ_BESTAETIGUNG = "Platzbestätigung";
+	public static final String BETREUUNGEN = "Betreuungen";
 	public static final String FAMILIEN_PORTAL = "Familienportal Bern";
 	public static final String TAGES_SCHULEN = "Tagesschulen";
 
