@@ -46,6 +46,7 @@ public class BetreuungStornierungAnfrageKafkaEventProducer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BetreuungStornierungAnfrageKafkaEventProducer.class);
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	@Channel("BetreuungStornierungEvents")
 	Emitter<String> betreuungStornierungEvent;
