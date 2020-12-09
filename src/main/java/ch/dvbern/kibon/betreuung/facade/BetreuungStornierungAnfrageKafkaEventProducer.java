@@ -19,7 +19,6 @@ package ch.dvbern.kibon.betreuung.facade;
 
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
