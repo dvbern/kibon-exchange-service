@@ -24,7 +24,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import ch.dvbern.kibon.betreuung.model.BetreuungStornierungAnfrage;
-import ch.dvbern.kibon.betreuung.model.BetreuungStornierungAnfrageDTO;
+import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungStornierungAnfrageDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ApplicationScoped
@@ -36,7 +36,7 @@ public class BetreuungStornierungAnfrageConverter {
 	@Nonnull
 	public BetreuungStornierungAnfrage create(@Nonnull BetreuungStornierungAnfrageDTO dto, @Nonnull LocalDateTime eventTimestamp) {
 		BetreuungStornierungAnfrage betreuungAnfrage = new BetreuungStornierungAnfrage();
-		betreuungAnfrage.setRefnr(dto.getFallNummer());
+		betreuungAnfrage.setRefnr(dto.getRefnr());
 		betreuungAnfrage.setInstitutionId(dto.getInstitutionId());
 		betreuungAnfrage.setEventTimestamp(eventTimestamp);
 

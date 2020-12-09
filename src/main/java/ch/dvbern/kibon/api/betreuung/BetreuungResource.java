@@ -36,11 +36,11 @@ import javax.ws.rs.core.Response.Status;
 
 import ch.dvbern.kibon.betreuung.facade.BetreuungStornierungAnfrageKafkaEventProducer;
 import ch.dvbern.kibon.betreuung.model.BetreuungStornierungAnfrage;
-import ch.dvbern.kibon.betreuung.model.BetreuungStornierungAnfrageDTO;
 import ch.dvbern.kibon.betreuung.service.BetreuungStornierungAnfrageService;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.clients.service.ClientService;
+import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungStornierungAnfrageDTO;
 import ch.dvbern.kibon.util.OpenApiTag;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;

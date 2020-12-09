@@ -27,7 +27,7 @@ import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
 import ch.dvbern.kibon.betreuung.model.BetreuungStornierungAnfrage;
-import ch.dvbern.kibon.betreuung.model.BetreuungStornierungAnfrageDTO;
+import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungStornierungAnfrageDTO;
 
 @ApplicationScoped
 public class BetreuungStornierungAnfrageService {

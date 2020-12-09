@@ -18,6 +18,8 @@
 package ch.dvbern.kibon.betreuung.facade;
 
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -62,9 +64,8 @@ public class BetreuungStornierungAnfrageKafkaEventProducer {
 				.add(MESSAGE_HEADER_EVENT_ID, UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
 				.add(MESSAGE_HEADER_EVENT_TYPE, eventType.getBytes(StandardCharsets.UTF_8))
 				.add(MESSAGE_HEADER_CLIENT_NAME, client.getId().getClientName().getBytes(StandardCharsets.UTF_8))
-				.add(
-					"timestamp",
-					Long.toString(System.currentTimeMillis()).getBytes(StandardCharsets.UTF_8)))
+			)
+			.withTimestamp(betreuungStornierungAnfrage.getEventTimestamp().atZone(ZoneId.systemDefault()).toInstant())
 			.build();
 
 		// there are two different send methods: the one that accepts a payload returns a CompletionStage, which will
