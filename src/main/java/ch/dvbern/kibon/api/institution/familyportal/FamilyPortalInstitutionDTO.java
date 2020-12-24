@@ -32,7 +32,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import ch.dvbern.kibon.exchange.api.common.verfuegung.BetreuungsAngebot;
+import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungsAngebot;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 public class FamilyPortalInstitutionDTO implements Serializable {
