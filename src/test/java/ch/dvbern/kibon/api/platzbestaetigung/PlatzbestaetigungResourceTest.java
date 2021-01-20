@@ -23,8 +23,8 @@ import java.time.LocalDate;
 import javax.annotation.Nonnull;
 import javax.ws.rs.core.Response.Status;
 
-import ch.dvbern.kibon.exchange.api.common.platzbestaetigung.BetreuungDTO;
-import ch.dvbern.kibon.exchange.api.common.platzbestaetigung.BetreuungZeitabschnittDTO;
+import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungDTO;
+import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungZeitabschnittDTO;
 import ch.dvbern.kibon.exchange.api.common.shared.Zeiteinheit;
 import ch.dvbern.kibon.testutils.TestcontainersEnvironment;
 import io.quarkus.test.common.QuarkusTestResource;
