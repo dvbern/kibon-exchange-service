@@ -1,0 +1,1 @@
+AlTER TABLE kontakt_angaben ADD COLUMN alternative_email VARCHAR(45) NULLABLE DEFAULT NULL;

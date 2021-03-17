@@ -105,6 +105,11 @@ public class InstitutionResource {
 		unit = MetricUnits.MILLISECONDS)
 	public FamilyPortalDTO getForFamilyPortal() {
 		List<Institution> all = institutionService.getForFamilyPortal();
+		all.forEach(institution -> {
+			if(institution.getKontaktAdresse().getAlternativeEmail() != null) {
+				institution.getKontaktAdresse().setEmail(institution.getKontaktAdresse().getAlternativeEmail());
+			}
+		});
 		FamilyPortalDTO dto = new FamilyPortalDTO();
 
 		dto.setInstitutionen(Arrays.asList(objectMapper.convertValue(all, FamilyPortalInstitutionDTO[].class)));
