@@ -1,1 +1,1 @@
-AlTER TABLE institution ADD COLUMN alternativeemail VARCHAR(45) DEFAULT NULL;
+AlTER TABLE institution ADD COLUMN alternativeemail VARCHAR(255) DEFAULT NULL;
