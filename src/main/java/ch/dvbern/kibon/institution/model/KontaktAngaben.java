@@ -61,6 +61,9 @@ public class KontaktAngaben {
 	private String email = null;
 
 	@Nullable
+	private String alternativeEmail = null;
+
+	@Nullable
 	private String telefon = null;
 
 	@Nullable
@@ -176,5 +179,14 @@ public class KontaktAngaben {
 
 	public void setWebseite(@Nullable String website) {
 		this.webseite = website;
+	}
+
+	@Nullable
+	public String getAlternativeEmail() {
+		return alternativeEmail;
+	}
+
+	public void setAlternativeEmail(@Nullable String alternativeEmail) {
+		this.alternativeEmail = alternativeEmail;
 	}
 }

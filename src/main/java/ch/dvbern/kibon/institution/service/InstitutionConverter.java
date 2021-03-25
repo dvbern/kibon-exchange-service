@@ -91,6 +91,7 @@ public class InstitutionConverter {
 		adresse.setLand(dto.getLand());
 		adresse.setGemeinde(getGemeinde(dto));
 		adresse.setEmail(dto.getEmail());
+		adresse.setAlternativeEmail(dto.getAlternativeEmail());
 		adresse.setTelefon(dto.getTelefon());
 		adresse.setWebseite(dto.getWebseite());
 	}
