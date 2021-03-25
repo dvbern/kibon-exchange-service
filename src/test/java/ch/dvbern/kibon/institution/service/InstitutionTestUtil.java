@@ -116,6 +116,7 @@ public final class InstitutionTestUtil {
 			FAKER.address().countryCode(),
 			gemeinde,
 			FAKER.internet().emailAddress(),
+			FAKER.internet().emailAddress(),
 			FAKER.phoneNumber().phoneNumber(),
 			FAKER.internet().url()
 		);
