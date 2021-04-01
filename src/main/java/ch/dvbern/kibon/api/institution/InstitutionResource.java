@@ -39,8 +39,10 @@ import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalInstitutionDTO;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.institution.model.Institution;
+import ch.dvbern.kibon.institution.model.KontaktAngaben;
 import ch.dvbern.kibon.institution.service.InstitutionService;
 import ch.dvbern.kibon.util.OpenApiTag;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -105,9 +107,16 @@ public class InstitutionResource {
 		unit = MetricUnits.MILLISECONDS)
 	public FamilyPortalDTO getForFamilyPortal() {
 		List<Institution> all = institutionService.getForFamilyPortal();
+		// Set familienportal email for insitution and its betreuungsadressen
 		all.forEach(institution -> {
-			if(institution.getKontaktAdresse().getAlternativeEmail() != null) {
+			if (institution.getKontaktAdresse().getAlternativeEmail() != null) {
 				institution.getKontaktAdresse().setEmail(institution.getKontaktAdresse().getAlternativeEmail());
+				KontaktAngaben[] mappedKontaktAngaben = Arrays.stream(objectMapper.convertValue(
+					institution.getBetreuungsAdressen(),
+					KontaktAngaben[].class))
+					.peek(angaben -> angaben.setEmail(institution.getKontaktAdresse().getAlternativeEmail()))
+					.toArray(KontaktAngaben[]::new);
+				institution.setBetreuungsAdressen(objectMapper.convertValue(mappedKontaktAngaben, JsonNode.class));
 			}
 		});
 		FamilyPortalDTO dto = new FamilyPortalDTO();
@@ -133,7 +142,7 @@ public class InstitutionResource {
 	@Transactional
 	@NoCache
 	@Nonnull
-	@RolesAllowed({"user", "tagesschule"})
+	@RolesAllowed({ "user", "tagesschule" })
 	@Timed(name = "requestTimer",
 		description = "A measure of how long it takes to load an Institution",
 		unit = MetricUnits.MILLISECONDS)
