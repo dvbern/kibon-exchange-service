@@ -110,11 +110,18 @@ public class InstitutionResource {
 		// Set familienportal email for insitution and its betreuungsadressen
 		all.forEach(institution -> {
 			if (institution.getKontaktAdresse().getAlternativeEmail() != null) {
+				String originalAdresse = institution.getKontaktAdresse().getEmail();
 				institution.getKontaktAdresse().setEmail(institution.getKontaktAdresse().getAlternativeEmail());
 				KontaktAngaben[] mappedKontaktAngaben = Arrays.stream(objectMapper.convertValue(
 					institution.getBetreuungsAdressen(),
 					KontaktAngaben[].class))
-					.peek(angaben -> angaben.setEmail(institution.getKontaktAdresse().getAlternativeEmail()))
+					.peek(angaben -> {
+						// if the email is not the same as the institution email, it means its the email
+						// specified inside the familienportal standort and should not be overridden
+						if (originalAdresse != null && originalAdresse.equals(angaben.getEmail())) {
+							angaben.setEmail(institution.getKontaktAdresse().getAlternativeEmail());
+						}
+					})
 					.toArray(KontaktAngaben[]::new);
 				institution.setBetreuungsAdressen(objectMapper.convertValue(mappedKontaktAngaben, JsonNode.class));
 			}
