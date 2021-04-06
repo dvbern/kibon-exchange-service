@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.platzbestaetigung.service.filter;
+package ch.dvbern.kibon.betreuung.service.filter;
 
 import java.util.Optional;
 
@@ -28,9 +28,9 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import ch.dvbern.kibon.persistence.Restriction;
-import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrage;
-import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrageDTO;
-import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrage_;
+import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage;
+import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
+import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage_;
 
 /**
  * Utility class for filtering criteria queries to only deliver entries with an ID > the specified one.

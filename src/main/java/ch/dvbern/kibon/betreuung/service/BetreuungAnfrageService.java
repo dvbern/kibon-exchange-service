@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 DV Bern AG, Switzerland
+ * Copyright (C) 2021 DV Bern AG, Switzerland
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.platzbestaetigung.service;
+package ch.dvbern.kibon.betreuung.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,13 +32,13 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import ch.dvbern.kibon.betreuung.service.filter.ClientBetreuungAnfrageFilter;
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
-import ch.dvbern.kibon.platzbestaetigung.model.BetreuungAnfrage;
-import ch.dvbern.kibon.platzbestaetigung.model.BetreuungAnfrage_;
-import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrage;
-import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrageDTO;
-import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrage_;
-import ch.dvbern.kibon.platzbestaetigung.service.filter.ClientBetreuungAnfrageFilter;
+import ch.dvbern.kibon.betreuung.model.BetreuungAnfrage;
+import ch.dvbern.kibon.betreuung.model.BetreuungAnfrage_;
+import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage;
+import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
+import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage_;
 
 @ApplicationScoped
 public class BetreuungAnfrageService {
