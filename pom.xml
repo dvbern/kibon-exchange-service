@@ -4,7 +4,7 @@
     <parent>
         <groupId>ch.dvbern.oss.maven</groupId>
         <artifactId>parent-minimal</artifactId>
-        <version>1.0.0</version>
+        <version>2.0.2</version>
     </parent>
     <groupId>ch.dvbern.kibon</groupId>
     <artifactId>kibon-exchange-service</artifactId>
@@ -19,8 +19,8 @@
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <quarkus.platform.version>1.9.2.Final</quarkus.platform.version>
         <hamcrest.version>2.2</hamcrest.version>
-        <spotify.hamcrest.version>1.1.5</spotify.hamcrest.version>
-        <testcontainers.version>1.15.0</testcontainers.version>
+        <spotify.hamcrest.version>1.2.0</spotify.hamcrest.version>
+        <testcontainers.version>1.15.2</testcontainers.version>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
         <kibon.exchange.api.commons.version>2.3.0-SNAPSHOT</kibon.exchange.api.commons.version>
@@ -116,12 +116,12 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
-            <version>5.5.2</version>
+            <version>5.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.10.0</version>
+            <version>1.10.2</version>
         </dependency>
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
@@ -136,7 +136,7 @@
         <dependency>
             <groupId>com.vladmihalcea</groupId>
             <artifactId>hibernate-types-52</artifactId>
-            <version>2.10.0</version>
+            <version>2.10.4</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
