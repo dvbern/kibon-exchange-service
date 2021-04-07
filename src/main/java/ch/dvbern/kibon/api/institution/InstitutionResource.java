@@ -105,11 +105,6 @@ public class InstitutionResource {
 		unit = MetricUnits.MILLISECONDS)
 	public FamilyPortalDTO getForFamilyPortal() {
 		List<Institution> all = institutionService.getForFamilyPortal();
-		all.forEach(institution -> {
-			if(institution.getKontaktAdresse().getAlternativeEmail() != null) {
-				institution.getKontaktAdresse().setEmail(institution.getKontaktAdresse().getAlternativeEmail());
-			}
-		});
 		FamilyPortalDTO dto = new FamilyPortalDTO();
 
 		dto.setInstitutionen(Arrays.asList(objectMapper.convertValue(all, FamilyPortalInstitutionDTO[].class)));
@@ -133,7 +128,7 @@ public class InstitutionResource {
 	@Transactional
 	@NoCache
 	@Nonnull
-	@RolesAllowed({"user", "tagesschule"})
+	@RolesAllowed({ "user", "tagesschule" })
 	@Timed(name = "requestTimer",
 		description = "A measure of how long it takes to load an Institution",
 		unit = MetricUnits.MILLISECONDS)

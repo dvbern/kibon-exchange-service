@@ -21,9 +21,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import ch.dvbern.kibon.exchange.api.common.institution.AdresseDTO;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class KontaktAngabenDTO extends AdresseDTO {
 
 	private static final long serialVersionUID = -4679630124896232877L;
