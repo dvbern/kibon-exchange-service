@@ -17,12 +17,6 @@
 
 package ch.dvbern.kibon.api.platzbestaetigung;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CompletionStage;
-import java.util.stream.Collectors;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.security.RolesAllowed;
@@ -39,24 +33,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
-import ch.dvbern.kibon.clients.model.Client;
-import ch.dvbern.kibon.clients.model.ClientId;
-import ch.dvbern.kibon.clients.service.ClientService;
-import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungAnfrageDTO;
+import ch.dvbern.kibon.api.betreuung.BetreuungResource;
 import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungAnfragenDTO;
 import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungDTO;
-import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungEventDTO;
-import ch.dvbern.kibon.platzbestaetigung.facade.PlatzbestaetigungKafkaEventProducer;
-import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrageDTO;
-import ch.dvbern.kibon.platzbestaetigung.service.BetreuungAnfrageService;
-import ch.dvbern.kibon.platzbestaetigung.service.filter.ClientBetreuungAnfrageFilter;
 import ch.dvbern.kibon.util.OpenApiTag;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
-import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -65,8 +47,6 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.annotations.cache.NoCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Path("/platzbestaetigung")
 @Tag(name = OpenApiTag.BETREUUNGEN)
@@ -74,44 +54,12 @@ import org.slf4j.LoggerFactory;
 @Consumes(MediaType.APPLICATION_JSON)
 public class PlatzbestaetigungResource {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PlatzbestaetigungResource.class);
-
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
-	BetreuungAnfrageService betreuungAnfrageService;
-
-	@SuppressWarnings("checkstyle:VisibilityModifier")
-	@Inject
-	ObjectMapper objectMapper;
-
-	@SuppressWarnings({ "checkstyle:VisibilityModifier", "CdiInjectionPointsInspection" })
-	@Inject
-	JsonWebToken jsonWebToken;
-
-	@SuppressWarnings("checkstyle:VisibilityModifier")
-	@Inject
-	SecurityIdentity identity;
-
-	@SuppressWarnings("checkstyle:VisibilityModifier")
-	@Inject
-	PlatzbestaetigungKafkaEventProducer platzbestaetigungProducer;
-
-	@SuppressWarnings("checkstyle:VisibilityModifier")
-	@Inject
-	ClientService clientService;
+	BetreuungResource betreuungResource;
 
 	@GET
-	@Operation(
-		summary = "Returniert Betreuung-Anfragen",
-		description = "Wenn ein Betreuungs-Gesuch bei einer Institution in kiBon eingereicht wird, muss diese den "
-			+ "Betreuungs-Platz des Kindes bestätigen."
-			+ "\n\n"
-			+ "Diese Schnittstelle kann genutzt werden um alle Betreuungs-Anfragen zu laden, welche die Institutionen "
-			+ "des Clients betreffen."
-			+ "\n\n"
-			+ "Betreuungs-Anfragen bleiben immer erhalten - egal ob die Betreuung unterdessen bereits bestätigt wurde."
-			+ "\n\n"
-			+ "Möchte die Instution die Betreuung ablehnen, so muss sie das weiterhin in kiBon machen.")
+	@Operation(deprecated = true, summary = "Siehe /betreuung")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
@@ -135,70 +83,11 @@ public class PlatzbestaetigungResource {
 		@Parameter(description = "Erweiterung für zusätzliche Filter - wird momentan nicht verwendet")
 		@QueryParam("$filter") @Nullable String filter) {
 
-		String clientName = jsonWebToken.getClaim("clientId");
-		Set<String> groups = identity.getRoles();
-		String userName = identity.getPrincipal().getName();
-
-		LOG.info(
-			"BetreuungAnfragen accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id '{}'",
-			userName,
-			clientName,
-			groups,
-			limit,
-			afterId);
-
-		ClientBetreuungAnfrageFilter queryFilter = new ClientBetreuungAnfrageFilter(clientName, afterId, limit);
-
-		List<ClientBetreuungAnfrageDTO> dtos = betreuungAnfrageService.getAllForClient(queryFilter);
-
-		List<BetreuungAnfrageDTO> betreuungAnfrageDTOs = dtos.stream()
-			.map(this::convert)
-			.collect(Collectors.toList());
-
-		BetreuungAnfragenDTO result = new BetreuungAnfragenDTO();
-		result.setAnfragen(betreuungAnfrageDTOs);
-
-		return result;
-	}
-
-	@Nonnull
-	private BetreuungAnfrageDTO convert(@Nonnull ClientBetreuungAnfrageDTO model) {
-		return objectMapper.convertValue(model, BetreuungAnfrageDTO.class);
+		return betreuungResource.getAll(afterId, limit, filter);
 	}
 
 	@POST
-	@Operation(summary = "Eine Betreuung-Anfrage in kiBon bestätigen oder Betreuungen mutieren.",
-		description = "Diese Schnittstelle hat zwei Funktionen:\n"
-			+ "1. Automatisierte Bestätigung einer Betreuung-Anfrage.\n"
-			+ "2. Mutieren einer Betreuung."
-			+ "\n\n"
-			+ "kiBon entscheidet selbst, basierend auf dem aktuellen Zustand der Betreuung in kiBon, welche Aktion "
-			+ "ausgelöst wird. Gibt es eine offene Betreuungs-Anfrage, dann werden die übergebenen Daten verwendet, "
-			+ "um die Betreuung zu bestätigen. Dadurch erhält die Gemeinde die benötigten Angaben der Institution, um "
-			+ "über den Antrag zu verfügen."
-			+ "\n\n"
-			+ "Ansonsten werden die Daten mit der bereits vorhandenen Betreuung verglichen. Hat es Abweichungen, wird "
-			+ "eine Mutationsmeldung erstellt, damit durch manuelle Aktion der Gemeinden die Betreuung mutiert werden "
-			+ "kann.\n"
-			+ "Mutation werden beispielsweise benötigt wenn sich die Betreuungskosten, das Pensum oder der "
-			+ "Betreuungszeitraum (Eintritt/Austritt) ändert."
-			+ "\n\n"
-			+ "### Berücksichtigte Daten\n"
-			+ "- Die Stadt Bern geht etwas weiter als der Kanton und übernimmt auch Vergünstigungen für die "
-			+ "Mahlzeiten. "
-			+ "Dazu müssen Institution der Stadt Bern jedoch die verrechneten Kosten ausweisen und melden.\n"
-			+ "- Zeitabschnitte für 2020 werden ignoriert, sofern es sich um eine Mutation handelt. "
-			+ "Dies wurde beschlossen, um die bereits versendeten Rechnungen für 2020 nicht zu verändern. "
-			+ "Es gibt nämlich verschiedene Ansätze für die Berechnung von dem Betreuungspensum und den Kosten. "
-			+ "Beispielsweise, wenn sich innerhalb eines Monats das Pensum ändert, oder beim Umgang mit "
-			+ "Kindergartenkinder.\n"
-			+ "Bei Betreuung-Anfrage Betätigungen werden aber alle Daten importiert: Da es sich um die erste "
-			+ "Betreuungsmeldung handelt, kann es auch noch keine Gutscheine geben, so dass die Rechnung an die Eltern"
-			+ " sowieso aktualisiert werden muss.\n"
-			+ "- Institutionsadmins können in kiBon definieren, für welchen Zeitraum eine API Client Software Zugriff "
-			+ "auf die Daten erhalten soll. Beim Import werden nur Zeitabschnitte innerhalb des berechtigten Zeitraums"
-			+ " berücksichtigt."
-	)
+	@Operation(deprecated = true, summary = "Siehe /betreuung/")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
 	@APIResponse(responseCode = "200", content = {})
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
@@ -212,37 +101,7 @@ public class PlatzbestaetigungResource {
 		description = "A measure of how long it takes to process BetreuungDTO",
 		unit = MetricUnits.MILLISECONDS)
 	public Uni<Response> sendPlatzbestaetigungBetreuungToKafka(@Nonnull @NotNull @Valid BetreuungDTO betreuungDTO) {
-		String clientName = jsonWebToken.getClaim("clientId");
-		Set<String> groups = identity.getRoles();
-		String userName = identity.getPrincipal().getName();
 
-		LOG.info(
-			"Betreuung received by '{}' with clientName '{}', roles '{}'",
-			userName,
-			clientName,
-			groups);
-
-		BetreuungEventDTO betreuungEventDTO = objectMapper.convertValue(betreuungDTO, BetreuungEventDTO.class);
-
-		String institutionId = betreuungEventDTO.getInstitutionId();
-		Optional<Client> client = clientService.findActive(new ClientId(clientName, institutionId));
-
-		if (client.isEmpty()) {
-			return Uni.createFrom().item(Response.status(Status.FORBIDDEN).build());
-		}
-
-		LOG.debug("generating message");
-		CompletionStage<Response> acked = platzbestaetigungProducer.process(betreuungEventDTO, client.get())
-			.thenApply(Void -> {
-				LOG.debug("received ack");
-				return Response.ok().build();
-			})
-			.exceptionally(error -> {
-				LOG.error("failed", error);
-				return Response.serverError().build();
-			});
-		LOG.debug("received completion stage");
-
-		return Uni.createFrom().completionStage(acked);
+		return betreuungResource.sendBetreuungToKafka(betreuungDTO);
 	}
 }

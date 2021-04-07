@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 DV Bern AG, Switzerland
+ * Copyright (C) 2021 DV Bern AG, Switzerland
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.platzbestaetigung.facade;
+package ch.dvbern.kibon.betreuung.facade;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -27,7 +27,7 @@ import javax.inject.Inject;
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
 import ch.dvbern.kibon.kafka.BaseEventHandler;
 import ch.dvbern.kibon.kafka.EventType;
-import ch.dvbern.kibon.platzbestaetigung.service.BetreuungAnfrageService;
+import ch.dvbern.kibon.betreuung.service.BetreuungAnfrageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

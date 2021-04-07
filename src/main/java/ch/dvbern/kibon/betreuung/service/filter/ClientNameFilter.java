@@ -15,35 +15,53 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.platzbestaetigung.service.filter;
+package ch.dvbern.kibon.betreuung.service.filter;
 
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import ch.dvbern.kibon.clients.model.ClientId_;
+import ch.dvbern.kibon.clients.model.Client_;
 import ch.dvbern.kibon.persistence.Restriction;
-import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrage;
-import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrageDTO;
-import ch.dvbern.kibon.platzbestaetigung.model.ClientBetreuungAnfrage_;
+import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage;
+import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
+import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage_;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 
 /**
- * Utility class for filtering criteria queries to only deliver {@link ClientVerfuegung}en that are active.
+ * Utility class for filtering criteria queries to only deliver {@link ClientVerfuegung}en with a specific client name.
  */
-public class ClientActiveFilter implements Restriction<ClientBetreuungAnfrage, ClientBetreuungAnfrageDTO> {
+public class ClientNameFilter implements Restriction<ClientBetreuungAnfrage, ClientBetreuungAnfrageDTO> {
+
+	@Nonnull
+	private final String clientName;
+
+	@Nullable
+	private ParameterExpression<String> clientParam;
+
+	public ClientNameFilter(@Nonnull String clientName) {
+		this.clientName = clientName;
+	}
 
 	@Nonnull
 	@Override
 	public Optional<Predicate> getPredicate(@Nonnull Root<ClientBetreuungAnfrage> root, @Nonnull CriteriaBuilder cb) {
-		return Optional.of(cb.isTrue(root.get(ClientBetreuungAnfrage_.active)));
+		clientParam = cb.parameter(String.class, "clientName");
+		Path<String> namePath = root.get(ClientBetreuungAnfrage_.client).get(Client_.id).get(ClientId_.clientName);
+
+		return Optional.of(cb.equal(namePath, clientParam));
 	}
 
 	@Override
 	public void setParameter(@Nonnull TypedQuery<ClientBetreuungAnfrageDTO> query) {
-		// nop
+		query.setParameter(clientParam, clientName);
 	}
 }
