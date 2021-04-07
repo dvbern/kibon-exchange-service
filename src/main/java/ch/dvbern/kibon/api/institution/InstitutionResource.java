@@ -106,30 +106,10 @@ public class InstitutionResource {
 		description = "A measure of how long it takes to load FamilyPortalDTO",
 		unit = MetricUnits.MILLISECONDS)
 	public FamilyPortalDTO getForFamilyPortal() {
+
 		List<Institution> all = institutionService.getForFamilyPortal();
-		// Set familienportal email for insitution and its betreuungsadressen
-		all.forEach(institution -> {
-			if (institution.getKontaktAdresse().getAlternativeEmail() != null) {
-				String originalAdresse = institution.getKontaktAdresse().getEmail();
-				institution.getKontaktAdresse().setEmail(institution.getKontaktAdresse().getAlternativeEmail());
-				KontaktAngaben[] mappedKontaktAngaben = Arrays.stream(objectMapper.convertValue(
-					institution.getBetreuungsAdressen(),
-					KontaktAngaben[].class))
-					.peek(angaben -> {
-						// if the email is not the same as the institution email, it means its the email
-						// specified inside the familienportal standort and should not be overridden
-						if (originalAdresse != null && originalAdresse.equals(angaben.getEmail())) {
-							angaben.setEmail(institution.getKontaktAdresse().getAlternativeEmail());
-						}
-					})
-					.toArray(KontaktAngaben[]::new);
-				institution.setBetreuungsAdressen(objectMapper.convertValue(mappedKontaktAngaben, JsonNode.class));
-			}
-		});
 		FamilyPortalDTO dto = new FamilyPortalDTO();
-
 		dto.setInstitutionen(Arrays.asList(objectMapper.convertValue(all, FamilyPortalInstitutionDTO[].class)));
-
 		return dto;
 	}
 
