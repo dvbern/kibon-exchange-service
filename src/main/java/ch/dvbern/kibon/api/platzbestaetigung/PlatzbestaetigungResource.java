@@ -59,7 +59,7 @@ public class PlatzbestaetigungResource {
 	BetreuungResource betreuungResource;
 
 	@GET
-	@Operation(deprecated = true, summary = "Siehe /betreuung")
+	@Operation(deprecated = true, summary = "Siehe /api/v1/betreuung")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
@@ -87,7 +87,7 @@ public class PlatzbestaetigungResource {
 	}
 
 	@POST
-	@Operation(deprecated = true, summary = "Siehe /betreuung/")
+	@Operation(deprecated = true, summary = "Siehe /api/v1/betreuung")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
 	@APIResponse(responseCode = "200", content = {})
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
