@@ -14,10 +14,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <quarkus-plugin.version>1.9.2.Final</quarkus-plugin.version>
+        <quarkus-plugin.version>1.13.2.Final</quarkus-plugin.version>
         <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <quarkus.platform.version>1.9.2.Final</quarkus.platform.version>
+        <quarkus.platform.version>1.13.2.Final</quarkus.platform.version>
         <hamcrest.version>2.2</hamcrest.version>
         <spotify.hamcrest.version>1.2.0</spotify.hamcrest.version>
         <testcontainers.version>1.15.2</testcontainers.version>
@@ -263,10 +263,13 @@
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
                 <version>${quarkus-plugin.version}</version>
+                <extensions>true</extensions>
                 <executions>
                     <execution>
                         <goals>
                             <goal>build</goal>
+                            <goal>generate-code</goal>
+                            <goal>generate-code-tests</goal>
                         </goals>
                     </execution>
                 </executions>

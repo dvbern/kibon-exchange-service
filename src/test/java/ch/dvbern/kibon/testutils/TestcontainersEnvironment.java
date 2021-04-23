@@ -126,6 +126,7 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 		systemProps.put("kafka.bootstrap.servers", kafka.getBootstrapServers());
 		String keycloakURL = "http://" + keycloak.getHost() + ':' + keycloak.getMappedPort(KEYCLOAK_PORT) + "/auth";
 		systemProps.put("quarkus.oidc.auth-server-url", keycloakURL + "/realms/kibon");
+		systemProps.put("quarkus.oidc.token.issuer", keycloakURL + "/realms/kibon");
 		systemProps.put("quarkus.oidc.credentials.secret", dummyPassword);
 
 		SCHEMA_REGISTRY_URL_PROPERTIES.forEach(url -> systemProps.put(url, schemaRegistry.getSchemaRegistryUrl()));

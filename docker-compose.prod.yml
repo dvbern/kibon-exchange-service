@@ -58,6 +58,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
+    user: ${HOST_USER}
     networks:
       - kibon_exchange_backbone
     volumes:
@@ -93,12 +94,13 @@ services:
       - ${CONF_DIR}/service/certs/cert.pem:/cert.pem:ro
     environment:
       TZ: "Europe/Zurich"
-      GROUP_ID: ${GROUP_ID}
+      KAFKA_GROUP_ID: ${KAFKA_GROUP_ID}
       KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_ADDR}:9092"
       QUARKUS_DATASOURCE_JDBC_URL: ${QUARKUS_DATASOURCE_JDBC_URL}
       QUARKUS_DATASOURCE_USERNAME: ${QUARKUS_DATASOURCE_USERNAME}
       QUARKUS_DATASOURCE_PASSWORD: ${QUARKUS_DATASOURCE_PASSWORD}
       QUARKUS_OIDC_AUTH_SERVER_URL: ${QUARKUS_OIDC_AUTH_SERVER_URL}
+      QUARKUS_OIDC_TOKEN_ISSUER: ${QUARKUS_OIDC_TOKEN_ISSUER}
       # we have to wait until keycloak is up and running
       QUARKUS_OIDC_CONNECTION_DELAY: "30s"
       QUARKUS_OIDC_CREDENTIALS_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}

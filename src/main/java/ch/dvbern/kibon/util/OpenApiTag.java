@@ -23,7 +23,7 @@ public final class OpenApiTag {
 	public static final String BETREUUNGS_GUTSCHEINE = "Betreuungsgutscheine";
 	public static final String BETREUUNGEN = "Betreuungen";
 	public static final String FAMILIEN_PORTAL = "Familienportal Bern";
-	public static final String TAGES_SCHULEN = "Tagesschulen";
+	public static final String TAGES_SCHULEN = "Tagesschulen (Entwurf)";
 
 	private OpenApiTag() {
 	}

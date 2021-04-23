@@ -74,6 +74,7 @@ services:
       TZ: "Europe/Zurich"
       KEYCLOAK_USER: ${KEYCLOAK_USER}
       KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+      KEYCLOAK_FRONTEND_URL: ${KEYCLOAK_FRONTEND_URL}
       # we map the realm configuration to /tmp/kibon_realm.json, but set-secrets.sh adds the secrets in
       # /opt/jboss/kibon_realm.json, because otherwise we modifiy the input file, e.g. the file on the localhost
       KEYCLOAK_IMPORT: "/opt/jboss/kibon_realm.json"
