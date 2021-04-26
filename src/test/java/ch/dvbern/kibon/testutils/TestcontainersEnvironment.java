@@ -47,8 +47,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleManager {
 
-	private static final String CONFLUENT_PLATFORM_VERSION = "5.5.2";
-	private static final String KEYCLOAK_VERSION = "11.0.3";
+	private static final String CONFLUENT_PLATFORM_VERSION = "5.5.3";
+	private static final String KEYCLOAK_VERSION = "12.0.4";
 
 	private static final int KEYCLOAK_PORT = 8080;
 
@@ -126,6 +126,7 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 		systemProps.put("kafka.bootstrap.servers", kafka.getBootstrapServers());
 		String keycloakURL = "http://" + keycloak.getHost() + ':' + keycloak.getMappedPort(KEYCLOAK_PORT) + "/auth";
 		systemProps.put("quarkus.oidc.auth-server-url", keycloakURL + "/realms/kibon");
+		systemProps.put("quarkus.oidc.token.issuer", keycloakURL + "/realms/kibon");
 		systemProps.put("quarkus.oidc.credentials.secret", dummyPassword);
 
 		SCHEMA_REGISTRY_URL_PROPERTIES.forEach(url -> systemProps.put(url, schemaRegistry.getSchemaRegistryUrl()));

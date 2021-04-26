@@ -10,10 +10,10 @@ client_body_timeout 300s;
 set $cspDefault "default-src 'self'";
 # the sha value is for swagger-ui. It will likely fail with quarkus updates. Never versions of swagger-ui should not
 # require csp exceptions though: https://github.com/swagger-api/swagger-ui/issues/4187
-set $cspScript  "script-src 'self' piwik.dvbern.ch 'sha256-mzuPeIRLdZ6QFxxZPLDbOc0jQxXVUFMjiZBJhZduI/U='";
+set $cspScript  "script-src 'self' 'sha256-CPpmtjE+Gc0ScDH507m9uu1cO4hPyQ96cYSE945lHcs='";
 set $cspStyle   "style-src 'self' 'unsafe-inline'";
 set $cspFont    "font-src 'self' data:";
-set $cspImg     "img-src 'self' piwik.dvbern.ch * data: blob:";
+set $cspImg     "img-src 'self' * data: blob:";
 set $connectSrc "connect-src 'self' sentry.dvbern.ch";
 
 add_header Content-Security-Policy "$cspDefault; $cspScript; $cspStyle; $cspFont; $cspImg; $connectSrc" always;
@@ -44,7 +44,6 @@ location / {
        return 301 /api/v1/openapi;
     }
 
-
     # Reverse proxy for API
     location /api/v1/ {
         proxy_pass https://apiserver;
@@ -58,9 +57,9 @@ location / {
         proxy_pass                         https://keycloak;
 
         proxy_set_header Host              $host;
-        proxy_set_header X-Real-IP         $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Host   "";
 
         # KeyCloak contains unsafe inline scripts, we allow them only for this location
         add_header Content-Security-Policy "$cspDefault; $cspStyle; $cspFont; $cspImg; script-src 'self' 'unsafe-eval' 'unsafe-inline'" always;

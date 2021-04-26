@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 DV Bern AG, Switzerland
+ * Copyright (C) 2021 DV Bern AG, Switzerland
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.api.platzbestaetigung;
+package ch.dvbern.kibon.api.betreuung;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -46,7 +46,7 @@ import static org.hamcrest.Matchers.not;
 
 @QuarkusTestResource(TestcontainersEnvironment.class)
 @QuarkusTest
-class PlatzbestaetigungResourceTest {
+class BetreuungResourceTest {
 
 	@Test
 	void testGetAllEndpoint() {
@@ -54,7 +54,7 @@ class PlatzbestaetigungResourceTest {
 			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
 			.when()
-			.get("/platzbestaetigung")
+			.get("/betreuung")
 			.then()
 			.assertThat()
 			.statusCode(Status.OK.getStatusCode())
@@ -69,7 +69,7 @@ class PlatzbestaetigungResourceTest {
 			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
 			.when()
-			.get("/platzbestaetigung?after_id=20")
+			.get("/betreuung?after_id=20")
 			.then()
 			.assertThat()
 			.statusCode(Status.OK.getStatusCode())
@@ -86,7 +86,7 @@ class PlatzbestaetigungResourceTest {
 			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
 			.when()
-			.get("/platzbestaetigung?limit=1")
+			.get("/betreuung?limit=1")
 			.then()
 			.assertThat()
 			.statusCode(Status.OK.getStatusCode())
@@ -101,7 +101,7 @@ class PlatzbestaetigungResourceTest {
 			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
 			.when()
-			.get("/platzbestaetigung?limit=-1")
+			.get("/betreuung?limit=-1")
 			.then()
 			.assertThat()
 			.statusCode(Status.BAD_REQUEST.getStatusCode());
@@ -112,7 +112,7 @@ class PlatzbestaetigungResourceTest {
 		given()
 			.contentType(ContentType.JSON)
 			.when()
-			.get("/platzbestaetigung")
+			.get("/betreuung")
 			.then()
 			.assertThat()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode());
@@ -123,7 +123,7 @@ class PlatzbestaetigungResourceTest {
 		given()
 			.contentType(ContentType.JSON)
 			.when()
-			.post("/platzbestaetigung/betreuung")
+			.post("/betreuung")
 			.then()
 			.assertThat()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode());
@@ -138,7 +138,7 @@ class PlatzbestaetigungResourceTest {
 			.contentType(ContentType.JSON)
 			.body(invalid)
 			.when()
-			.post("/platzbestaetigung/betreuung")
+			.post("/betreuung")
 			.then()
 			.assertThat()
 			.statusCode(Status.BAD_REQUEST.getStatusCode());
@@ -153,7 +153,7 @@ class PlatzbestaetigungResourceTest {
 			.contentType(ContentType.JSON)
 			.body(valid)
 			.when()
-			.post("/platzbestaetigung/betreuung")
+			.post("/betreuung")
 			.then()
 			.assertThat()
 			.statusCode(Status.OK.getStatusCode());

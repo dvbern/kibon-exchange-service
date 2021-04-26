@@ -102,7 +102,7 @@ In case some environment variables must be adjusted, either create a separate .e
 #!/usr/bin/env bash
 
 # using a fixed group id for kafka consumers, to continue listenting from last offset
-export GROUP_ID=v1
+export KAFKA_GROUP_ID=v1
 # accessing keycloak directly through the docker network on the HTTP port (bypass self-signed certificate issue)
 export QUARKUS_OIDC_AUTH_SERVER_URL=http://keycloak:8080/auth/realms/kibon
 # connection to database on localhost
@@ -111,6 +111,9 @@ export DB_PORT=5432
 HOST_IP=$(ifconfig enp0s31f6 | grep "inet " | awk '{print $2}')
 export QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://${HOST_IP}:${DB_PORT}/kibon-exchange
 export QUARKUS_DATASOURCE_PASSWORD=CHANGE_ME
+
+export KEYCLOAK_FRONTEND_URL=https://localhost/auth
+export QUARKUS_OIDC_TOKEN_ISSUER=${KEYCLOAK_FRONTEND_URL}/realms/kibon
 
 # applies environment variables from `.env` file, with overrides as exported above, and uses the `docker-compose.prod.yml` setup.
 # All arguments are passed further to docker-compose.
