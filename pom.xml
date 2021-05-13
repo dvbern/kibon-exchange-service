@@ -14,13 +14,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <quarkus-plugin.version>1.13.3.Final</quarkus-plugin.version>
+        <quarkus-plugin.version>1.13.4.Final</quarkus-plugin.version>
         <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <quarkus.platform.version>1.13.3.Final</quarkus.platform.version>
+        <quarkus.platform.version>1.13.4.Final</quarkus.platform.version>
         <hamcrest.version>2.2</hamcrest.version>
         <spotify.hamcrest.version>1.2.0</spotify.hamcrest.version>
-        <testcontainers.version>1.15.2</testcontainers.version>
+        <testcontainers.version>1.15.3</testcontainers.version>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
         <kibon.exchange.api.commons.version>2.3.0</kibon.exchange.api.commons.version>
@@ -136,7 +136,7 @@
         <dependency>
             <groupId>com.vladmihalcea</groupId>
             <artifactId>hibernate-types-52</artifactId>
-            <version>2.10.4</version>
+            <version>2.11.1</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -195,7 +195,7 @@
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
-            <version>4.2</version>
+            <version>4.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -207,7 +207,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-authz-client</artifactId>
-            <version>10.0.1</version>
+            <version>13.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -274,7 +274,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.34.1</version>
+                <version>0.35.0</version>
                 <configuration>
                     <imagePullPolicy>always</imagePullPolicy>
                     <skipPush>false</skipPush>

@@ -37,6 +37,7 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 /**
  * Testcontainers reads the compose-test.yml, starts the docker-compose services and exposes the database and kafka
@@ -48,7 +49,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleManager {
 
 	private static final String CONFLUENT_PLATFORM_VERSION = "5.5.3";
-	private static final String KEYCLOAK_VERSION = "12.0.4";
+	private static final String KEYCLOAK_VERSION = "13.0.0";
 
 	private static final int KEYCLOAK_PORT = 8080;
 
@@ -63,7 +64,8 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 	private static AuthzClient authzClientFambe = null;
 
 	@Container
-	private final KafkaContainer kafka = new KafkaContainer(CONFLUENT_PLATFORM_VERSION);
+	private final KafkaContainer kafka =
+		new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:" + CONFLUENT_PLATFORM_VERSION));
 
 	@Container
 	private final SchemaRegistryContainer schemaRegistry = new SchemaRegistryContainer(CONFLUENT_PLATFORM_VERSION);
