@@ -49,7 +49,7 @@ import org.testcontainers.utility.DockerImageName;
 public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleManager {
 
 	private static final String CONFLUENT_PLATFORM_VERSION = "5.5.3";
-	private static final String KEYCLOAK_VERSION = "13.0.0";
+	private static final String KEYCLOAK_VERSION = "14.0.0";
 
 	private static final int KEYCLOAK_PORT = 8080;
 
