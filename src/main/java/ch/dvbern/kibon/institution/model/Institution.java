@@ -22,9 +22,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -32,6 +35,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -39,9 +43,11 @@ import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.tagesschulen.model.Modul;
 import ch.dvbern.kibon.util.ConstantsUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.hibernate.annotations.SortNatural;
 import org.hibernate.annotations.Type;
 
 @Table(indexes = @Index(name = "institution_idx1", columnList = "betreuungsArt, status"))
@@ -131,6 +137,10 @@ public class Institution {
 	@Nonnull
 	@NotNull
 	private LocalDateTime timestampMutiert = LocalDateTime.now();
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "institution")
+	@SortNatural
+	private @Valid Set<Modul> modulSet = new TreeSet<>();
 
 	@Override
 	public boolean equals(@Nullable Object o) {
@@ -315,5 +325,13 @@ public class Institution {
 
 	public void setTimestampMutiert(@Nonnull LocalDateTime timestampMutiert) {
 		this.timestampMutiert = timestampMutiert;
+	}
+
+	public Set<Modul> getModulSet() {
+		return modulSet;
+	}
+
+	public void setModulSet(Set<Modul> modulSet) {
+		this.modulSet = modulSet;
 	}
 }

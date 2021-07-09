@@ -24,14 +24,19 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulDTO;
+import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
+import ch.dvbern.kibon.shared.model.Gesuchsperiode;
+import ch.dvbern.kibon.tagesschulen.model.Modul;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -42,6 +47,10 @@ public class InstitutionConverter {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	ObjectMapper mapper;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	EntityManager em;
 
 	@Nonnull
 	public Institution create(@Nonnull InstitutionEventDTO dto) {
@@ -79,6 +88,10 @@ public class InstitutionConverter {
 		if (dto.getTimestampMutiert() != null) {
 			institution.setTimestampMutiert(TimestampConverter.toLocalDateTime(dto.getTimestampMutiert()));
 		}
+
+		if(institution.getBetreuungsArt().equals(BetreuungsangebotTyp.TAGESSCHULE)) {
+			update(institution, dto.getModule());
+		}
 	}
 
 	private void update(@Nonnull KontaktAngaben adresse, @Nonnull KontaktAngabenDTO dto) {
@@ -93,6 +106,33 @@ public class InstitutionConverter {
 		adresse.setEmail(dto.getEmail());
 		adresse.setTelefon(dto.getTelefon());
 		adresse.setWebseite(dto.getWebseite());
+	}
+
+	private void update(@Nonnull Institution institution, @Nonnull List<ModulDTO> modulDTOS) {
+		modulDTOS.forEach(
+			modulDTO -> {
+					Modul modul = new Modul();
+					modul.setInstitution(institution);
+					modul.setBezeichnungDE(modulDTO.getBezeichnungDE());
+					modul.setBezeichnungFR(modulDTO.getBezeichnungFR());
+					Gesuchsperiode gesuchsperiode = em.find(Gesuchsperiode.class, modulDTO.getGesuchsperiode().getId());
+					if(gesuchsperiode == null) {
+						gesuchsperiode = new Gesuchsperiode();
+						gesuchsperiode.setId(modulDTO.getGesuchsperiode().getId());
+						gesuchsperiode.setGueltigAb(modulDTO.getGesuchsperiode().getGueltigAb());
+						gesuchsperiode.setGueltigBis(modulDTO.getGesuchsperiode().getGueltigBis());
+						em.persist(gesuchsperiode);
+					}
+					modul.setGesuchsperiode(gesuchsperiode);
+					modul.setIntervall(modulDTO.getIntervall());
+					modul.setWochentag(mapper.valueToTree(modulDTO.getWochentage()));
+					modul.setPadaegogischBetreut(modulDTO.getPadaegogischBetreut());
+					modul.setVerpflegungsKosten(modulDTO.getVerpflegungsKosten());
+					modul.setZeitVon(TimeConverter.deserialize(modulDTO.getZeitVon()));
+					modul.setZeitBis(TimeConverter.deserialize(modulDTO.getZeitBis()));
+					institution.getModulSet().add(modul);
+			}
+		);
 	}
 
 	@Nonnull
