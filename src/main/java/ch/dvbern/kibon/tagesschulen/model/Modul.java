@@ -17,7 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import ch.dvbern.kibon.exchange.commons.types.Intervall;
+import ch.dvbern.kibon.exchange.commons.types.ModulIntervall;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.shared.model.Gesuchsperiode;
 import ch.dvbern.kibon.util.ConstantsUtil;
@@ -50,12 +50,12 @@ public class Modul implements Comparable<Modul> {
 	@NotNull
 	@Type(type = "jsonb-node")
 	@Column(columnDefinition = "jsonb")
-	private JsonNode wochentag;
+	private JsonNode wochentage;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
-	private Intervall intervall;
+	private ModulIntervall intervall;
 
 	@NotNull
 	private boolean padaegogischBetreut;
@@ -113,19 +113,19 @@ public class Modul implements Comparable<Modul> {
 		this.zeitBis = zeitBis;
 	}
 
-	public JsonNode getWochentag() {
-		return wochentag;
+	public JsonNode getWochentage() {
+		return wochentage;
 	}
 
-	public void setWochentag(JsonNode wochentag) {
-		this.wochentag = wochentag;
+	public void setWochentage(JsonNode wochentage) {
+		this.wochentage = wochentage;
 	}
 
-	public Intervall getIntervall() {
+	public ModulIntervall getIntervall() {
 		return intervall;
 	}
 
-	public void setIntervall(Intervall intervall) {
+	public void setIntervall(ModulIntervall intervall) {
 		this.intervall = intervall;
 	}
 

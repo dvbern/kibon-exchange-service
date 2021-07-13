@@ -89,7 +89,7 @@ public class InstitutionConverter {
 			institution.setTimestampMutiert(TimestampConverter.toLocalDateTime(dto.getTimestampMutiert()));
 		}
 
-		if(institution.getBetreuungsArt().equals(BetreuungsangebotTyp.TAGESSCHULE)) {
+		if(institution.getBetreuungsArt().equals(BetreuungsangebotTyp.TAGESSCHULE) && dto.getModule() != null) {
 			update(institution, dto.getModule());
 		}
 	}
@@ -111,7 +111,11 @@ public class InstitutionConverter {
 	private void update(@Nonnull Institution institution, @Nonnull List<ModulDTO> modulDTOS) {
 		modulDTOS.forEach(
 			modulDTO -> {
-					Modul modul = new Modul();
+				    Modul modul = em.find(Modul.class, modulDTO.getId());
+				    if(modul == null) {
+						modul = new Modul();
+						modul.setId(modulDTO.getId());
+					}
 					modul.setInstitution(institution);
 					modul.setBezeichnungDE(modulDTO.getBezeichnungDE());
 					modul.setBezeichnungFR(modulDTO.getBezeichnungFR());
@@ -125,7 +129,7 @@ public class InstitutionConverter {
 					}
 					modul.setGesuchsperiode(gesuchsperiode);
 					modul.setIntervall(modulDTO.getIntervall());
-					modul.setWochentag(mapper.valueToTree(modulDTO.getWochentage()));
+					modul.setWochentage(mapper.valueToTree(modulDTO.getWochentage()));
 					modul.setPadaegogischBetreut(modulDTO.getPadaegogischBetreut());
 					modul.setVerpflegungsKosten(modulDTO.getVerpflegungsKosten());
 					modul.setZeitVon(TimeConverter.deserialize(modulDTO.getZeitVon()));
