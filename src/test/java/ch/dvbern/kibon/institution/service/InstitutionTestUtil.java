@@ -37,7 +37,7 @@ import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulDTO;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.exchange.commons.types.Gesuchsperiode;
-import ch.dvbern.kibon.exchange.commons.types.Intervall;
+import ch.dvbern.kibon.exchange.commons.types.ModulIntervall;
 import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
@@ -119,7 +119,7 @@ public final class InstitutionTestUtil {
 			TimeConverter.serialize(LocalTime.of(7, 30)),
 			TimeConverter.serialize(LocalTime.of(8, 30)),
 			Arrays.asList(1, 2) ,
-			Intervall.WOECHENTLICH,
+			ModulIntervall.WOECHENTLICH,
 			true,
 			new BigDecimal(10.5),
 			new Gesuchsperiode("101",
