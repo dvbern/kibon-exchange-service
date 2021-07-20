@@ -51,7 +51,7 @@ public class ClientEventHandler extends BaseEventHandler<InstitutionClientEventD
 		@Nonnull EventType eventType,
 		@Nonnull InstitutionClientEventDTO dto) {
 
-		if (!dto.getClientType().equals("EXCHANGE_SERVICE_USER")) {
+		if (!dto.getClientType().startsWith("EXCHANGE_SERVICE_USER")) {
 			LOG.warn("Unknown clientType '{}' for event type '{}' with id '{}'",
 				dto.getClientType(), eventType, eventId);
 
