@@ -104,8 +104,9 @@
             <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-logging-sentry</artifactId>
+            <groupId>ch.dvbern.honegger.b3000.server.tools</groupId>
+            <artifactId>quarkus-b3000-sentry</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
