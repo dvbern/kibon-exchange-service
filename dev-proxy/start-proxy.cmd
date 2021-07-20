@@ -1,0 +1,1 @@
+docker run --rm --name kibon-exchange-proxy -p 80:80 -d kibon-exchange-proxy
