@@ -17,9 +17,11 @@
 
 package ch.dvbern.kibon.institution.service;
 
+import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
+import javax.persistence.EntityManager;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
@@ -29,13 +31,21 @@ import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
+import ch.dvbern.kibon.shared.model.Gesuchsperiode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spotify.hamcrest.jackson.JsonMatchers;
 import com.spotify.hamcrest.pojo.IsPojo;
+import org.easymock.Capture;
+import org.easymock.EasyMock;
+import org.easymock.EasyMockExtension;
+import org.easymock.Mock;
+import org.easymock.MockType;
+import org.easymock.TestSubject;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static ch.dvbern.kibon.institution.service.InstitutionTestUtil.createInstitutionEvent;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
@@ -43,15 +53,25 @@ import static com.spotify.hamcrest.jackson.JsonMatchers.jsonNull;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static com.spotify.hamcrest.pojo.IsPojo.pojo;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.comparesEqualTo;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.either;
 import static org.hamcrest.core.Is.is;
+import static org.easymock.EasyMock.eq;
 
+@ExtendWith(EasyMockExtension.class)
 class InstitutionConverterTest {
 
+	@TestSubject
 	private final InstitutionConverter converter = new InstitutionConverter();
+
+	@SuppressWarnings("InstanceVariableMayNotBeInitialized")
+	@Mock(MockType.NICE)
+	private EntityManager em;
 
 	@BeforeEach
 	public void setup() {
@@ -60,7 +80,7 @@ class InstitutionConverterTest {
 
 	@Test
 	public void testCreate() {
-		InstitutionEventDTO dto = createInstitutionEvent();
+		InstitutionEventDTO dto = createInstitutionEvent(false);
 
 		Institution institution = converter.create(dto);
 
@@ -69,7 +89,37 @@ class InstitutionConverterTest {
 
 	@Test
 	public void testUpdate() {
-		InstitutionEventDTO dto = createInstitutionEvent();
+		InstitutionEventDTO dto = createInstitutionEvent(false);
+		Institution institution = new Institution();
+		// id is not updated, set manually for correct test setup
+		institution.setId(dto.getId());
+
+		converter.update(institution, dto);
+
+		assertThat(institution, matchesDTO(dto));
+	}
+
+	@Test
+	public void testCreateTagesschule() {
+		InstitutionEventDTO dto = createInstitutionEvent(true);
+		Gesuchsperiode gesuchsperiode = new Gesuchsperiode();
+		expect(em.find(Gesuchsperiode.class, dto.getModule().get(0).getGesuchsperiode().getId())).andReturn(null);
+		em.persist(gesuchsperiode);
+		expectLastCall();
+		replay(em);
+		Institution institution = converter.create(dto);
+
+		assertThat(institution, matchesDTO(dto));
+	}
+
+	@Test
+	public void testUpdateTagesschule() {
+		InstitutionEventDTO dto = createInstitutionEvent(true);
+		Gesuchsperiode gesuchsperiode = new Gesuchsperiode();
+		expect(em.find(Gesuchsperiode.class, dto.getModule().get(0).getGesuchsperiode().getId())).andReturn(null);
+		em.persist(gesuchsperiode);
+		expectLastCall();
+		replay(em);
 		Institution institution = new Institution();
 		// id is not updated, set manually for correct test setup
 		institution.setId(dto.getId());
