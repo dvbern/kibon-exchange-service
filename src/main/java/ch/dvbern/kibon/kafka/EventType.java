@@ -30,7 +30,8 @@ public enum EventType {
 	CLIENT_MODIFIED("ClientModified"),
 	INSTITUTION_CHANGED("InstitutionChanged"),
 	VERFUEGUNG_VERFUEGT("VerfuegungVerfuegt"),
-	BETREUUNG_ANFRAGE_ADDED("BetreuungAnfrageAdded");
+	BETREUUNG_ANFRAGE_ADDED("BetreuungAnfrageAdded"),
+	ANMELDUNG_TAGESSCHULE("AnmeldungTagesschule");
 
 	private final String name;
 
