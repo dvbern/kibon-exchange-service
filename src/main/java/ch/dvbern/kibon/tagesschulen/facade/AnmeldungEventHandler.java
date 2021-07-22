@@ -33,7 +33,7 @@ public class AnmeldungEventHandler extends BaseEventHandler<TagesschuleAnmeldung
 		@Nonnull TagesschuleAnmeldungEventDTO dto) {
 
 		if (ANMELDUNG_TAGESSCHULE == eventType) {
-			anmeldungService.onAnmeldungTagesschule(dto);
+			anmeldungService.onAnmeldungTagesschule(dto, eventTime);
 		} else {
 			LOG.warn("Unimplemented event type '{}' with id '{}'", eventType, eventId);
 		}

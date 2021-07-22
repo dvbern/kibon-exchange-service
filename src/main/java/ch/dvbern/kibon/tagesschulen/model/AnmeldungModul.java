@@ -12,8 +12,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.exchange.commons.types.Intervall;
+
 @Entity
-public class AnmeldungModul {
+public class AnmeldungModul implements Comparable<AnmeldungModul>{
 	@Nonnull
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +24,7 @@ public class AnmeldungModul {
 
 	@Nonnull
 	@Column(nullable = false)
-	private @NotNull String intervall;
+	private @NotNull Intervall intervall;
 
 	@Nonnull
 	@Column(nullable = false)
@@ -48,11 +50,11 @@ public class AnmeldungModul {
 	}
 
 	@Nonnull
-	public String getIntervall() {
+	public Intervall getIntervall() {
 		return intervall;
 	}
 
-	public void setIntervall(@Nonnull String intervall) {
+	public void setIntervall(@Nonnull Intervall intervall) {
 		this.intervall = intervall;
 	}
 
@@ -81,5 +83,20 @@ public class AnmeldungModul {
 
 	public void setModul(@Nonnull Modul modul) {
 		this.modul = modul;
+	}
+
+	@Override
+	public int compareTo(AnmeldungModul o) {
+		int compare = getWeekday().compareTo(o.weekday);
+		if(compare == 0) {
+			compare = getIntervall().compareTo(o.intervall);
+		}
+		if(compare == 0) {
+			compare = getId().compareTo(o.getId());
+		}
+		if(compare == 0) {
+			compare = getModul().getId().compareTo(o.getModul().getId());
+		}
+		return compare;
 	}
 }

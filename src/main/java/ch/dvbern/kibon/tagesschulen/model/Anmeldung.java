@@ -26,6 +26,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.exchange.commons.tagesschulen.AbholungTagesschule;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungStatus;
 import ch.dvbern.kibon.shared.model.Gesuchsperiode;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.hibernate.annotations.SortNatural;
@@ -56,7 +58,7 @@ public class Anmeldung {
 
 	@Nonnull
 	@Column(nullable = false)
-	private @NotNull String status;
+	private @NotNull TagesschuleAnmeldungStatus status;
 
 	@NotNull
 	private boolean anmeldungZurueckgezogen;
@@ -73,7 +75,7 @@ public class Anmeldung {
 	private String planKlasse;
 
 	@Nullable
-	private String abholung;
+	private AbholungTagesschule abholung;
 
 	@NotNull
 	private boolean abweichungZweitesSemester;
@@ -137,15 +139,15 @@ public class Anmeldung {
 	}
 
 	@Nonnull
-	public String getStatus() {
+	public TagesschuleAnmeldungStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(@Nonnull String status) {
+	public void setStatus(@Nonnull TagesschuleAnmeldungStatus status) {
 		this.status = status;
 	}
 
-	public boolean isAnmeldungZurueckgezogen() {
+	public boolean getAnmeldungZurueckgezogen() {
 		return anmeldungZurueckgezogen;
 	}
 
@@ -181,15 +183,15 @@ public class Anmeldung {
 	}
 
 	@Nullable
-	public String getAbholung() {
+	public AbholungTagesschule getAbholung() {
 		return abholung;
 	}
 
-	public void setAbholung(@Nullable String abholung) {
+	public void setAbholung(@Nullable AbholungTagesschule abholung) {
 		this.abholung = abholung;
 	}
 
-	public boolean isAbweichungZweitesSemester() {
+	public boolean getAbweichungZweitesSemester() {
 		return abweichungZweitesSemester;
 	}
 

@@ -73,6 +73,17 @@ public class Modul implements Comparable<Modul> {
 	@JoinColumn(foreignKey = @ForeignKey(name = "institution_fk"), nullable = false, updatable = false)
 	private Institution institution;
 
+	public Modul() {
+	}
+
+	/**
+	 * For test
+	 * @param modulId
+	 */
+	public Modul(String modulId) {
+		id = modulId;
+	}
+
 	public String getId() {
 		return id;
 	}

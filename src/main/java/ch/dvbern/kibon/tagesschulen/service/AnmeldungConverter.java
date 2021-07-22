@@ -7,8 +7,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
-import ch.dvbern.kibon.betreuung.model.BetreuungAnfrage;
-import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
 import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
@@ -36,7 +34,7 @@ public class AnmeldungConverter {
 		anmeldung.setInstitutionId(dto.getInstitutionId());
 		anmeldung.setRefnr(dto.getAnmeldungsDetails().getRefnr());
 		anmeldung.setAnmeldungZurueckgezogen(dto.getAnmeldungZurueckgezogen());
-		anmeldung.setAbholung(dto.getAnmeldungsDetails().getAbholung().name());
+		anmeldung.setAbholung(dto.getAnmeldungsDetails().getAbholung());
 		anmeldung.setBemerkung(dto.getAnmeldungsDetails().getBemerkung());
 		anmeldung.setEintrittsdatum(dto.getAnmeldungsDetails().getEintrittsdatum());
 		anmeldung.setEventTimestamp(eventTimestamp);
@@ -45,6 +43,8 @@ public class AnmeldungConverter {
 		anmeldung.setAbweichungZweitesSemester(dto.getAnmeldungsDetails().getAbweichungZweitesSemester());
 		anmeldung.setFreigegebenAm(dto.getFreigegebenAm());
 		anmeldung.setPlanKlasse(dto.getAnmeldungsDetails().getPlanKlasse());
+		anmeldung.setStatus(dto.getStatus());
+		anmeldung.setAnmeldungZurueckgezogen(dto.getAnmeldungZurueckgezogen());
 
 		Gesuchsperiode gesuchsperiode = em.find(Gesuchsperiode.class, dto.getGesuchsperiode().getId());
 		anmeldung.setGesuchsperiode(gesuchsperiode);
@@ -52,13 +52,12 @@ public class AnmeldungConverter {
 			modulAuswahlDTO -> {
 				AnmeldungModul anmeldungModul = new AnmeldungModul();
 				anmeldungModul.setAnmeldung(anmeldung);
-				anmeldungModul.setIntervall(modulAuswahlDTO.getIntervall().name());
+				anmeldungModul.setIntervall(modulAuswahlDTO.getIntervall());
 				anmeldungModul.setWeekday(modulAuswahlDTO.getWeekday());
 				anmeldungModul.setModul(em.find(Modul.class, modulAuswahlDTO.getModulId()));
 				anmeldung.getAnmeldungModulSet().add(anmeldungModul);
 			}
 		);
-
 		return anmeldung;
 	}
 
@@ -69,15 +68,27 @@ public class AnmeldungConverter {
 		return mapper.createObjectNode()
 			.put("vorname", kind.getVorname())
 			.put("nachname", kind.getNachname())
-			.put("geburtsdatum", kind.getGeburtsdatum().toString());
+			.put("geburtsdatum", kind.getGeburtsdatum().toString())
+			.put("geschlecht", kind.getGeschlecht().name());
 	}
 
 	@Nonnull
 	private ObjectNode toGesuchsteller(@Nonnull GesuchstellerDTO gesuchsteller) {
-		return mapper.createObjectNode()
+		ObjectNode result = mapper.createObjectNode()
 			.put("vorname", gesuchsteller.getVorname())
 			.put("nachname", gesuchsteller.getNachname())
+			.put("geburtsdatum", gesuchsteller.getGeburtsdatum().toString())
+			.put("geschlecht", gesuchsteller.getGeschlecht().name())
 			.put("email", gesuchsteller.getEmail());
-	}
 
+		result.putObject("adresse")
+			.put("ort", gesuchsteller.getAdresse().getOrt())
+			.put("land", gesuchsteller.getAdresse().getLand())
+			.put("strasse", gesuchsteller.getAdresse().getStrasse())
+			.put("hausnummer", gesuchsteller.getAdresse().getHausnummer())
+			.put("adresszusatz", gesuchsteller.getAdresse().getAdresszusatz())
+			.put("plz", gesuchsteller.getAdresse().getPlz());
+
+		return result;
+	}
 }

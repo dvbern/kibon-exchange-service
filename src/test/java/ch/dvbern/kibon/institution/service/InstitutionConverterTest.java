@@ -17,7 +17,6 @@
 
 package ch.dvbern.kibon.institution.service;
 
-import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -61,7 +60,6 @@ import static org.hamcrest.Matchers.comparesEqualTo;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.either;
 import static org.hamcrest.core.Is.is;
-import static org.easymock.EasyMock.eq;
 
 @ExtendWith(EasyMockExtension.class)
 class InstitutionConverterTest {
