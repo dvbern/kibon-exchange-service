@@ -206,6 +206,21 @@ public class Modul implements Comparable<Modul> {
 		if(compare == 0) {
 			compare = getId().compareTo(o.getId());
 		}
+		if(compare == 0) {
+			compare = getBezeichnungDE().compareTo(o.getBezeichnungDE());
+		}
+		if(compare == 0) {
+			compare = getBezeichnungFR().compareTo(o.getBezeichnungFR());
+		}
+		if(compare == 0) {
+			compare = getVerpflegungsKosten().compareTo(o.getVerpflegungsKosten());
+		}
+		if(compare == 0) {
+			compare = getIntervall().compareTo(o.getIntervall());
+		}
+		if(compare == 0) {
+			compare = getWochentage().equals(o.getWochentage()) ? 0 : 1;
+		}
 		return compare;
 	}
 }

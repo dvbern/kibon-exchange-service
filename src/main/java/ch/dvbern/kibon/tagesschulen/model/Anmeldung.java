@@ -2,8 +2,12 @@ package ch.dvbern.kibon.tagesschulen.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.IntStream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -69,7 +73,7 @@ public class Anmeldung {
 
 	@Nonnull
 	@Column(nullable = false)
-	private  @NotNull LocalDate eintrittsdatum;
+	private @NotNull LocalDate eintrittsdatum;
 
 	@Nullable
 	private String planKlasse;
@@ -101,7 +105,6 @@ public class Anmeldung {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "anmeldung")
 	@SortNatural
 	private @Valid Set<AnmeldungModul> anmeldungModulSet = new TreeSet<>();
-
 
 	public Long getId() {
 		return id;
@@ -240,5 +243,64 @@ public class Anmeldung {
 
 	public void setAnmeldungModulSet(Set<AnmeldungModul> anmeldungModulSet) {
 		this.anmeldungModulSet = anmeldungModulSet;
+	}
+
+	public int compareTo(Anmeldung newAnmeldung) {
+		Comparator<Anmeldung> ANMELDUNG_COMPARATOR = Comparator
+			.comparing(Anmeldung::getRefnr)
+			.thenComparing(Anmeldung::getFreigegebenAm)
+			.thenComparing(Anmeldung::getStatus)
+			.thenComparing(Anmeldung::getAnmeldungZurueckgezogen)
+			.thenComparing(Anmeldung::getEintrittsdatum)
+			.thenComparing(Anmeldung::getPlanKlasse)
+			.thenComparing(Anmeldung::getAbholung)
+			.thenComparing(Anmeldung::getAbweichungZweitesSemester)
+			.thenComparing(Anmeldung::getBemerkung)
+			.thenComparing(Anmeldung::getInstitutionId);
+
+		int result = ANMELDUNG_COMPARATOR.compare(this, newAnmeldung);
+
+		//Compare JsonNode and Gesuchsperiode als Sicherheit if needed
+		if (result == 0) {
+			result = this.getGesuchsperiode().getId().compareTo(newAnmeldung.getGesuchsperiode().getId());
+			if (result == 0) {
+				if (!this.getKind().equals(newAnmeldung.getKind())) {
+					result = 1;
+				} else if (!this.getGesuchsteller().equals(newAnmeldung.getGesuchsteller())) {
+					result = 1;
+				}
+			}
+		}
+
+		//Compare List of module if still needed
+		if (result == 0) {
+			Comparator<AnmeldungModul> ANMELDUNG_MODUL_COMPARATOR = Comparator
+				.comparing(AnmeldungModul::getModul)
+				.thenComparing(AnmeldungModul::getWeekday)
+				.thenComparing(AnmeldungModul::getIntervall);
+			result = listComparator(new ArrayList<>(this.getAnmeldungModulSet()),
+				new ArrayList<>(newAnmeldung.getAnmeldungModulSet()),
+				ANMELDUNG_MODUL_COMPARATOR);
+		}
+
+		return result;
+	}
+
+	@Nonnull
+	public static <T> Integer listComparator(
+		@Nonnull List<T> listA,
+		@Nonnull List<T> listB,
+		@Nonnull Comparator<T> comparator) {
+		int sizeDifference = listB.size() - listA.size();
+		if (sizeDifference != 0) {
+			return sizeDifference;
+		}
+		// Erstelle eine Kopie der Liste, damit die ursprüngliche Sortierung nicht verändert wird
+		List<T> aPos = new ArrayList<>(listA);
+		aPos.sort(comparator);
+		List<T> bPos = new ArrayList<>(listB);
+		bPos.sort(comparator);
+		return IntStream.range(0, aPos.size())
+			.allMatch(i -> comparator.compare(aPos.get(i), bPos.get(i)) == 0) ? 0 : 1;
 	}
 }

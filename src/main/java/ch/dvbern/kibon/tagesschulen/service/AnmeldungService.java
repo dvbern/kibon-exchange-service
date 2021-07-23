@@ -9,13 +9,14 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
-import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
+import ch.dvbern.kibon.tagesschulen.model.Anmeldung_;
 
 @ApplicationScoped
 public class AnmeldungService {
@@ -28,26 +29,16 @@ public class AnmeldungService {
 	@Inject
 	AnmeldungConverter converter;
 
-	public static final Comparator<Anmeldung> ANMELDUNG_COMPARATOR = Comparator
-		.comparing(Anmeldung::getRefnr)
-		.thenComparing(Anmeldung::getBemerkung)
-		.thenComparing(Anmeldung::getAbholung)
-		.thenComparing(Anmeldung::getStatus)
-		.thenComparing(Anmeldung::getEintrittsdatum)
-		.thenComparing(Anmeldung::getFreigegebenAm);
-
-
-
 	@Transactional(TxType.MANDATORY)
 	public void onAnmeldungTagesschule(@Nonnull TagesschuleAnmeldungEventDTO dto, @Nonnull LocalDateTime eventTime) {
 		//sucht ob es schon eine Anmeldung mit selbe Refnummer gibt
 		Anmeldung lastExistingAnmeldung = getLatestAnmeldung(dto.getAnmeldungsDetails().getRefnr());
 		Anmeldung newAnmeldung = converter.create(dto, eventTime);
 
-		if (ANMELDUNG_COMPARATOR.compare(lastExistingAnmeldung, newAnmeldung) == 0) {
+		if (lastExistingAnmeldung != null && lastExistingAnmeldung.compareTo(newAnmeldung) == 0) {
 			// ignore new
 		} else {
-			em.persist(dto);
+			em.persist(newAnmeldung);
 		}
 
 
@@ -57,7 +48,12 @@ public class AnmeldungService {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Anmeldung> query = cb.createQuery(Anmeldung.class);
 		Root<Anmeldung> root = query.from(Anmeldung.class);
-		return null;
+
+		Predicate refnrPredicate = cb.equal(root.get(Anmeldung_.refnr), refnr);
+		query.where(refnrPredicate);
+		query.orderBy(cb.desc(root.get(Anmeldung_.eventTimestamp)));
+
+		return em.createQuery(query).getSingleResult();
 	}
 
 }
