@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.IntStream;
@@ -20,10 +21,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.Valid;
@@ -105,6 +103,23 @@ public class Anmeldung {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "anmeldung")
 	@SortNatural
 	private @Valid Set<AnmeldungModul> anmeldungModulSet = new TreeSet<>();
+
+	private static final Comparator<Anmeldung> ANMELDUNG_COMPARATOR = Comparator
+		.comparing(Anmeldung::getRefnr)
+		.thenComparing(Anmeldung::getFreigegebenAm)
+		.thenComparing(Anmeldung::getStatus)
+		.thenComparing(Anmeldung::getAnmeldungZurueckgezogen)
+		.thenComparing(Anmeldung::getEintrittsdatum)
+		.thenComparing(Anmeldung::getPlanKlasse)
+		.thenComparing(Anmeldung::getAbholung)
+		.thenComparing(Anmeldung::getAbweichungZweitesSemester)
+		.thenComparing(Anmeldung::getBemerkung)
+		.thenComparing(Anmeldung::getInstitutionId);
+
+	private static final Comparator<AnmeldungModul> ANMELDUNG_MODUL_COMPARATOR = Comparator
+		.comparing(AnmeldungModul::getModul)
+		.thenComparing(AnmeldungModul::getWeekday)
+		.thenComparing(AnmeldungModul::getIntervall);
 
 	public Long getId() {
 		return id;
@@ -246,18 +261,6 @@ public class Anmeldung {
 	}
 
 	public int compareTo(Anmeldung newAnmeldung) {
-		Comparator<Anmeldung> ANMELDUNG_COMPARATOR = Comparator
-			.comparing(Anmeldung::getRefnr)
-			.thenComparing(Anmeldung::getFreigegebenAm)
-			.thenComparing(Anmeldung::getStatus)
-			.thenComparing(Anmeldung::getAnmeldungZurueckgezogen)
-			.thenComparing(Anmeldung::getEintrittsdatum)
-			.thenComparing(Anmeldung::getPlanKlasse)
-			.thenComparing(Anmeldung::getAbholung)
-			.thenComparing(Anmeldung::getAbweichungZweitesSemester)
-			.thenComparing(Anmeldung::getBemerkung)
-			.thenComparing(Anmeldung::getInstitutionId);
-
 		int result = ANMELDUNG_COMPARATOR.compare(this, newAnmeldung);
 
 		//Compare JsonNode and Gesuchsperiode als Sicherheit if needed
@@ -274,11 +277,8 @@ public class Anmeldung {
 
 		//Compare List of module if still needed
 		if (result == 0) {
-			Comparator<AnmeldungModul> ANMELDUNG_MODUL_COMPARATOR = Comparator
-				.comparing(AnmeldungModul::getModul)
-				.thenComparing(AnmeldungModul::getWeekday)
-				.thenComparing(AnmeldungModul::getIntervall);
-			result = listComparator(new ArrayList<>(this.getAnmeldungModulSet()),
+			result = listComparator(
+				new ArrayList<>(this.getAnmeldungModulSet()),
 				new ArrayList<>(newAnmeldung.getAnmeldungModulSet()),
 				ANMELDUNG_MODUL_COMPARATOR);
 		}
@@ -302,5 +302,29 @@ public class Anmeldung {
 		bPos.sort(comparator);
 		return IntStream.range(0, aPos.size())
 			.allMatch(i -> comparator.compare(aPos.get(i), bPos.get(i)) == 0) ? 0 : 1;
+	}
+
+	@Override
+	public boolean equals(@Nullable Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (o == null || !getClass().equals(o.getClass())) {
+			return false;
+		}
+
+		Anmeldung that = (Anmeldung) o;
+
+		return hashCode() == that.hashCode() &&
+			getAnmeldungZurueckgezogen() == that.getAnmeldungZurueckgezogen() &&
+			getEintrittsdatum().equals(that.getEintrittsdatum()) &&
+			getBemerkung().equals(that.getBemerkung()) &&
+			getAnmeldungModulSet().equals(that.getAnmeldungModulSet());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getId(), getKind(), getGesuchsteller(), getFreigegebenAm(), getStatus(), getRefnr());
 	}
 }

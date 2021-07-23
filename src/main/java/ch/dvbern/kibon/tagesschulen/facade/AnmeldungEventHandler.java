@@ -8,7 +8,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
-import ch.dvbern.kibon.institution.facade.InstitutionEventHandler;
 import ch.dvbern.kibon.kafka.BaseEventHandler;
 import ch.dvbern.kibon.kafka.EventType;
 import ch.dvbern.kibon.tagesschulen.service.AnmeldungService;
@@ -22,6 +21,7 @@ public class AnmeldungEventHandler extends BaseEventHandler<TagesschuleAnmeldung
 
 	private static final Logger LOG = LoggerFactory.getLogger(AnmeldungEventHandler.class);
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	AnmeldungService anmeldungService;
 

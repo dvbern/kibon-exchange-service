@@ -1,6 +1,9 @@
 package ch.dvbern.kibon.tagesschulen.model;
 
+import java.util.Objects;
+
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -89,7 +92,7 @@ public class AnmeldungModul implements Comparable<AnmeldungModul>{
 	public int compareTo(AnmeldungModul o) {
 		int compare = getWeekday().compareTo(o.weekday);
 		if(compare == 0) {
-			compare = getIntervall().compareTo(o.intervall);
+			compare = getIntervall().name().compareTo(o.intervall.name());
 		}
 		if(compare == 0) {
 			compare = getId().compareTo(o.getId());
@@ -98,5 +101,29 @@ public class AnmeldungModul implements Comparable<AnmeldungModul>{
 			compare = getModul().getId().compareTo(o.getModul().getId());
 		}
 		return compare;
+	}
+
+	@Override
+	public boolean equals(@Nullable Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (o == null || !getClass().equals(o.getClass())) {
+			return false;
+		}
+
+		AnmeldungModul that = (AnmeldungModul) o;
+
+		return getId().equals(that.getId()) &&
+			getIntervall().equals(that.getIntervall()) &&
+			getWeekday().equals(that.getWeekday()) &&
+			getAnmeldung().equals(that.getAnmeldung()) &&
+			getModul().equals(that.getModul());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getId(), getWeekday(), getIntervall());
 	}
 }

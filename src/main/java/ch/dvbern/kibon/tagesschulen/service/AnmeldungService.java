@@ -1,7 +1,6 @@
 package ch.dvbern.kibon.tagesschulen.service;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
@@ -35,13 +34,9 @@ public class AnmeldungService {
 		Anmeldung lastExistingAnmeldung = getLatestAnmeldung(dto.getAnmeldungsDetails().getRefnr());
 		Anmeldung newAnmeldung = converter.create(dto, eventTime);
 
-		if (lastExistingAnmeldung != null && lastExistingAnmeldung.compareTo(newAnmeldung) == 0) {
-			// ignore new
-		} else {
+		if (!(lastExistingAnmeldung != null && lastExistingAnmeldung.compareTo(newAnmeldung) == 0)) {
 			em.persist(newAnmeldung);
 		}
-
-
 	}
 
 	private Anmeldung getLatestAnmeldung(String refnr) {

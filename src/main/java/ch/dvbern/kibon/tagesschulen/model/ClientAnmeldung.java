@@ -16,11 +16,9 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import ch.dvbern.kibon.betreuung.model.BetreuungAnfrage;
 import ch.dvbern.kibon.clients.model.Client;
-import org.hibernate.annotations.Immutable;
 
-@Table(indexes = @Index(name = "clientanmeldung_idx1", columnList = "client_clientname, active, since, id"))
+@Table(indexes = @Index(name = "clientanmeldung_idx1", columnList = "client_clientname, active, id"))
 @Entity
 public class ClientAnmeldung {
 
@@ -42,7 +40,7 @@ public class ClientAnmeldung {
 
 	@Nonnull
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(foreignKey = @ForeignKey(name = "client_anmeldung_fk"), nullable = false, updatable = false)
+	@JoinColumn(foreignKey = @ForeignKey(name = "client_anmeldung_anmeldung_fk"), nullable = false, updatable = false)
 	private @NotNull Anmeldung anmeldung = new Anmeldung();
 
 	@Nonnull
