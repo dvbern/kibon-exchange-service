@@ -1,6 +1,8 @@
 package ch.dvbern.kibon.tagesschulen.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -68,12 +70,13 @@ public class AnmeldungServiceTest {
 		expect(cb.createQuery(Anmeldung.class)).andReturn(query);
 		expect(query.from(Anmeldung.class)).andReturn(root);
 		expect(em.createQuery(query)).andReturn(tq);
-		expect(tq.getSingleResult()).andReturn(null);
+		List<Anmeldung> anmeldungList = new ArrayList<>();
+		expect(tq.getResultList()).andReturn(anmeldungList);
 
 		em.persist(anmeldung);
 		expectLastCall();
 
-		replay(em, cb, query, root, converter);
+		replay(em, cb, query, root, converter, tq);
 
 		anmeldungService.onAnmeldungTagesschule(dto, eventTime);
 

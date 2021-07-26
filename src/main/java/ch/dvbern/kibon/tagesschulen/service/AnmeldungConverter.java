@@ -16,9 +16,13 @@ import ch.dvbern.kibon.tagesschulen.model.AnmeldungModul;
 import ch.dvbern.kibon.tagesschulen.model.Modul;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class AnmeldungConverter {
+
+	private static final Logger LOG = LoggerFactory.getLogger(AnmeldungConverter.class);
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
@@ -54,8 +58,14 @@ public class AnmeldungConverter {
 				anmeldungModul.setAnmeldung(anmeldung);
 				anmeldungModul.setIntervall(modulAuswahlDTO.getIntervall());
 				anmeldungModul.setWeekday(modulAuswahlDTO.getWeekday());
-				anmeldungModul.setModul(em.find(Modul.class, modulAuswahlDTO.getModulId()));
-				anmeldung.getAnmeldungModulSet().add(anmeldungModul);
+				Modul modul = em.find(Modul.class, modulAuswahlDTO.getModulId());
+				if(modul != null){
+					anmeldungModul.setModul(modul);
+					anmeldung.getAnmeldungModulSet().add(anmeldungModul);
+				}
+				else {
+					LOG.warn("Modul mit ID: {}  war nicht gefunden!", modulAuswahlDTO.getModulId());
+				}
 			}
 		);
 		return anmeldung;

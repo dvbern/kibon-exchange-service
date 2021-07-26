@@ -48,7 +48,7 @@ public class AnmeldungService {
 		query.where(refnrPredicate);
 		query.orderBy(cb.desc(root.get(Anmeldung_.eventTimestamp)));
 
-		return em.createQuery(query).getSingleResult();
+		return em.createQuery(query).getResultList().stream().findFirst().orElse(null);
 	}
 
 }

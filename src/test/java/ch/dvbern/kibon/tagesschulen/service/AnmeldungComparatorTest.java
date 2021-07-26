@@ -50,6 +50,19 @@ public class AnmeldungComparatorTest {
 	}
 
 	@Test
+	public void testCompareSameReceivedDTOWithNull() {
+		TagesschuleAnmeldungEventDTO dto = replayAll();
+		Anmeldung anmeldung = converter.create(dto, LocalDateTime.now());
+		Anmeldung sameAnmeldung = converter.create(dto, LocalDateTime.now());
+		anmeldung.setBemerkung(null);
+		anmeldung.setPlanKlasse(null);
+		sameAnmeldung.setBemerkung(null);
+		sameAnmeldung.setPlanKlasse(null);
+
+		Assert.assertTrue(anmeldung.compareTo(sameAnmeldung) == 0);
+	}
+
+	@Test
 	public void testCompareOtherModulInReceivedDTO() {
 		TagesschuleAnmeldungEventDTO dto = replayAll();
 		Anmeldung anmeldung = converter.create(dto, LocalDateTime.now());

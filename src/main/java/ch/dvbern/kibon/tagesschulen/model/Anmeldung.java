@@ -82,9 +82,8 @@ public class Anmeldung {
 	@NotNull
 	private boolean abweichungZweitesSemester;
 
-	@Nonnull
-	@Column(nullable = false)
-	private @NotNull String bemerkung;
+	@Nullable
+	private String bemerkung;
 
 	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -110,10 +109,10 @@ public class Anmeldung {
 		.thenComparing(Anmeldung::getStatus)
 		.thenComparing(Anmeldung::getAnmeldungZurueckgezogen)
 		.thenComparing(Anmeldung::getEintrittsdatum)
-		.thenComparing(Anmeldung::getPlanKlasse)
+		.thenComparing(Anmeldung::getPlanKlasse, Comparator.nullsLast(Comparator.naturalOrder()))
 		.thenComparing(Anmeldung::getAbholung)
 		.thenComparing(Anmeldung::getAbweichungZweitesSemester)
-		.thenComparing(Anmeldung::getBemerkung)
+		.thenComparing(Anmeldung::getBemerkung, Comparator.nullsLast(Comparator.naturalOrder()))
 		.thenComparing(Anmeldung::getInstitutionId);
 
 	private static final Comparator<AnmeldungModul> ANMELDUNG_MODUL_COMPARATOR = Comparator
@@ -217,12 +216,12 @@ public class Anmeldung {
 		this.abweichungZweitesSemester = abweichungZweitesSemester;
 	}
 
-	@Nonnull
+	@Nullable
 	public String getBemerkung() {
 		return bemerkung;
 	}
 
-	public void setBemerkung(@Nonnull String bemerkung) {
+	public void setBemerkung(@Nullable String bemerkung) {
 		this.bemerkung = bemerkung;
 	}
 
