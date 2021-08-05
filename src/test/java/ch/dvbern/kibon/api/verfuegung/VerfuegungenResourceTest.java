@@ -53,7 +53,6 @@ class VerfuegungenResourceTest extends EasyMockSupport {
 
 	private final String institutionId = "1";
 	private final String clientName = "fake-client";
-	;
 
 	@TestSubject
 	private final VerfuegungenResource resource = new VerfuegungenResource();

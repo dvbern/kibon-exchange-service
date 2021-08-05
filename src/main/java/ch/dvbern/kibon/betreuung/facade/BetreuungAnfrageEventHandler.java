@@ -24,10 +24,10 @@ import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import ch.dvbern.kibon.betreuung.service.BetreuungAnfrageService;
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
 import ch.dvbern.kibon.kafka.BaseEventHandler;
 import ch.dvbern.kibon.kafka.EventType;
-import ch.dvbern.kibon.betreuung.service.BetreuungAnfrageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

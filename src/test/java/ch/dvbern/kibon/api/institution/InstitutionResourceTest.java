@@ -19,7 +19,6 @@ package ch.dvbern.kibon.api.institution;
 
 import javax.ws.rs.core.Response.Status;
 
-import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.testutils.TestcontainersEnvironment;
 import io.quarkus.test.common.QuarkusTestResource;

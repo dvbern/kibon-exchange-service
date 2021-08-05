@@ -18,7 +18,9 @@
 package ch.dvbern.kibon.clients.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
@@ -30,6 +32,7 @@ import javax.transaction.Transactional.TxType;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.exchange.commons.institutionclient.InstitutionClientEventDTO;
+import ch.dvbern.kibon.util.DateRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,15 +83,43 @@ public class ClientService {
 	 */
 	@Transactional(TxType.MANDATORY)
 	public void onClientModified(@Nonnull InstitutionClientEventDTO dto) {
-		Optional<Client> existingClient = find(toClientId(dto));
+		find(toClientId(dto)).ifPresentOrElse(
+			client -> updateClientGueltigkeit(client, dto),
+			() -> LOG.warn("Cannot update unknown client with name '{}' and institutionId '{}'",
+				dto.getClientName(), dto.getInstitutionId()));
+	}
 
-		if (existingClient.isPresent()) {
-			existingClient.get().setGueltigAb(dto.getGueltigAb());
-			existingClient.get().setGueltigBis(dto.getGueltigBis());
-		} else {
-			LOG.warn("Cannot update unknown client with name '{}' and institutionId '{}'",
-				dto.getClientName(), dto.getInstitutionId());
+	private void updateClientGueltigkeit(
+		@Nonnull Client existingClient,
+		@Nonnull InstitutionClientEventDTO dto) {
+
+		DateRange existingGueltigkeit = DateRange.of(existingClient.getGueltigAb(), existingClient.getGueltigBis());
+		DateRange newGueltigkeit = DateRange.of(dto.getGueltigAb(), dto.getGueltigBis());
+		List<DateRange> previsoulyExcludedDates = newGueltigkeit.except(existingGueltigkeit);
+		insertClientVerfuegungen(existingClient, previsoulyExcludedDates);
+
+		existingClient.setGueltigAb(dto.getGueltigAb());
+		existingClient.setGueltigBis(dto.getGueltigBis());
+	}
+
+	private void insertClientVerfuegungen(@Nonnull Client client, @Nonnull List<DateRange> searchRanges) {
+		if (searchRanges.isEmpty()) {
+			return;
 		}
+
+		String gueltigkeiten = searchRanges.stream()
+			.map(d -> String.format("(v.von <= '%s' AND v.bis >= '%s')", d.getGueltigBis(), d.getGueltigAb()))
+			.collect(Collectors.joining(" OR "));
+
+		em.createNativeQuery(
+			"INSERT INTO clientverfuegung (id, active, client_clientname, client_institutionid, verfuegung_id, since) "
+				+ "(SELECT nextval('clientverfuegung_id_seq'), :active, :client, :institutionId, missing.id, now() "
+				+ "FROM (SELECT DISTINCT v.id FROM verfuegung v WHERE v.institutionid = :institutionId "
+				+ "AND (" + gueltigkeiten + ") ) AS missing );")
+			.setParameter("active", client.getActive())
+			.setParameter("client", client.getId().getClientName())
+			.setParameter("institutionId", client.getId().getInstitutionId())
+			.executeUpdate();
 	}
 
 	/**
