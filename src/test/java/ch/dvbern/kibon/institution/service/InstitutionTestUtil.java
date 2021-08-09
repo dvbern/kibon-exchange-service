@@ -18,11 +18,14 @@
 package ch.dvbern.kibon.institution.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -31,7 +34,10 @@ import ch.dvbern.kibon.exchange.commons.institution.GemeindeDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulDTO;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.exchange.commons.types.Gesuchsperiode;
+import ch.dvbern.kibon.exchange.commons.types.ModulIntervall;
 import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
@@ -45,6 +51,7 @@ import static ch.dvbern.kibon.exchange.commons.types.Wochentag.MONDAY;
 import static ch.dvbern.kibon.exchange.commons.types.Wochentag.THURSDAY;
 import static ch.dvbern.kibon.exchange.commons.types.Wochentag.TUESDAY;
 import static ch.dvbern.kibon.exchange.commons.types.Wochentag.WEDNESDAY;
+import static org.hamcrest.core.Is.is;
 
 public final class InstitutionTestUtil {
 
@@ -77,14 +84,14 @@ public final class InstitutionTestUtil {
 	}
 
 	@Nonnull
-	public static InstitutionEventDTO createInstitutionEvent() {
+	public static InstitutionEventDTO createInstitutionEvent(boolean isTagesschule) {
 		KontaktAngabenDTO adresse = fakeKontaktAngabenDTO();
 
 		return new InstitutionEventDTO(
 			"99",
 			FAKER.funnyName().name(),
 			FAKER.funnyName().name(),
-			BetreuungsangebotTyp.TAGESFAMILIEN,
+			isTagesschule ? BetreuungsangebotTyp.TAGESSCHULE : BetreuungsangebotTyp.TAGESFAMILIEN,
 			adresse,
 			Arrays.asList(fakeKontaktAngabenDTO(), fakeKontaktAngabenDTO()),
 			InstitutionStatus.AKTIV,
@@ -98,8 +105,30 @@ public final class InstitutionTestUtil {
 			true,
 			BigDecimal.valueOf(13.23),
 			BigDecimal.valueOf(7.13),
-			TimestampConverter.fromLocalDateTime(LocalDateTime.now())
+			TimestampConverter.fromLocalDateTime(LocalDateTime.now()),
+			isTagesschule ? createModule() : null
 		);
+	}
+
+	private static List<ModulDTO> createModule() {
+		List<ModulDTO> modulDTOS = new ArrayList<>();
+		ModulDTO modulDTO = new ModulDTO(
+			"100",
+			"bezeichnungDE",
+			"bezeichnungFR",
+			TimeConverter.serialize(LocalTime.of(7, 30)),
+			TimeConverter.serialize(LocalTime.of(8, 30)),
+			Arrays.asList(1, 2) ,
+			ModulIntervall.WOECHENTLICH,
+			true,
+			new BigDecimal(10.5),
+			new Gesuchsperiode("101",
+				LocalDate.of(2020,8,1),
+				LocalDate.of(2020,8,1))
+
+		);
+		modulDTOS.add(modulDTO);
+		return modulDTOS;
 	}
 
 	@Nonnull
