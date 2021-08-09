@@ -16,14 +16,15 @@ CREATE TABLE anmeldung (
 	gesuchsperiode_id         VARCHAR(255) NOT NULL
 		CONSTRAINT anmeldung_gesuchsperiode_fk
 			REFERENCES gesuchsperiode,
-	institutionId            VARCHAR(255) NOT NULL,
-	eventtimestamp            TIMESTAMP    NOT NULL
+	institutionId             VARCHAR(255) NOT NULL,
+	eventtimestamp            TIMESTAMP    NOT NULL,
+	version                   INT          NOT NULL
 );
 
 CREATE TABLE anmeldungmodul (
-	id           BIGSERIAL NOT NULL
+	id           BIGSERIAL    NOT NULL
 		CONSTRAINT anmeldung_modul_pkey
-		PRIMARY KEY,
+			PRIMARY KEY,
 	intervall    VARCHAR(100) NOT NULL,
 	weekday      INT          NOT NULL,
 	anmeldung_id BIGINT       NOT NULL

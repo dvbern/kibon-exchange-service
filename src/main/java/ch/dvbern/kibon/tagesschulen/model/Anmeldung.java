@@ -98,6 +98,10 @@ public class Anmeldung {
 	@Column(updatable = false)
 	private @NotNull LocalDateTime eventTimestamp = LocalDateTime.now();
 
+	@Nonnull
+	@Column(nullable = false)
+	private @NotNull Integer version;
+
 	@NotNull
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "anmeldung")
 	@SortNatural
@@ -318,12 +322,21 @@ public class Anmeldung {
 		return hashCode() == that.hashCode() &&
 			getAnmeldungZurueckgezogen() == that.getAnmeldungZurueckgezogen() &&
 			getEintrittsdatum().equals(that.getEintrittsdatum()) &&
-			getBemerkung().equals(that.getBemerkung()) &&
+			getRefnr().equals(that.getRefnr()) &&
 			getAnmeldungModulSet().equals(that.getAnmeldungModulSet());
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(getId(), getKind(), getGesuchsteller(), getFreigegebenAm(), getStatus(), getRefnr());
+	}
+
+	@Nonnull
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(@Nonnull Integer version) {
+		this.version = version;
 	}
 }
