@@ -49,6 +49,7 @@ public class AnmeldungConverter {
 		anmeldung.setPlanKlasse(dto.getAnmeldungsDetails().getPlanKlasse());
 		anmeldung.setStatus(dto.getStatus());
 		anmeldung.setAnmeldungZurueckgezogen(dto.getAnmeldungZurueckgezogen());
+		anmeldung.setVersion(dto.getVersion());
 
 		Gesuchsperiode gesuchsperiode = em.find(Gesuchsperiode.class, dto.getGesuchsperiode().getId());
 		anmeldung.setGesuchsperiode(gesuchsperiode);
