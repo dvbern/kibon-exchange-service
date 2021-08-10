@@ -13,6 +13,8 @@ import javax.persistence.criteria.Root;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungDetailsDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
+import ch.dvbern.kibon.tagesschulen.service.filter.ClientAnmeldungFilter;
 import org.easymock.EasyMockExtension;
 import org.easymock.Mock;
 import org.easymock.MockType;

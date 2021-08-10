@@ -6,6 +6,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
@@ -16,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.types.Intervall;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class AnmeldungModul implements Comparable<AnmeldungModul>{
@@ -29,7 +32,9 @@ public class AnmeldungModul implements Comparable<AnmeldungModul>{
 	@Column(nullable = false)
 	private @NotNull Intervall intervall;
 
+	@JsonIgnore
 	@Nonnull
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private @NotNull Integer weekday;
 

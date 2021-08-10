@@ -17,10 +17,9 @@
 
 package ch.dvbern.kibon.api.tagesschule;
 
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,10 +42,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnmeldungDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnmeldungenDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleBestaetigungDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TagesschuleTarifeDTO;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
+import ch.dvbern.kibon.tagesschulen.service.AnmeldungService;
+import ch.dvbern.kibon.tagesschulen.service.filter.ClientAnmeldungFilter;
 import ch.dvbern.kibon.util.OpenApiTag;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.MetricUnits;
@@ -84,6 +88,14 @@ public class TagesschulenResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	TagesschulenMockResponses mockResponses;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	AnmeldungService anmeldungService;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	ObjectMapper objectMapper;
 
 	@GET
 	@Path("/anmeldungen")
@@ -143,26 +155,21 @@ public class TagesschulenResource {
 			limit,
 			afterId);
 
+		ClientAnmeldungFilter queryFilter = new ClientAnmeldungFilter(clientName, afterId, limit);
+
+		List<ClientAnmeldungDTO> clientAnmeldungen = anmeldungService.getAllForClient(queryFilter);
+
+		List<TagesschuleAnmeldungDTO> tagesschuleAnmeldungDTOS = clientAnmeldungen.stream()
+			.map(this::convert)
+			.collect(Collectors.toList());
+
 		TagesschuleAnmeldungenDTO anmeldungenDTO = new TagesschuleAnmeldungenDTO();
-
-		Long maxSize = Optional.ofNullable(limit)
-			.map(Long::valueOf)
-			.orElse(Long.MAX_VALUE);
-
-		Stream.of(mockResponses.createAnmeldung1(REF_NR_1), mockResponses.createAnmeldung2(REF_NR_2))
-			.filter(a -> afterId == null || a.getId() > afterId)
-			.limit(maxSize)
-			.forEach(a -> anmeldungenDTO.getAnmeldungen().add(a));
-
-		if (!anmeldungenDTO.getAnmeldungen().isEmpty()) {
-			anmeldungenDTO.setModule(Arrays.asList(
-				TagesschulenMockResponses.MODUL_MORGEN,
-				TagesschulenMockResponses.MODUL_MITTAG,
-				TagesschulenMockResponses.MODUL_NACHMITTAG
-			));
-		}
-
+		anmeldungenDTO.setAnmeldungen(tagesschuleAnmeldungDTOS);
 		return anmeldungenDTO;
+	}
+
+	private TagesschuleAnmeldungDTO convert(@Nonnull ClientAnmeldungDTO model) {
+		return objectMapper.convertValue(model, TagesschuleAnmeldungDTO.class);
 	}
 
 	@DELETE

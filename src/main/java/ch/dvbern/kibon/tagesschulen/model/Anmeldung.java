@@ -15,6 +15,8 @@ import javax.annotation.Nullable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
@@ -31,6 +33,7 @@ import javax.validation.constraints.NotNull;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.AbholungTagesschule;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungStatus;
 import ch.dvbern.kibon.shared.model.Gesuchsperiode;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.hibernate.annotations.SortNatural;
 import org.hibernate.annotations.Type;
@@ -58,7 +61,9 @@ public class Anmeldung {
 	@Column(nullable = false)
 	private @NotNull LocalDate freigegebenAm;
 
+	@JsonIgnore
 	@Nonnull
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private @NotNull TagesschuleAnmeldungStatus status;
 
@@ -76,7 +81,9 @@ public class Anmeldung {
 	@Nullable
 	private String planKlasse;
 
+	@JsonIgnore
 	@Nullable
+	@Enumerated(EnumType.STRING)
 	private AbholungTagesschule abholung;
 
 	@NotNull

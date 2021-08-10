@@ -24,6 +24,7 @@
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
         <kibon.exchange.api.commons.version>2.4.0-SNAPSHOT</kibon.exchange.api.commons.version>
+        <kibon.exchange.api.version>3.0.3-SNAPSHOT</kibon.exchange.api.version>
 
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <maven.compiler.source>11</maven.compiler.source>
@@ -132,7 +133,7 @@
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
             <artifactId>kibon-exchange-api</artifactId>
-            <version>3.0.2</version>
+            <version>${kibon.exchange.api.version}</version>
         </dependency>
         <dependency>
             <groupId>com.vladmihalcea</groupId>

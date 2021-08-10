@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import javax.annotation.Nonnull;
 import javax.persistence.EntityManager;
 
+import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulAuswahlDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
 import ch.dvbern.kibon.exchange.commons.types.Gesuchsperiode;
@@ -12,6 +13,8 @@ import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
 import ch.dvbern.kibon.tagesschulen.model.AnmeldungModul;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.model.Modul;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,6 +59,43 @@ public class AnmeldungConverterTest {
 	@Test
 	public void testCreate() {
 		TagesschuleAnmeldungEventDTO dto = createTagesschuleAnmeldungTestDTO();
+		replayAll(dto);
+		Anmeldung anmeldung = converter.create(dto, LocalDateTime.now());
+		assertThat(anmeldung, matchesDTO(dto));
+		Assert.assertTrue(anmeldung.getAnmeldungModulSet().size() == dto.getAnmeldungsDetails().getModulSelection().size());
+	}
+
+	@Test
+	public void testConvert() {
+		TagesschuleAnmeldungEventDTO dto = createTagesschuleAnmeldungTestDTO();
+		replayAll(dto);
+		Anmeldung anmeldung = converter.create(dto, LocalDateTime.now());
+		ClientAnmeldung clientAnmeldung = new ClientAnmeldung();
+		clientAnmeldung.setAnmeldung(anmeldung);
+		clientAnmeldung.setClient(new Client());
+		clientAnmeldung.setId(1L);
+		clientAnmeldung.setActive(true);
+		ClientAnmeldungDTO clientAnmeldungDTO = converter.toClientAnmeldungDTO(clientAnmeldung);
+
+		Assert.assertTrue(clientAnmeldungDTO.getId() == clientAnmeldung.getId());
+		Assert.assertTrue(clientAnmeldungDTO.getInstitutionId().equals(clientAnmeldung.getAnmeldung().getInstitutionId()));
+		Assert.assertTrue(clientAnmeldungDTO.getRefnr().equals(clientAnmeldung.getAnmeldung().getRefnr()));
+		Assert.assertTrue(clientAnmeldungDTO.getVersion() == clientAnmeldung.getAnmeldung().getVersion());
+		Assert.assertTrue(clientAnmeldungDTO.getEventTimestamp().isEqual(clientAnmeldung.getAnmeldung().getEventTimestamp()));
+		Assert.assertTrue(clientAnmeldungDTO.getPeriodeVon().isEqual(clientAnmeldung.getAnmeldung().getGesuchsperiode().getGueltigAb()));
+		Assert.assertTrue(clientAnmeldungDTO.getPeriodeBis().isEqual(clientAnmeldung.getAnmeldung().getGesuchsperiode().getGueltigBis()));
+		Assert.assertTrue(clientAnmeldungDTO.getKind().equals(clientAnmeldung.getAnmeldung().getKind()));
+		Assert.assertTrue(clientAnmeldungDTO.getAntragsteller().equals(clientAnmeldung.getAnmeldung().getGesuchsteller()));
+		Assert.assertTrue(clientAnmeldungDTO.getPlanKlasse() != null && clientAnmeldungDTO.getPlanKlasse().equals(clientAnmeldung.getAnmeldung().getPlanKlasse()));
+		Assert.assertTrue(clientAnmeldungDTO.getAbholung() != null && clientAnmeldungDTO.getAbholung().equals(clientAnmeldung.getAnmeldung().getAbholung()));
+		Assert.assertTrue(clientAnmeldungDTO.getAbweichungZweitesSemester() == clientAnmeldung.getAnmeldung().getAbweichungZweitesSemester());
+		Assert.assertTrue(clientAnmeldungDTO.getBemerkung() != null && clientAnmeldungDTO.getBemerkung().equals(clientAnmeldung.getAnmeldung().getBemerkung()));
+		Assert.assertTrue(clientAnmeldungDTO.isAnmeldungZurueckgezogen() == clientAnmeldung.getAnmeldung().getAnmeldungZurueckgezogen());
+		Assert.assertTrue(clientAnmeldungDTO.getEintrittsdatum().isEqual(clientAnmeldung.getAnmeldung().getEintrittsdatum()));
+		Assert.assertTrue(clientAnmeldungDTO.getModule().size() == clientAnmeldung.getAnmeldung().getAnmeldungModulSet().size());
+	}
+
+	private void replayAll(TagesschuleAnmeldungEventDTO dto) {
 		ch.dvbern.kibon.shared.model.Gesuchsperiode gesuchsperiode = new ch.dvbern.kibon.shared.model.Gesuchsperiode();
 		gesuchsperiode.setId(dto.getGesuchsperiode().getId());
 		gesuchsperiode.setGueltigAb(dto.getGesuchsperiode().getGueltigAb());
@@ -66,9 +106,6 @@ public class AnmeldungConverterTest {
 			modulAuswahlDTO -> expect(em.find(Modul.class, modulAuswahlDTO.getModulId())).andReturn(new Modul(modulAuswahlDTO.getModulId())));
 		expectLastCall();
 		replay(em);
-		Anmeldung anmeldung = converter.create(dto, LocalDateTime.now());
-		assertThat(anmeldung, matchesDTO(dto));
-		Assert.assertTrue(anmeldung.getAnmeldungModulSet().size() == dto.getAnmeldungsDetails().getModulSelection().size());
 	}
 
 	@Nonnull
