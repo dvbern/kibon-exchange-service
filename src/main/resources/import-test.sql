@@ -200,7 +200,7 @@ FROM generate_series(1, 10) i
 
 -- region anmeldung trigger
 
-/*CREATE FUNCTION anmeldung_insert() RETURNS TRIGGER SECURITY DEFINER
+CREATE FUNCTION anmeldung_insert() RETURNS TRIGGER SECURITY DEFINER
 	LANGUAGE plpgsql
 AS
 '
@@ -266,4 +266,4 @@ INSERT INTO anmeldung (id, kind, gesuchsteller, freigegebenam, status, anmeldung
 					   planklasse, abholung, abweichungzweitessemester, bemerkung, anmeldungmodule, gesuchsperiode_id, institutionid,
 					   eventtimestamp, version)
 VALUES ('1002', '{}'::JSONB, '[]'::JSONB, '2021-07-26'::DATE, 'SCHULAMT_ANMELDUNG_ERFASST', FALSE, '20.000101.001.1.1',
-		'2020-08-01'::DATE, '3a', 'ABHOLUNG', FALSE, 'test Bemerkung','[]'::JSONB, '1001', '4', now(), 0);*/
+		'2020-08-01'::DATE, '3a', 'ABHOLUNG', FALSE, 'test Bemerkung','[]'::JSONB, '1001', '4', now(), 0);
