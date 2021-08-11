@@ -266,5 +266,5 @@ VALUES ('1001', '2020-08-01'::DATE, '2021-07-31'::DATE);
 INSERT INTO anmeldung (id, kind, gesuchsteller, freigegebenam, status, anmeldungzurueckgezogen, refnr, eintrittsdatum,
 					   planklasse, abholung, abweichungzweitessemester, bemerkung, anmeldungmodule, gesuchsperiode_id, institutionid,
 					   eventtimestamp, version)
-VALUES ('1002', '{}'::JSONB, '[]'::JSONB, '2021-07-26'::DATE, 'SCHULAMT_ANMELDUNG_ERFASST', FALSE, '20.000101.001.1.1',
+VALUES ('1002', '{}'::JSONB, '{}'::JSONB, '2021-07-26'::DATE, 'SCHULAMT_ANMELDUNG_ERFASST', FALSE, '20.000101.001.1.1',
 		'2020-08-01'::DATE, '3a', 'ABHOLUNG', FALSE, 'test Bemerkung','[]'::JSONB, '1001', '4', now(), 0);
