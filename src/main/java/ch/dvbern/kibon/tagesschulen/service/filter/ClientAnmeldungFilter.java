@@ -31,6 +31,7 @@ import javax.persistence.criteria.Root;
 
 import ch.dvbern.kibon.persistence.Restriction;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 
 /**
  * Helper class for filtering {@link ClientAnmeldung}en.
@@ -40,7 +41,7 @@ public class ClientAnmeldungFilter {
 	@Nullable
 	private final Integer limit;
 	@Nonnull
-	private final List<Restriction<ClientAnmeldung, ClientAnmeldung>> restrictions = new ArrayList<>();
+	private final List<Restriction<ClientAnmeldung, ClientAnmeldungDTO>> restrictions = new ArrayList<>();
 
 	/**
 	 * For filtering by clientName only.
@@ -70,7 +71,7 @@ public class ClientAnmeldungFilter {
 	 * Sets the filter predicates on the given query.
 	 */
 	public void setPredicate(
-		@Nonnull CriteriaQuery<ClientAnmeldung> query,
+		@Nonnull CriteriaQuery<ClientAnmeldungDTO> query,
 		@Nonnull Root<ClientAnmeldung> root,
 		@Nonnull CriteriaBuilder cb) {
 
@@ -86,7 +87,7 @@ public class ClientAnmeldungFilter {
 	/**
 	 * Sets the filter parameters on the given query.
 	 */
-	public void setParameters(@Nonnull TypedQuery<ClientAnmeldung> query) {
+	public void setParameters(@Nonnull TypedQuery<ClientAnmeldungDTO> query) {
 		restrictions.forEach(r -> r.setParameter(query));
 
 		if (limit != null) {

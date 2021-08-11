@@ -2,32 +2,27 @@ package ch.dvbern.kibon.tagesschulen.service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
+import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulAuswahlDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
 import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
 import ch.dvbern.kibon.shared.model.Gesuchsperiode;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
-import ch.dvbern.kibon.tagesschulen.model.AnmeldungModul;
-import ch.dvbern.kibon.tagesschulen.model.AnmeldungModulDTO;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
-import ch.dvbern.kibon.tagesschulen.model.Modul;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class AnmeldungConverter {
-
-	private static final Logger LOG = LoggerFactory.getLogger(AnmeldungConverter.class);
 
 	private static final int SUNDAY_INT_VALUE = 0;
 	private static final int MONDAY_INT_VALUE = 1;
@@ -66,21 +61,7 @@ public class AnmeldungConverter {
 
 		Gesuchsperiode gesuchsperiode = em.find(Gesuchsperiode.class, dto.getGesuchsperiode().getId());
 		anmeldung.setGesuchsperiode(gesuchsperiode);
-		dto.getAnmeldungsDetails().getModulSelection().forEach(
-			modulAuswahlDTO -> {
-				AnmeldungModul anmeldungModul = new AnmeldungModul();
-				anmeldungModul.setAnmeldung(anmeldung);
-				anmeldungModul.setIntervall(modulAuswahlDTO.getIntervall());
-				anmeldungModul.setWeekday(modulAuswahlDTO.getWeekday());
-				Modul modul = em.find(Modul.class, modulAuswahlDTO.getModulId());
-				if (modul != null) {
-					anmeldungModul.setModul(modul);
-					anmeldung.getAnmeldungModulSet().add(anmeldungModul);
-				} else {
-					LOG.warn("Modul mit ID: {}  war nicht gefunden!", modulAuswahlDTO.getModulId());
-				}
-			}
-		);
+		anmeldung.setAnmeldungModule(toAnmeldungModule(dto.getAnmeldungsDetails().getModulSelection()));
 		return anmeldung;
 	}
 
@@ -113,37 +94,29 @@ public class AnmeldungConverter {
 		return result;
 	}
 
-	public ClientAnmeldungDTO toClientAnmeldungDTO(ClientAnmeldung clientAnmeldung) {
-		Anmeldung anmeldung = clientAnmeldung.getAnmeldung();
-		ClientAnmeldungDTO clientAnmeldungDTO = new ClientAnmeldungDTO(
-			clientAnmeldung.getId(),
-			anmeldung.getInstitutionId(),
-			anmeldung.getRefnr(),
-			anmeldung.getVersion(),
-			anmeldung.getEventTimestamp(),
-			anmeldung.getGesuchsperiode().getGueltigAb(),
-			anmeldung.getGesuchsperiode().getGueltigBis(),
-			anmeldung.getKind(),
-			anmeldung.getGesuchsteller(),
-			anmeldung.getPlanKlasse(),
-			anmeldung.getAbholung(),
-			anmeldung.getAbweichungZweitesSemester(),
-			anmeldung.getBemerkung(),
-			anmeldung.getAnmeldungZurueckgezogen(),
-			anmeldung.getEintrittsdatum(),
-			anmeldung.getAnmeldungModulSet().stream().map(this::toAnmeldungModul).collect(Collectors.toList())
-		);
-		return clientAnmeldungDTO;
-	}
-	private AnmeldungModulDTO toAnmeldungModul(AnmeldungModul anmeldungModul) {
-		return new AnmeldungModulDTO(
-			anmeldungModul.getModul().getId(),
-			toDayOfWeek(anmeldungModul.getWeekday()),
-			anmeldungModul.getIntervall()
-		);
+	@Nonnull
+	private ArrayNode toAnmeldungModule(@Nullable List<ModulAuswahlDTO> modulAuswahlDTOS) {
+		if (modulAuswahlDTOS == null) {
+			return mapper.createArrayNode();
+		}
+
+		List<ObjectNode> mapped = modulAuswahlDTOS.stream()
+			.map(this::toAnmeldungModul)
+			.collect(Collectors.toList());
+
+		return mapper.createArrayNode()
+			.addAll(mapped);
 	}
 
-	private DayOfWeek toDayOfWeek(int weekday) {
+	@Nonnull
+	private ObjectNode toAnmeldungModul(@Nonnull ModulAuswahlDTO modulAuswahlDTO) {
+		return mapper.createObjectNode()
+			.put("modulId", modulAuswahlDTO.getModulId())
+			.put("wochentag", toDayOfWeek(modulAuswahlDTO.getWeekday()).name())
+			.put("intervall", modulAuswahlDTO.getIntervall().toString());
+	}
+
+	public DayOfWeek toDayOfWeek(int weekday) {
 		switch (weekday) {
 		case SUNDAY_INT_VALUE:
 			return DayOfWeek.SUNDAY;

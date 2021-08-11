@@ -2,7 +2,6 @@ package ch.dvbern.kibon.tagesschulen.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -55,7 +54,7 @@ public class ClientAnmeldungDTO {
 	private final JsonNode antragsteller;
 
 	@Nonnull
-	private List<AnmeldungModulDTO> module;
+	private JsonNode module;
 
 	@Nonnull
 	private boolean anmeldungZurueckgezogen;
@@ -76,7 +75,7 @@ public class ClientAnmeldungDTO {
 		@Nullable String bemerkung,
 		@Nonnull Boolean anmeldungZurueckgezogen,
 		@Nonnull LocalDate eintrittsdatum,
-		@Nonnull List<AnmeldungModulDTO> module) {
+		@Nonnull JsonNode module) {
 		this.id = id;
 		this.institutionId = institutionId;
 		this.refnr = refnr;
@@ -185,15 +184,6 @@ public class ClientAnmeldungDTO {
 		return antragsteller;
 	}
 
-	@Nonnull
-	public List<AnmeldungModulDTO> getModule() {
-		return module;
-	}
-
-	public void setModule(@Nonnull List<AnmeldungModulDTO> module) {
-		this.module = module;
-	}
-
 	public boolean isAnmeldungZurueckgezogen() {
 		return anmeldungZurueckgezogen;
 	}
@@ -202,4 +192,12 @@ public class ClientAnmeldungDTO {
 		this.anmeldungZurueckgezogen = anmeldungZurueckgezogen;
 	}
 
+	@Nonnull
+	public JsonNode getModule() {
+		return module;
+	}
+
+	public void setModule(@Nonnull JsonNode module) {
+		this.module = module;
+	}
 }

@@ -110,9 +110,6 @@ public class AnmeldungComparatorTest {
 		gesuchsperiode.setGueltigBis(dto.getGesuchsperiode().getGueltigBis());
 		expect(em.find(ch.dvbern.kibon.shared.model.Gesuchsperiode.class, dto.getGesuchsperiode().getId())).andReturn(
 			gesuchsperiode).times(2);
-		dto.getAnmeldungsDetails().getModulSelection().forEach(
-			modulAuswahlDTO -> expect(em.find(Modul.class, modulAuswahlDTO.getModulId())).andReturn(createNewModulWithId(
-				modulAuswahlDTO.getModulId())).times(2));
 		expectLastCall();
 		replay(em);
 		return dto;

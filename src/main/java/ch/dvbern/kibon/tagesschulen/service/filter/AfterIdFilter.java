@@ -29,12 +29,13 @@ import javax.persistence.criteria.Root;
 
 import ch.dvbern.kibon.persistence.Restriction;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
 
 /**
  * Utility class for filtering criteria queries to only deliver entries with an ID > the specified one.
  */
-public class AfterIdFilter implements Restriction<ClientAnmeldung, ClientAnmeldung> {
+public class AfterIdFilter implements Restriction<ClientAnmeldung, ClientAnmeldungDTO> {
 
 	@Nullable
 	private final Long afterId;
@@ -59,7 +60,7 @@ public class AfterIdFilter implements Restriction<ClientAnmeldung, ClientAnmeldu
 	}
 
 	@Override
-	public void setParameter(@Nonnull TypedQuery<ClientAnmeldung> query) {
+	public void setParameter(@Nonnull TypedQuery<ClientAnmeldungDTO> query) {
 		if (afterId == null) {
 			return;
 		}

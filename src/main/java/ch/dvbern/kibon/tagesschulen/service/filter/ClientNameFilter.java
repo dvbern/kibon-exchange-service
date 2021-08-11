@@ -32,6 +32,7 @@ import ch.dvbern.kibon.clients.model.ClientId_;
 import ch.dvbern.kibon.clients.model.Client_;
 import ch.dvbern.kibon.persistence.Restriction;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
 
 
@@ -39,7 +40,7 @@ import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
 /**
  * Utility class for filtering criteria queries to only deliver {@link ClientAnmeldung}en with a specific client name.
  */
-public class ClientNameFilter implements Restriction<ClientAnmeldung, ClientAnmeldung> {
+public class ClientNameFilter implements Restriction<ClientAnmeldung, ClientAnmeldungDTO> {
 
 	@Nonnull
 	private final String clientName;
@@ -61,7 +62,7 @@ public class ClientNameFilter implements Restriction<ClientAnmeldung, ClientAnme
 	}
 
 	@Override
-	public void setParameter(@Nonnull TypedQuery<ClientAnmeldung> query) {
+	public void setParameter(@Nonnull TypedQuery<ClientAnmeldungDTO> query) {
 		query.setParameter(clientParam, clientName);
 	}
 }

@@ -6,13 +6,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.IntStream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -25,8 +22,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -35,7 +30,6 @@ import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungStatus;
 import ch.dvbern.kibon.shared.model.Gesuchsperiode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.hibernate.annotations.SortNatural;
 import org.hibernate.annotations.Type;
 
 @Entity
@@ -109,10 +103,10 @@ public class Anmeldung {
 	@Column(nullable = false)
 	private @NotNull Integer version;
 
-	@NotNull
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "anmeldung")
-	@SortNatural
-	private @Valid Set<AnmeldungModul> anmeldungModulSet = new TreeSet<>();
+	@Nonnull
+	@Type(type = "jsonb-node")
+	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	private @NotNull JsonNode anmeldungModule;
 
 	private static final Comparator<Anmeldung> ANMELDUNG_COMPARATOR = Comparator
 		.comparing(Anmeldung::getRefnr)
@@ -125,11 +119,6 @@ public class Anmeldung {
 		.thenComparing(Anmeldung::getAbweichungZweitesSemester)
 		.thenComparing(Anmeldung::getBemerkung, Comparator.nullsLast(Comparator.naturalOrder()))
 		.thenComparing(Anmeldung::getInstitutionId);
-
-	private static final Comparator<AnmeldungModul> ANMELDUNG_MODUL_COMPARATOR = Comparator
-		.comparing(AnmeldungModul::getModul)
-		.thenComparing(AnmeldungModul::getWeekday)
-		.thenComparing(AnmeldungModul::getIntervall);
 
 	public Long getId() {
 		return id;
@@ -262,14 +251,6 @@ public class Anmeldung {
 		this.eventTimestamp = eventTimestamp;
 	}
 
-	public Set<AnmeldungModul> getAnmeldungModulSet() {
-		return anmeldungModulSet;
-	}
-
-	public void setAnmeldungModulSet(Set<AnmeldungModul> anmeldungModulSet) {
-		this.anmeldungModulSet = anmeldungModulSet;
-	}
-
 	public int compareTo(Anmeldung newAnmeldung) {
 		int result = ANMELDUNG_COMPARATOR.compare(this, newAnmeldung);
 
@@ -282,17 +263,11 @@ public class Anmeldung {
 				} else if (!this.getGesuchsteller().equals(newAnmeldung.getGesuchsteller())) {
 					result = 1;
 				}
+				else if (!this.getAnmeldungModule().equals(newAnmeldung.getAnmeldungModule())) {
+					result = 1;
+				}
 			}
 		}
-
-		//Compare List of module if still needed
-		if (result == 0) {
-			result = listComparator(
-				new ArrayList<>(this.getAnmeldungModulSet()),
-				new ArrayList<>(newAnmeldung.getAnmeldungModulSet()),
-				ANMELDUNG_MODUL_COMPARATOR);
-		}
-
 		return result;
 	}
 
@@ -329,8 +304,7 @@ public class Anmeldung {
 		return hashCode() == that.hashCode() &&
 			getAnmeldungZurueckgezogen() == that.getAnmeldungZurueckgezogen() &&
 			getEintrittsdatum().equals(that.getEintrittsdatum()) &&
-			getRefnr().equals(that.getRefnr()) &&
-			getAnmeldungModulSet().equals(that.getAnmeldungModulSet());
+			getRefnr().equals(that.getRefnr());
 	}
 
 	@Override
@@ -345,5 +319,14 @@ public class Anmeldung {
 
 	public void setVersion(@Nonnull Integer version) {
 		this.version = version;
+	}
+
+	@Nonnull
+	public JsonNode getAnmeldungModule() {
+		return anmeldungModule;
+	}
+
+	public void setAnmeldungModule(@Nonnull JsonNode anmeldungModule) {
+		this.anmeldungModule = anmeldungModule;
 	}
 }

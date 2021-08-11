@@ -1,6 +1,9 @@
 package ch.dvbern.kibon.tagesschulen.service;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.persistence.EntityManager;
@@ -12,9 +15,6 @@ import ch.dvbern.kibon.exchange.commons.types.Gesuchsperiode;
 import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
-import ch.dvbern.kibon.tagesschulen.model.AnmeldungModul;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.model.Modul;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +30,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonInt;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static com.spotify.hamcrest.pojo.IsPojo.pojo;
@@ -62,37 +64,6 @@ public class AnmeldungConverterTest {
 		replayAll(dto);
 		Anmeldung anmeldung = converter.create(dto, LocalDateTime.now());
 		assertThat(anmeldung, matchesDTO(dto));
-		Assert.assertTrue(anmeldung.getAnmeldungModulSet().size() == dto.getAnmeldungsDetails().getModulSelection().size());
-	}
-
-	@Test
-	public void testConvert() {
-		TagesschuleAnmeldungEventDTO dto = createTagesschuleAnmeldungTestDTO();
-		replayAll(dto);
-		Anmeldung anmeldung = converter.create(dto, LocalDateTime.now());
-		ClientAnmeldung clientAnmeldung = new ClientAnmeldung();
-		clientAnmeldung.setAnmeldung(anmeldung);
-		clientAnmeldung.setClient(new Client());
-		clientAnmeldung.setId(1L);
-		clientAnmeldung.setActive(true);
-		ClientAnmeldungDTO clientAnmeldungDTO = converter.toClientAnmeldungDTO(clientAnmeldung);
-
-		Assert.assertTrue(clientAnmeldungDTO.getId() == clientAnmeldung.getId());
-		Assert.assertTrue(clientAnmeldungDTO.getInstitutionId().equals(clientAnmeldung.getAnmeldung().getInstitutionId()));
-		Assert.assertTrue(clientAnmeldungDTO.getRefnr().equals(clientAnmeldung.getAnmeldung().getRefnr()));
-		Assert.assertTrue(clientAnmeldungDTO.getVersion() == clientAnmeldung.getAnmeldung().getVersion());
-		Assert.assertTrue(clientAnmeldungDTO.getEventTimestamp().isEqual(clientAnmeldung.getAnmeldung().getEventTimestamp()));
-		Assert.assertTrue(clientAnmeldungDTO.getPeriodeVon().isEqual(clientAnmeldung.getAnmeldung().getGesuchsperiode().getGueltigAb()));
-		Assert.assertTrue(clientAnmeldungDTO.getPeriodeBis().isEqual(clientAnmeldung.getAnmeldung().getGesuchsperiode().getGueltigBis()));
-		Assert.assertTrue(clientAnmeldungDTO.getKind().equals(clientAnmeldung.getAnmeldung().getKind()));
-		Assert.assertTrue(clientAnmeldungDTO.getAntragsteller().equals(clientAnmeldung.getAnmeldung().getGesuchsteller()));
-		Assert.assertTrue(clientAnmeldungDTO.getPlanKlasse() != null && clientAnmeldungDTO.getPlanKlasse().equals(clientAnmeldung.getAnmeldung().getPlanKlasse()));
-		Assert.assertTrue(clientAnmeldungDTO.getAbholung() != null && clientAnmeldungDTO.getAbholung().equals(clientAnmeldung.getAnmeldung().getAbholung()));
-		Assert.assertTrue(clientAnmeldungDTO.getAbweichungZweitesSemester() == clientAnmeldung.getAnmeldung().getAbweichungZweitesSemester());
-		Assert.assertTrue(clientAnmeldungDTO.getBemerkung() != null && clientAnmeldungDTO.getBemerkung().equals(clientAnmeldung.getAnmeldung().getBemerkung()));
-		Assert.assertTrue(clientAnmeldungDTO.isAnmeldungZurueckgezogen() == clientAnmeldung.getAnmeldung().getAnmeldungZurueckgezogen());
-		Assert.assertTrue(clientAnmeldungDTO.getEintrittsdatum().isEqual(clientAnmeldung.getAnmeldung().getEintrittsdatum()));
-		Assert.assertTrue(clientAnmeldungDTO.getModule().size() == clientAnmeldung.getAnmeldung().getAnmeldungModulSet().size());
 	}
 
 	private void replayAll(TagesschuleAnmeldungEventDTO dto) {
@@ -103,7 +74,8 @@ public class AnmeldungConverterTest {
 		expect(em.find(ch.dvbern.kibon.shared.model.Gesuchsperiode.class, dto.getGesuchsperiode().getId())).andReturn(
 			gesuchsperiode);
 		dto.getAnmeldungsDetails().getModulSelection().forEach(
-			modulAuswahlDTO -> expect(em.find(Modul.class, modulAuswahlDTO.getModulId())).andReturn(new Modul(modulAuswahlDTO.getModulId())));
+			modulAuswahlDTO -> expect(em.find(Modul.class, modulAuswahlDTO.getModulId())).andReturn(new Modul(
+				modulAuswahlDTO.getModulId())));
 		expectLastCall();
 		replay(em);
 	}
@@ -124,22 +96,23 @@ public class AnmeldungConverterTest {
 			.withProperty("bemerkung", is(dto.getAnmeldungsDetails().getBemerkung()))
 			.withProperty("gesuchsperiode", matchesGesuchperiode(dto.getGesuchsperiode()))
 			.withProperty("institutionId", is(dto.getInstitutionId()))
-			.where(Anmeldung::getAnmeldungModulSet, containsInAnyOrder(
-				matchesAnmeldungModul(dto.getAnmeldungsDetails().getModulSelection().get(0)),
-				matchesAnmeldungModul(dto.getAnmeldungsDetails().getModulSelection().get(1))
-			));
+			.where(
+				Anmeldung::getAnmeldungModule,
+				is(jsonArray(containsInAnyOrder(toMatchers(dto.getAnmeldungsDetails().getModulSelection())))))
+			;
 	}
 
-	private IsPojo<AnmeldungModul> matchesAnmeldungModul(ModulAuswahlDTO modulAuswahlDTO) {
-		return pojo(AnmeldungModul.class)
-			.where(AnmeldungModul::getIntervall, Matchers.is(modulAuswahlDTO.getIntervall()))
-			.where(AnmeldungModul::getWeekday, Matchers.is(modulAuswahlDTO.getWeekday()))
-			.where(AnmeldungModul::getModul, matchesModulId(modulAuswahlDTO.getModulId()));
+	private Collection<Matcher<? super JsonNode>> toMatchers(@Nonnull List<ModulAuswahlDTO> modulAuswahlDTOS) {
+		return modulAuswahlDTOS.stream()
+			.map(this::matchesAnmeldungModul)
+			.collect(Collectors.toList());
 	}
 
-	private IsPojo<Modul> matchesModulId(String modulId) {
-		return pojo(Modul.class)
-			.where(Modul::getId, Matchers.is(modulId));
+	private Matcher<JsonNode> matchesAnmeldungModul(ModulAuswahlDTO modulAuswahlDTO) {
+		return is(jsonObject()
+			.where("intervall", is(jsonText(modulAuswahlDTO.getIntervall().name())))
+			.where("weekday", is(jsonText(converter.toDayOfWeek(modulAuswahlDTO.getWeekday()).name())))
+			.where("modulId", is(jsonText(modulAuswahlDTO.getModulId()))));
 	}
 
 	private Matcher<?> matchesGesuchperiode(Gesuchsperiode gesuchsperiode) {

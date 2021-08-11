@@ -13,26 +13,13 @@ CREATE TABLE anmeldung (
 	abholung                  VARCHAR(100),
 	abweichungzweitessemester BOOLEAN      NOT NULL,
 	bemerkung                 VARCHAR(4000),
+	anmeldungmodule			  JSONB		   NOT NULL,
 	gesuchsperiode_id         VARCHAR(255) NOT NULL
 		CONSTRAINT anmeldung_gesuchsperiode_fk
 			REFERENCES gesuchsperiode,
 	institutionId             VARCHAR(255) NOT NULL,
 	eventtimestamp            TIMESTAMP    NOT NULL,
 	version                   INT          NOT NULL
-);
-
-CREATE TABLE anmeldungmodul (
-	id           BIGSERIAL    NOT NULL
-		CONSTRAINT anmeldung_modul_pkey
-			PRIMARY KEY,
-	intervall    VARCHAR(100) NOT NULL,
-	weekday      INT          NOT NULL,
-	anmeldung_id BIGINT       NOT NULL
-		CONSTRAINT anmeldung_modul_anmeldung_id
-			REFERENCES anmeldung,
-	modul_id     VARCHAR(255) NOT NULL
-		CONSTRAINT anmeldung_modul_modul_id
-			REFERENCES modul
 );
 
 CREATE TABLE clientanmeldung (
@@ -50,10 +37,6 @@ CREATE TABLE clientanmeldung (
 );
 
 CREATE
-INDEX clientanmeldung_idx1
-	ON clientanmeldung(client_clientname, active, id);
-
-CREATE
 INDEX anmeldung_idx1
 	ON anmeldung(institutionId);
 
@@ -63,7 +46,7 @@ AS
 $$
 BEGIN
 INSERT INTO clientanmeldung (id, active, client_clientname, client_institutionid, anmeldung_id)
-	(SELECT nextval('clientbetreuunganfrage_id_seq'), c.active, c.clientname, c.institutionid, new.id
+	(SELECT nextval('clientanmeldung_id_seq'), c.active, c.clientname, c.institutionid, new.id
 	 FROM client c
 	 WHERE c.institutionid = new.institutionid);
 RETURN new;

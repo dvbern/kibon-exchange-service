@@ -27,12 +27,13 @@ import javax.persistence.criteria.Root;
 
 import ch.dvbern.kibon.persistence.Restriction;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
 
 /**
  * Utility class for filtering criteria queries to only deliver {@link ClientAnmeldung}en that are active.
  */
-public class ClientActiveFilter implements Restriction<ClientAnmeldung, ClientAnmeldung> {
+public class ClientActiveFilter implements Restriction<ClientAnmeldung, ClientAnmeldungDTO> {
 
 	@Nonnull
 	@Override
@@ -41,7 +42,7 @@ public class ClientActiveFilter implements Restriction<ClientAnmeldung, ClientAn
 	}
 
 	@Override
-	public void setParameter(@Nonnull TypedQuery<ClientAnmeldung> query) {
+	public void setParameter(@Nonnull TypedQuery<ClientAnmeldungDTO> query) {
 		// nop
 	}
 }
