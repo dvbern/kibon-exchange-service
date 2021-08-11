@@ -152,6 +152,7 @@ INSERT INTO client (clientname, grantedsince, institutionid, active)
 VALUES ('kitAdmin', now(), '1', TRUE),
 	   ('kitAdmin', now() - INTERVAL '3 days', '2', TRUE),
 	   ('kitAdmin', now() - INTERVAL '4 days', '3', FALSE),
+	   ('kitAdmin', now(), '4', TRUE),
 	   ('KiD', now() - INTERVAL '5 days', '2', FALSE),
 	   ('CSE', now() - INTERVAL '3 days', '1', TRUE);
 
