@@ -172,7 +172,10 @@ VALUES ('1', 'DV Kids', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3006
 		'AKTIV', NULL, NULL),
 	   ('4', 'DV Tweens', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
 		'TAGESSCHULE', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL,
-		now(), 'AKTIV', NULL, NULL);
+		now(), 'AKTIV', NULL, NULL),
+		('5', 'TS Test', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
+ 		'TAGESSCHULE', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL,
+ 		now(), 'AKTIV', NULL, NULL);
 
 INSERT INTO verfuegung (betreuungsart, bis, gesuchsteller, ignoriertezeitabschnitte, institutionid, gemeindebfsnr,
 						gemeindename, kind, refnr, verfuegtam, version, von, zeitabschnitte)
@@ -266,5 +269,7 @@ VALUES ('1001', '2020-08-01'::DATE, '2021-07-31'::DATE);
 INSERT INTO anmeldung (id, kind, gesuchsteller, freigegebenam, status, anmeldungzurueckgezogen, refnr, eintrittsdatum,
 					   planklasse, abholung, abweichungzweitessemester, bemerkung, anmeldungmodule, gesuchsperiode_id, institutionid,
 					   eventtimestamp, version)
-VALUES ('1002', '{}'::JSONB, '{}'::JSONB, '2021-07-26'::DATE, 'SCHULAMT_ANMELDUNG_ERFASST', FALSE, '20.000101.001.1.1',
+VALUES ('1002', '{"vorname": "Simon", "nachname": "Wälti", "geschlecht": "MAENNLICH", "geburtsdatum": "2014-04-13"}'::JSONB,
+        '{"email": "test@mailbucket.dvbern.ch", "adresse": {"ort": "Bern", "plz": "3000", "land": "CH", "strasse": "Testweg", "hausnummer": "10", "adresszusatz": null}, "vorname": "Dagmar", "nachname": "Wälti", "geschlecht": "WEIBLICH", "geburtsdatum": "1980-03-25"}'::JSONB,
+        '2021-07-26'::DATE, 'SCHULAMT_ANMELDUNG_ERFASST', FALSE, '20.000101.001.1.1',
 		'2020-08-01'::DATE, '3a', 'ABHOLUNG', FALSE, 'test Bemerkung','[]'::JSONB, '1001', '4', now(), 0);
