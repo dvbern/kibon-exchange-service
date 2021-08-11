@@ -69,6 +69,14 @@
       "clientRole" : false,
       "containerId" : "kibon",
       "attributes" : { }
+    }, {
+      "id" : "a1448848-dbac-4c3c-90cb-f7053adaaa9b",
+      "name" : "tagesschule",
+      "description" : "${role_tagesschule}",
+      "composite" : false,
+      "clientRole" : false,
+      "containerId" : "kibon",
+      "attributes" : { }
     } ],
     "client" : {
       "realm-management" : [ {
@@ -351,7 +359,7 @@
     "credentials" : [ ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "user", "uma_authorization", "offline_access" ],
+    "realmRoles" : [ "user", "tagesschule", "uma_authorization", "offline_access" ],
     "clientRoles" : {
       "account" : [ "manage-account", "view-profile" ]
     },
