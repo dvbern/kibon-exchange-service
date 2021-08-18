@@ -19,7 +19,6 @@ package ch.dvbern.kibon.api.institution;
 
 import javax.ws.rs.core.Response.Status;
 
-import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.testutils.TestcontainersEnvironment;
 import io.quarkus.test.common.QuarkusTestResource;
@@ -146,8 +145,8 @@ class InstitutionResourceTest {
 			.body(isJsonStringMatching(jsonObject()
 				.where("institutionen", is(jsonArray(
 					everyItem(jsonObject()
-						// in import-test.dev, institution with ID 2 has status DELETED and should not be in the output
-						.where("id", not(jsonText("2")))
+						// in import-test.dev, institution with ID 3 has status DELETED and should not be in the output
+						.where("id", not(jsonText("3")))
 					)
 				)))
 			));

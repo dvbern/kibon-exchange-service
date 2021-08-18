@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -38,7 +37,7 @@ import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
 import ch.dvbern.kibon.clients.model.Client;
-import ch.dvbern.kibon.clients.model.ClientId;
+import ch.dvbern.kibon.exchange.api.common.institution.ClientInstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
@@ -148,20 +147,46 @@ public class InstitutionService {
 			.setParameter(idsParam, institutionIds);
 	}
 
-	@Nullable
-	public Client getClient(@Nonnull String institutionId, @Nonnull String clientName) {
-		if (institutionId.isBlank()) {
-			return null;
-		}
-
-		return em.find(Client.class, new ClientId(clientName, institutionId));
-	}
-
 	@Nonnull
 	public InstitutionDTO get(@Nonnull String institutionId) {
 
 		TypedQuery<InstitutionDTO> q = getInstitutionDTOTypedQuery(Collections.singleton(institutionId));
 
 		return q.getSingleResult();
+	}
+
+	@Nonnull
+	public ClientInstitutionDTO get(@Nonnull Client client) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<ClientInstitutionDTO> query = cb.createQuery(ClientInstitutionDTO.class);
+		Root<Institution> root = query.from(Institution.class);
+		Path<KontaktAngaben> adresse = root.get(Institution_.kontaktAdresse);
+
+		query.select(cb.construct(
+			ClientInstitutionDTO.class,
+			root.get(Institution_.id),
+			root.get(Institution_.name),
+			root.get(Institution_.traegerschaft),
+			adresse.get(KontaktAngaben_.strasse),
+			adresse.get(KontaktAngaben_.hausnummer),
+			adresse.get(KontaktAngaben_.adresszusatz),
+			adresse.get(KontaktAngaben_.plz),
+			adresse.get(KontaktAngaben_.ort),
+			adresse.get(KontaktAngaben_.land)
+		));
+
+		ParameterExpression<String> idParam = cb.parameter(String.class, "id");
+		Predicate idPredicate = cb.equal(root.get(Institution_.id), idParam);
+
+		query.where(idPredicate);
+
+		ClientInstitutionDTO result = em.createQuery(query)
+			.setParameter(idParam, client.getId().getInstitutionId())
+			.getSingleResult();
+
+		result.getClientBerechtigung().setVon(client.getGueltigAb());
+		result.getClientBerechtigung().setBis(client.getGueltigBis());
+
+		return result;
 	}
 }

@@ -37,7 +37,9 @@ import javax.ws.rs.core.Response.Status;
 import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalDTO;
 import ch.dvbern.kibon.api.institution.familyportal.FamilyPortalInstitutionDTO;
 import ch.dvbern.kibon.clients.model.Client;
-import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
+import ch.dvbern.kibon.clients.model.ClientId;
+import ch.dvbern.kibon.clients.service.ClientService;
+import ch.dvbern.kibon.exchange.api.common.institution.ClientInstitutionDTO;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.service.InstitutionService;
 import ch.dvbern.kibon.util.OpenApiTag;
@@ -66,6 +68,10 @@ public class InstitutionResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	InstitutionService institutionService;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	ClientService clientService;
 
 	@SuppressWarnings({ "checkstyle:VisibilityModifier", "CdiInjectionPointsInspection" })
 	@Inject
@@ -120,7 +126,8 @@ public class InstitutionResource {
 		summary = "Institutions Daten",
 		description = "Returniert Namen und Adresse einer Institution.")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
-	@APIResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = InstitutionDTO.class)))
+	@APIResponse(responseCode = "200",
+		content = @Content(schema = @Schema(implementation = ClientInstitutionDTO.class)))
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
 	@APIResponse(responseCode = "404", ref = "#/components/responses/NotFound")
@@ -147,20 +154,22 @@ public class InstitutionResource {
 			groups,
 			id);
 
-		Client client = institutionService.getClient(id, clientName);
-
-		if (client == null) {
+		Response response = clientService.find(new ClientId(clientName, id))
+			.map(this::toClientResponse)
 			// Institution not found for given client
-			return Response.status(Status.NOT_FOUND).build();
-		}
+			.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 
+		return response;
+	}
+
+	@Nonnull
+	private Response toClientResponse(@Nonnull Client client) {
 		if (!client.getActive()) {
 			// Client not active (forbidden) for given institution
 			return Response.status(Status.FORBIDDEN).build();
 		}
 
-		// Get InstitutionDTO
-		InstitutionDTO institutionDTO = institutionService.get(id);
+		ClientInstitutionDTO institutionDTO = institutionService.get(client);
 
 		return Response.ok(institutionDTO).build();
 	}
