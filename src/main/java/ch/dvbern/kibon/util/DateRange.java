@@ -40,6 +40,9 @@ public class DateRange implements Comparable<DateRange> {
 	@Nonnull
 	private LocalDate gueltigBis = LocalDate.MAX;
 
+	private static final LocalDate AB =  LocalDate.of(2010, 8, 1);
+	private static final LocalDate BIS =  LocalDate.of(3000, 7, 31);
+
 	public DateRange() {
 	}
 
@@ -57,10 +60,10 @@ public class DateRange implements Comparable<DateRange> {
 	@Nonnull
 	public static DateRange of(@Nullable LocalDate gueltigAb, @Nullable LocalDate gueltigBis) {
 		LocalDate ab = Optional.ofNullable(gueltigAb)
-			.orElseGet(() -> LocalDate.of(2010, 8, 1));
+			.orElseGet(() -> AB);
 
 		LocalDate bis = Optional.ofNullable(gueltigBis)
-			.orElseGet(() -> LocalDate.of(3000, 7, 31));
+			.orElseGet(() -> BIS);
 
 		return new DateRange(ab, bis);
 	}
