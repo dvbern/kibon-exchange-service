@@ -10,7 +10,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import ch.dvbern.kibon.clients.model.Client;
-import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungDetailsDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleBestaetigungEventDTO;
 import io.smallrye.reactive.messaging.kafka.KafkaRecord;
 import io.smallrye.reactive.messaging.kafka.OutgoingKafkaRecordMetadata;
 import org.apache.kafka.common.header.internals.RecordHeaders;
@@ -32,7 +32,7 @@ public class AnmeldungKafkaEventProducer {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	@Channel("AnmeldungBestaetigungEvents")
-	Emitter<TagesschuleAnmeldungDetailsDTO> anmeldungBestaetigungEvents;
+	Emitter<TagesschuleBestaetigungEventDTO> anmeldungBestaetigungEvents;
 
 	/**
 	 * Sends a betreuungEventDTO to Kafka.
@@ -42,8 +42,8 @@ public class AnmeldungKafkaEventProducer {
 	 * by Kafka, or which will completeExceptionally upon NACK, channel cancellation/termination or queue overlflow.
 	 */
 	@Nonnull
-	public CompletionStage<Void> process(@Nonnull TagesschuleAnmeldungDetailsDTO tagesschuleAnmeldungDetailsDTO, @Nonnull Client client) {
-		String key = tagesschuleAnmeldungDetailsDTO.getRefnr();
+	public CompletionStage<Void> process(@Nonnull TagesschuleBestaetigungEventDTO tagesschuleBestaetigungEventDTO, @Nonnull Client client) {
+		String key = tagesschuleBestaetigungEventDTO.getRefnr();
 		String eventType = "TagesschuleAnmeldungBestaetigung";
 
 		OutgoingKafkaRecordMetadata<String> metadata = OutgoingKafkaRecordMetadata.<String>builder()
@@ -61,7 +61,7 @@ public class AnmeldungKafkaEventProducer {
 		// in the payload-parameter method of EmitterImpl, to block the REST request until an ACK is received.
 		CompletableFuture<Void> future = new CompletableFuture<>();
 
-		Message<TagesschuleAnmeldungDetailsDTO> message = KafkaRecord.of(key, tagesschuleAnmeldungDetailsDTO)
+		Message<TagesschuleBestaetigungEventDTO> message = KafkaRecord.of(key, tagesschuleBestaetigungEventDTO)
 			.addMetadata(metadata)
 			.withAck(() -> {
 				LOG.info("ACK");
@@ -77,7 +77,7 @@ public class AnmeldungKafkaEventProducer {
 		try {
 			anmeldungBestaetigungEvents.send(message);
 		} catch (Exception e) {
-			String eventName = tagesschuleAnmeldungDetailsDTO.getClass().getSimpleName();
+			String eventName = tagesschuleBestaetigungEventDTO.getClass().getSimpleName();
 			LOG.error("Emitter failed sending {}, with refNr. {} to Kafka", eventName, key, e);
 			future.completeExceptionally(e);
 		}

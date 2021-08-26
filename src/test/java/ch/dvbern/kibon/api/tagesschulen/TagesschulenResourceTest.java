@@ -62,12 +62,12 @@ public class TagesschulenResourceTest {
 
 	@Test
 	void testPostConfirmAnmeldungNotFound() {
-		TagesschuleBestaetigungDTO invalid = create(createValidModul());
+		TagesschuleBestaetigungDTO valid = create(createValidModul());
 
 		given()
 			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
-			.body(invalid)
+			.body(valid)
 			.when()
 			.post("/tagesschulen/anmeldungen/refnr/20.000102.001.1.1")
 			.then()
