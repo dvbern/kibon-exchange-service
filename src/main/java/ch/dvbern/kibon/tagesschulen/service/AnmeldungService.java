@@ -48,7 +48,7 @@ public class AnmeldungService {
 		}
 	}
 
-	private Anmeldung getLatestAnmeldung(String refnr) {
+	public Anmeldung getLatestAnmeldung(String refnr) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Anmeldung> query = cb.createQuery(Anmeldung.class);
 		Root<Anmeldung> root = query.from(Anmeldung.class);
