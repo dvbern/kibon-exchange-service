@@ -57,7 +57,8 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 		"mp.messaging.incoming.VerfuegungEvents.schema.registry.url",
 		"mp.messaging.incoming.InstitutionEvents.schema.registry.url",
 		"mp.messaging.incoming.BetreuungAnfrageEvents.schema.registry.url",
-		"mp.messaging.outgoing.PlatzbestaetigungBetreuungEvents.schema.registry.url"
+		"mp.messaging.outgoing.PlatzbestaetigungBetreuungEvents.schema.registry.url",
+		"mp.messaging.outgoing.AnmeldungBestaetigungEvents.schema.registry.url"
 	);
 
 	private static AuthzClient authzClient = null;
