@@ -23,10 +23,10 @@ import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import ch.dvbern.kibon.betreuung.model.BetreuungAnfrage;
+import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.KindDTO;
-import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
-import ch.dvbern.kibon.betreuung.model.BetreuungAnfrage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 

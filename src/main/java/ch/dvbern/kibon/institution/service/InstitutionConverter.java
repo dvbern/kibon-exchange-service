@@ -30,8 +30,8 @@ import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulDTO;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
-import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
+import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
@@ -89,7 +89,7 @@ public class InstitutionConverter {
 			institution.setTimestampMutiert(TimestampConverter.toLocalDateTime(dto.getTimestampMutiert()));
 		}
 
-		if(institution.getBetreuungsArt().equals(BetreuungsangebotTyp.TAGESSCHULE) && dto.getModule() != null) {
+		if (institution.getBetreuungsArt() == BetreuungsangebotTyp.TAGESSCHULE && dto.getModule() != null) {
 			update(institution, dto.getModule());
 		}
 	}
@@ -111,30 +111,30 @@ public class InstitutionConverter {
 	private void update(@Nonnull Institution institution, @Nonnull List<ModulDTO> modulDTOS) {
 		modulDTOS.forEach(
 			modulDTO -> {
-				    Modul modul = em.find(Modul.class, modulDTO.getId());
-				    if(modul == null) {
-						modul = new Modul();
-						modul.setId(modulDTO.getId());
-					}
-					modul.setInstitution(institution);
-					modul.setBezeichnungDE(modulDTO.getBezeichnungDE());
-					modul.setBezeichnungFR(modulDTO.getBezeichnungFR());
-					Gesuchsperiode gesuchsperiode = em.find(Gesuchsperiode.class, modulDTO.getGesuchsperiode().getId());
-					if(gesuchsperiode == null) {
-						gesuchsperiode = new Gesuchsperiode();
-						gesuchsperiode.setId(modulDTO.getGesuchsperiode().getId());
-						gesuchsperiode.setGueltigAb(modulDTO.getGesuchsperiode().getGueltigAb());
-						gesuchsperiode.setGueltigBis(modulDTO.getGesuchsperiode().getGueltigBis());
-						em.persist(gesuchsperiode);
-					}
-					modul.setGesuchsperiode(gesuchsperiode);
-					modul.setIntervall(modulDTO.getIntervall());
-					modul.setWochentage(mapper.valueToTree(modulDTO.getWochentage()));
-					modul.setPadaegogischBetreut(modulDTO.getPadaegogischBetreut());
-					modul.setVerpflegungsKosten(modulDTO.getVerpflegungsKosten());
-					modul.setZeitVon(TimeConverter.deserialize(modulDTO.getZeitVon()));
-					modul.setZeitBis(TimeConverter.deserialize(modulDTO.getZeitBis()));
-					institution.getModulSet().add(modul);
+				Modul modul = em.find(Modul.class, modulDTO.getId());
+				if (modul == null) {
+					modul = new Modul();
+					modul.setId(modulDTO.getId());
+				}
+				modul.setInstitution(institution);
+				modul.setBezeichnungDE(modulDTO.getBezeichnungDE());
+				modul.setBezeichnungFR(modulDTO.getBezeichnungFR());
+				Gesuchsperiode gesuchsperiode = em.find(Gesuchsperiode.class, modulDTO.getGesuchsperiode().getId());
+				if (gesuchsperiode == null) {
+					gesuchsperiode = new Gesuchsperiode();
+					gesuchsperiode.setId(modulDTO.getGesuchsperiode().getId());
+					gesuchsperiode.setGueltigAb(modulDTO.getGesuchsperiode().getGueltigAb());
+					gesuchsperiode.setGueltigBis(modulDTO.getGesuchsperiode().getGueltigBis());
+					em.persist(gesuchsperiode);
+				}
+				modul.setGesuchsperiode(gesuchsperiode);
+				modul.setIntervall(modulDTO.getIntervall());
+				modul.setWochentage(mapper.valueToTree(modulDTO.getWochentage()));
+				modul.setPadaegogischBetreut(modulDTO.getPadaegogischBetreut());
+				modul.setVerpflegungsKosten(modulDTO.getVerpflegungsKosten());
+				modul.setZeitVon(TimeConverter.deserialize(modulDTO.getZeitVon()));
+				modul.setZeitBis(TimeConverter.deserialize(modulDTO.getZeitBis()));
+				institution.getModulSet().add(modul);
 			}
 		);
 	}

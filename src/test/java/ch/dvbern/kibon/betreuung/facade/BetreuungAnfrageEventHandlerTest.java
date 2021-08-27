@@ -21,8 +21,8 @@ import java.time.LocalDateTime;
 
 import javax.annotation.Nonnull;
 
-import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
 import ch.dvbern.kibon.betreuung.service.BetreuungAnfrageService;
+import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
 import ch.dvbern.kibon.testutils.EventHandlerTest;
 import org.easymock.Mock;
 import org.easymock.MockType;

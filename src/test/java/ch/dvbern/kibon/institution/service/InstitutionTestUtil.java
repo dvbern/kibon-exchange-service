@@ -38,8 +38,8 @@ import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulDTO;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.exchange.commons.types.Gesuchsperiode;
 import ch.dvbern.kibon.exchange.commons.types.ModulIntervall;
-import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
+import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
@@ -51,7 +51,6 @@ import static ch.dvbern.kibon.exchange.commons.types.Wochentag.MONDAY;
 import static ch.dvbern.kibon.exchange.commons.types.Wochentag.THURSDAY;
 import static ch.dvbern.kibon.exchange.commons.types.Wochentag.TUESDAY;
 import static ch.dvbern.kibon.exchange.commons.types.Wochentag.WEDNESDAY;
-import static org.hamcrest.core.Is.is;
 
 public final class InstitutionTestUtil {
 

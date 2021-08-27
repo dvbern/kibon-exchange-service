@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 DV Bern AG, Switzerland
+ * Copyright (C) 2020 DV Bern AG, Switzerland
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,100 +17,194 @@
 
 package ch.dvbern.kibon.api.verfuegung;
 
-import javax.ws.rs.core.Response.Status;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-import ch.dvbern.kibon.testutils.TestcontainersEnvironment;
-import io.quarkus.test.common.QuarkusTestResource;
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import ch.dvbern.kibon.clients.model.Client;
+import ch.dvbern.kibon.clients.model.ClientId;
+import ch.dvbern.kibon.clients.service.ClientService;
+import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungDTO;
+import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungenDTO;
+import ch.dvbern.kibon.exchange.api.common.verfuegung.ZeitabschnittDTO;
+import org.easymock.EasyMockExtension;
+import org.easymock.EasyMockSupport;
+import org.easymock.Mock;
+import org.easymock.MockType;
+import org.easymock.TestSubject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import static com.spotify.hamcrest.jackson.JsonMatchers.isJsonStringMatching;
-import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
-import static com.spotify.hamcrest.jackson.JsonMatchers.jsonInt;
-import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
+import static org.easymock.EasyMock.expect;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-@QuarkusTestResource(TestcontainersEnvironment.class)
-@QuarkusTest
-class VerfuegungenResourceTest {
+@ExtendWith(EasyMockExtension.class)
+class VerfuegungenResourceTest extends EasyMockSupport {
+
+	private final String institutionId = "1";
+	private final String clientName = "fake-client";
+
+	@TestSubject
+	private final VerfuegungenResource resource = new VerfuegungenResource();
+
+	@SuppressWarnings("InstanceVariableMayNotBeInitialized")
+	@Mock(type = MockType.STRICT)
+	private ClientService clientService;
 
 	@Test
-	public void testGetAllEndpoint() {
-		given()
-			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
-			.contentType(ContentType.JSON)
-			.when()
-			.get("/verfuegungen")
-			.then()
-			.assertThat()
-			.statusCode(Status.OK.getStatusCode())
-			.body(isJsonStringMatching(jsonObject()
-				.where("verfuegungen", is(jsonArray(is(not(empty())))))
-				.where("institutionen", is(jsonArray(is(not(empty())))))
-			));
+	void noFilteringWhenNoGueltigkeitRestriction() {
+		VerfuegungenDTO dto = createDTO();
+		VerfuegungDTO verfuegung = dto.getVerfuegungen().get(0);
+
+		ZeitabschnittDTO z1 = createZeitabschnitt(YearMonth.of(2021, 1));
+		ZeitabschnittDTO z2 = createZeitabschnitt(YearMonth.of(2021, 2));
+		List<ZeitabschnittDTO> zeitabschnitte = Arrays.asList(z1, z2);
+		verfuegung.setZeitabschnitte(zeitabschnitte);
+
+		Client client = createClient(null, null);
+
+		expect(clientService.get(client.getId()))
+			.andReturn(client);
+
+		replayAll();
+
+		resource.removeZeitabschnitteOutsideGueltigkeit(clientName, dto, Collections.singleton(institutionId));
+
+		assertThat(verfuegung.getZeitabschnitte(), is(zeitabschnitte));
+
+		verifyAll();
 	}
 
 	@Test
-	public void testGetAllEndpointWithAfterIdParam() {
-		given()
-			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
-			.contentType(ContentType.JSON)
-			.when()
-			.get("/verfuegungen?after_id=100")
-			.then()
-			.assertThat()
-			.statusCode(Status.OK.getStatusCode())
-			.body(isJsonStringMatching(jsonObject()
-				.where("verfuegungen", is(jsonArray(everyItem(jsonObject()
-					.where("id", is(jsonInt(greaterThan(100))))))
-				))
-				.where("institutionen", is(jsonArray(is(not(empty())))))
-			));
+	void removesZeitabschnittBeforeClientGueltigAb() {
+		VerfuegungenDTO dto = createDTO();
+		VerfuegungDTO verfuegung = dto.getVerfuegungen().get(0);
+
+		ZeitabschnittDTO z1 = createZeitabschnitt(YearMonth.of(2021, 1));
+		ZeitabschnittDTO z2 = createZeitabschnitt(YearMonth.of(2021, 2));
+		List<ZeitabschnittDTO> zeitabschnitte = Arrays.asList(z1, z2);
+		verfuegung.getZeitabschnitte().addAll(zeitabschnitte);
+
+		Client client = createClient(LocalDate.of(2021, 2, 1), null);
+
+		expect(clientService.get(client.getId()))
+			.andReturn(client);
+
+		replayAll();
+
+		resource.removeZeitabschnitteOutsideGueltigkeit(clientName, dto, Collections.singleton(institutionId));
+
+		assertThat(verfuegung.getZeitabschnitte(), contains(z2));
+
+		verifyAll();
 	}
 
 	@Test
-	public void testGetAllEndpointWithLimit() {
-		given()
-			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
-			.contentType(ContentType.JSON)
-			.when()
-			.get("/verfuegungen?limit=1")
-			.then()
-			.assertThat()
-			.statusCode(Status.OK.getStatusCode())
-			.body(isJsonStringMatching(jsonObject()
-				.where("verfuegungen", is(jsonArray(hasSize(1))))
-				.where("institutionen", is(jsonArray(hasSize(1))))
-			));
+	void removesZeitabschnittAfterClientGueltigBis() {
+		VerfuegungenDTO dto = createDTO();
+		VerfuegungDTO verfuegung = dto.getVerfuegungen().get(0);
+
+		ZeitabschnittDTO z1 = createZeitabschnitt(YearMonth.of(2021, 1));
+		ZeitabschnittDTO z2 = createZeitabschnitt(YearMonth.of(2021, 2));
+		List<ZeitabschnittDTO> zeitabschnitte = Arrays.asList(z1, z2);
+		verfuegung.getZeitabschnitte().addAll(zeitabschnitte);
+
+		Client client = createClient(null, LocalDate.of(2021, 1, 31));
+
+		expect(clientService.get(client.getId()))
+			.andReturn(client);
+
+		replayAll();
+
+		resource.removeZeitabschnitteOutsideGueltigkeit(clientName, dto, Collections.singleton(institutionId));
+
+		assertThat(verfuegung.getZeitabschnitte(), contains(z1));
+
+		verifyAll();
 	}
 
 	@Test
-	public void testGetAllEndpointLimitMustBeNonnegative() {
-		given()
-			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
-			.contentType(ContentType.JSON)
-			.when()
-			.get("/verfuegungen?limit=-1")
-			.then()
-			.assertThat()
-			.statusCode(Status.BAD_REQUEST.getStatusCode());
+	void removesIgnorierteZeitabschnitt() {
+		VerfuegungenDTO dto = createDTO();
+		VerfuegungDTO verfuegung = dto.getVerfuegungen().get(0);
+		YearMonth gueltigkeitsRange = YearMonth.of(2021, 2);
+
+		ZeitabschnittDTO z1 = createZeitabschnitt(YearMonth.of(2021, 1));
+		ZeitabschnittDTO z2 = createZeitabschnitt(gueltigkeitsRange);
+		ZeitabschnittDTO z3 = createZeitabschnitt(YearMonth.of(2021, 3));
+		List<ZeitabschnittDTO> zeitabschnitte = Arrays.asList(z1, z2, z3);
+		verfuegung.getIgnorierteZeitabschnitte().addAll(zeitabschnitte);
+
+		Client client = createClient(gueltigkeitsRange.atDay(1), gueltigkeitsRange.atEndOfMonth());
+
+		expect(clientService.get(client.getId()))
+			.andReturn(client);
+
+		replayAll();
+
+		resource.removeZeitabschnitteOutsideGueltigkeit(clientName, dto, Collections.singleton(institutionId));
+
+		assertThat(verfuegung.getIgnorierteZeitabschnitte(), contains(z2));
+
+		verifyAll();
 	}
 
 	@Test
-	public void testGetAllEndpointRequiresAuthorisation() {
-		given()
-			.contentType(ContentType.JSON)
-			.when()
-			.get("/verfuegungen")
-			.then()
-			.assertThat()
-			.statusCode(Status.UNAUTHORIZED.getStatusCode());
+	void removesVerfuegungWithoutZeitabschnitte() {
+		VerfuegungenDTO dto = createDTO();
+		VerfuegungDTO verfuegung = dto.getVerfuegungen().get(0);
+
+		ZeitabschnittDTO z1 = createZeitabschnitt(YearMonth.of(2021, 1));
+		verfuegung.getZeitabschnitte().add(z1);
+
+		Client client = createClient(LocalDate.of(2021, 2, 1), null);
+
+		expect(clientService.get(client.getId()))
+			.andReturn(client);
+
+		replayAll();
+
+		resource.removeZeitabschnitteOutsideGueltigkeit(clientName, dto, Collections.singleton(institutionId));
+
+		assertThat(dto.getVerfuegungen(), not(hasItem(verfuegung)));
+
+		verifyAll();
+	}
+
+	@Nonnull
+	private VerfuegungenDTO createDTO() {
+		VerfuegungenDTO verfuegungenDTO = new VerfuegungenDTO();
+		VerfuegungDTO dto = new VerfuegungDTO();
+		dto.setInstitutionId(institutionId);
+
+		verfuegungenDTO.getVerfuegungen().add(dto);
+
+		return verfuegungenDTO;
+	}
+
+	@Nonnull
+	private ZeitabschnittDTO createZeitabschnitt(@Nonnull YearMonth yearMonth) {
+		ZeitabschnittDTO zeitabschnitt = new ZeitabschnittDTO();
+		zeitabschnitt.setVon(yearMonth.atDay(1));
+		zeitabschnitt.setBis(yearMonth.atEndOfMonth());
+
+		return zeitabschnitt;
+	}
+
+	@Nonnull
+	private Client createClient(@Nullable LocalDate gueltigAb, @Nullable LocalDate gueltigBis) {
+		ClientId id = new ClientId(clientName, institutionId);
+
+		return new Client(id, LocalDateTime.now(), gueltigAb, gueltigBis);
 	}
 }

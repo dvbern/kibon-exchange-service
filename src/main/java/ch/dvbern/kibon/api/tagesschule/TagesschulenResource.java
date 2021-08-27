@@ -165,9 +165,11 @@ public class TagesschulenResource {
 
 		TagesschuleAnmeldungenDTO anmeldungenDTO = new TagesschuleAnmeldungenDTO();
 		anmeldungenDTO.setAnmeldungen(tagesschuleAnmeldungDTOS);
+
 		return anmeldungenDTO;
 	}
 
+	@Nonnull
 	private TagesschuleAnmeldungDTO convert(@Nonnull ClientAnmeldungDTO model) {
 		return objectMapper.convertValue(model, TagesschuleAnmeldungDTO.class);
 	}

@@ -73,6 +73,8 @@ public class VerfuegungService {
 		CriteriaQuery<ClientVerfuegungDTO> query = cb.createQuery(ClientVerfuegungDTO.class);
 		Root<ClientVerfuegung> root = query.from(ClientVerfuegung.class);
 		Join<ClientVerfuegung, Verfuegung> verfuegung = root.join(ClientVerfuegung_.verfuegung);
+		// is used by ClientGueltigkeitFilter (included in ClientVerfuegungFilter)
+		root.join(ClientVerfuegung_.client);
 
 		query.select(cb.construct(
 			ClientVerfuegungDTO.class,

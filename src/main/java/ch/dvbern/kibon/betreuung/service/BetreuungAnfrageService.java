@@ -32,13 +32,13 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
-import ch.dvbern.kibon.betreuung.service.filter.ClientBetreuungAnfrageFilter;
-import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
 import ch.dvbern.kibon.betreuung.model.BetreuungAnfrage;
 import ch.dvbern.kibon.betreuung.model.BetreuungAnfrage_;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage_;
+import ch.dvbern.kibon.betreuung.service.filter.ClientBetreuungAnfrageFilter;
+import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
 
 @ApplicationScoped
 public class BetreuungAnfrageService {
