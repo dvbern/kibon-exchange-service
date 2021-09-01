@@ -40,7 +40,7 @@ public class TagesschulenResourceTest {
 	@Test
 	void testGetAllEndpoint() {
 		given()
-			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
+			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
 			.contentType(ContentType.JSON)
 			.when()
 			.get("/tagesschulen/anmeldungen")

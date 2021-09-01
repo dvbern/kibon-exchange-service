@@ -18,6 +18,7 @@
 package ch.dvbern.kibon.tagesschulen.model;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -34,10 +35,14 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.clients.model.Client;
+import org.hibernate.annotations.Immutable;
 
 @Table(indexes = @Index(name = "clientanmeldung_idx1", columnList = "client_clientname, active, id"))
 @Entity
+@Immutable
 public class ClientAnmeldung {
+
+	private static final int HASH_CODE = 35;
 
 	@Nonnull
 	@Id
@@ -48,7 +53,7 @@ public class ClientAnmeldung {
 
 	@Nonnull
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumns(foreignKey = @ForeignKey(name = "client_anmeldung_fk"),
+	@JoinColumns(foreignKey = @ForeignKey(name = "client_fk"),
 		value = {
 			@JoinColumn(nullable = false, updatable = false),
 			@JoinColumn(nullable = false, updatable = false)
@@ -63,6 +68,27 @@ public class ClientAnmeldung {
 	@Nonnull
 	@Column(nullable = false, updatable = true)
 	private @NotNull Boolean active = true;
+
+	@Override
+	public boolean equals(@Nullable Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (!(o instanceof ClientAnmeldung)) {
+			return false;
+		}
+
+		ClientAnmeldung that = (ClientAnmeldung) o;
+
+		return getId() != -1L
+			&& getId().equals(that.getId());
+	}
+
+	@Override
+	public int hashCode() {
+		return HASH_CODE;
+	}
 
 	@Nonnull
 	public Long getId() {

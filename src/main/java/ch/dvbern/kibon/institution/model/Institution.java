@@ -21,9 +21,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,11 +43,10 @@ import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
-import ch.dvbern.kibon.tagesschulen.model.Modul;
+import ch.dvbern.kibon.tagesschulen.model.TagesschuleModule;
 import ch.dvbern.kibon.util.ConstantsUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.hibernate.annotations.SortNatural;
 import org.hibernate.annotations.Type;
 
 @Table(indexes = @Index(name = "institution_idx1", columnList = "betreuungsArt, status"))
@@ -135,12 +134,11 @@ public class Institution {
 	private BigDecimal anzahlPlaetzeFirmen = null;
 
 	@Nonnull
-	@NotNull
-	private LocalDateTime timestampMutiert = LocalDateTime.now();
+	private @NotNull LocalDateTime timestampMutiert = LocalDateTime.now();
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "institution")
-	@SortNatural
-	private @Valid Set<Modul> modulSet = new TreeSet<>();
+	@Nonnull
+	private @NotNull @Valid Set<TagesschuleModule> tagesschuleModule = new HashSet<>();
 
 	@Override
 	public boolean equals(@Nullable Object o) {
@@ -327,11 +325,12 @@ public class Institution {
 		this.timestampMutiert = timestampMutiert;
 	}
 
-	public Set<Modul> getModulSet() {
-		return modulSet;
+	@Nonnull
+	public Set<TagesschuleModule> getTagesschuleModule() {
+		return tagesschuleModule;
 	}
 
-	public void setModulSet(Set<Modul> modulSet) {
-		this.modulSet = modulSet;
+	public void setTagesschuleModule(@Nonnull Set<TagesschuleModule> tagesschuleModule) {
+		this.tagesschuleModule = tagesschuleModule;
 	}
 }

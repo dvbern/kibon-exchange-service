@@ -108,14 +108,19 @@ public class ClientService {
 		}
 
 		String gueltigkeiten = searchRanges.stream()
-			.map(d -> String.format("(v.von <= '%s' AND v.bis >= '%s')", d.getGueltigBis(), d.getGueltigAb()))
+			.map(d -> String.format(
+				"(v.periodevon <= '%s' AND v.periodebis >= '%s')",
+				d.getGueltigBis(),
+				d.getGueltigAb()))
 			.collect(Collectors.joining(" OR "));
 
 		em.createNativeQuery(
-			"INSERT INTO clientverfuegung (id, active, client_clientname, client_institutionid, verfuegung_id, since) "
-				+ "(SELECT nextval('clientverfuegung_id_seq'), :active, :client, :institutionId, missing.id, now() "
-				+ "FROM (SELECT DISTINCT v.id FROM verfuegung v WHERE v.institutionid = :institutionId "
-				+ "AND (" + gueltigkeiten + ") ) AS missing );")
+				"INSERT INTO clientverfuegung (id, active, client_clientname, client_institutionid, verfuegung_id, "
+					+ "since) (SELECT nextval('clientverfuegung_id_seq'), :active, :client, :institutionId, missing"
+					+ ".id, now() FROM (SELECT DISTINCT v.id FROM verfuegung v WHERE v.institutionid = :institutionId "
+					+ "AND ("
+					+ gueltigkeiten
+					+ ") ) AS missing );")
 			.setParameter("active", client.getActive())
 			.setParameter("client", client.getId().getClientName())
 			.setParameter("institutionId", client.getId().getInstitutionId())

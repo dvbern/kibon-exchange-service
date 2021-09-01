@@ -19,11 +19,9 @@ package ch.dvbern.kibon.tagesschulen.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.IntStream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -31,32 +29,40 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotEmpty;
+import javax.persistence.Index;
+import javax.persistence.Table;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.tagesschulen.AbholungTagesschule;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungStatus;
-import ch.dvbern.kibon.shared.model.Gesuchsperiode;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
+import ch.dvbern.kibon.util.ComparatorUtil;
+import ch.dvbern.kibon.util.JsonNodeComparator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.hibernate.annotations.Type;
 
+@Table(indexes = {
+	@Index(name = "anmeldung_idx1", columnList = "institutionId"),
+	@Index(name = "anmeldung_idx2", columnList = "refnr")
+})
 @Entity
-public class Anmeldung {
+public class Anmeldung extends AbstractInstitutionPeriodeEntity {
 
-	@Nonnull
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(updatable = false, nullable = false)
-	private @NotNull Long id = -1L;
+	// all properties, which when changed should result in a seperatly persisted Anmeldung
+	public static final Comparator<Anmeldung> COMPARATOR = ComparatorUtil.<Anmeldung>baseComparator()
+		.thenComparing(Anmeldung::getFreigegebenAm)
+		.thenComparing(Anmeldung::getAnmeldungZurueckgezogen)
+		.thenComparing(Anmeldung::getEintrittsdatum)
+		.thenComparing(Anmeldung::getPlanKlasse, Comparator.nullsLast(Comparator.naturalOrder()))
+		.thenComparing(Anmeldung::getAbholung, Comparator.nullsLast(Comparator.naturalOrder()))
+		.thenComparing(Anmeldung::getAbweichungZweitesSemester)
+		.thenComparing(Anmeldung::getBemerkung, Comparator.nullsLast(Comparator.naturalOrder()))
+		.thenComparing(Anmeldung::getVersion)
+		.thenComparing(Anmeldung::getKind, JsonNodeComparator.INSTANCE)
+		.thenComparing(Anmeldung::getGesuchsteller, JsonNodeComparator.INSTANCE)
+		.thenComparing(Anmeldung::getModule, JsonNodeComparator.INSTANCE);
 
 	@Nonnull
 	@Type(type = "jsonb-node")
@@ -83,10 +89,6 @@ public class Anmeldung {
 
 	@Nonnull
 	@Column(nullable = false)
-	private @NotNull String refnr;
-
-	@Nonnull
-	@Column(nullable = false)
 	private @NotNull LocalDate eintrittsdatum;
 
 	@Nullable
@@ -97,20 +99,10 @@ public class Anmeldung {
 	@Enumerated(EnumType.STRING)
 	private AbholungTagesschule abholung;
 
-	@NotNull
 	private boolean abweichungZweitesSemester;
 
 	@Nullable
 	private String bemerkung;
-
-	@NotNull
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(foreignKey = @ForeignKey(name = "anmeldung_gesuchsperiode_fk"), nullable = false, updatable = false)
-	private Gesuchsperiode gesuchsperiode;
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotEmpty String institutionId = "";
 
 	@Nonnull
 	@Column(updatable = false)
@@ -118,31 +110,53 @@ public class Anmeldung {
 
 	@Nonnull
 	@Column(nullable = false)
-	private @NotNull Integer version;
+	private @Min(0) Integer version = -1;
 
 	@Nonnull
 	@Type(type = "jsonb-node")
 	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
-	private @NotNull JsonNode anmeldungModule;
+	private @NotNull JsonNode module;
 
-	private static final Comparator<Anmeldung> ANMELDUNG_COMPARATOR = Comparator
-		.comparing(Anmeldung::getRefnr)
-		.thenComparing(Anmeldung::getFreigegebenAm)
-		.thenComparing(Anmeldung::getStatus)
-		.thenComparing(Anmeldung::getAnmeldungZurueckgezogen)
-		.thenComparing(Anmeldung::getEintrittsdatum)
-		.thenComparing(Anmeldung::getPlanKlasse, Comparator.nullsLast(Comparator.naturalOrder()))
-		.thenComparing(Anmeldung::getAbholung)
-		.thenComparing(Anmeldung::getAbweichungZweitesSemester)
-		.thenComparing(Anmeldung::getBemerkung, Comparator.nullsLast(Comparator.naturalOrder()))
-		.thenComparing(Anmeldung::getInstitutionId);
+	@SuppressWarnings("checkstyle:CyclomaticComplexity")
+	@Override
+	public boolean equals(@Nullable Object o) {
+		if (this == o) {
+			return true;
+		}
 
-	public Long getId() {
-		return id;
+		if (!(o instanceof Anmeldung)) {
+			return false;
+		}
+
+		Anmeldung anmeldung = (Anmeldung) o;
+
+		return super.equals(o)
+			&& getAnmeldungZurueckgezogen() == anmeldung.getAnmeldungZurueckgezogen()
+			&& getAbweichungZweitesSemester() == anmeldung.getAbweichungZweitesSemester()
+			&& getFreigegebenAm().equals(anmeldung.getFreigegebenAm())
+			&& getStatus() == anmeldung.getStatus()
+			&& getEintrittsdatum().equals(anmeldung.getEintrittsdatum())
+			&& Objects.equals(getPlanKlasse(), anmeldung.getPlanKlasse())
+			&& getAbholung() == anmeldung.getAbholung()
+			&& Objects.equals(getBemerkung(), anmeldung.getBemerkung())
+			&& getEventTimestamp().equals(anmeldung.getEventTimestamp())
+			&& getVersion().equals(anmeldung.getVersion());
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	@Override
+	public int hashCode() {
+		return Objects.hash(
+			Arrays.hashCode(baseHashCodeValues()),
+			getFreigegebenAm(),
+			getStatus(),
+			getAnmeldungZurueckgezogen(),
+			getEintrittsdatum(),
+			getPlanKlasse(),
+			getAbholung(),
+			getAbweichungZweitesSemester(),
+			getBemerkung(),
+			getEventTimestamp(),
+			getVersion());
 	}
 
 	@Nonnull
@@ -190,15 +204,6 @@ public class Anmeldung {
 	}
 
 	@Nonnull
-	public String getRefnr() {
-		return refnr;
-	}
-
-	public void setRefnr(@Nonnull String refnr) {
-		this.refnr = refnr;
-	}
-
-	@Nonnull
 	public LocalDate getEintrittsdatum() {
 		return eintrittsdatum;
 	}
@@ -242,23 +247,6 @@ public class Anmeldung {
 		this.bemerkung = bemerkung;
 	}
 
-	public Gesuchsperiode getGesuchsperiode() {
-		return gesuchsperiode;
-	}
-
-	public void setGesuchsperiode(Gesuchsperiode gesuchsperiode) {
-		this.gesuchsperiode = gesuchsperiode;
-	}
-
-	@Nonnull
-	public String getInstitutionId() {
-		return institutionId;
-	}
-
-	public void setInstitutionId(@Nonnull String institutionId) {
-		this.institutionId = institutionId;
-	}
-
 	@Nonnull
 	public LocalDateTime getEventTimestamp() {
 		return eventTimestamp;
@@ -266,67 +254,6 @@ public class Anmeldung {
 
 	public void setEventTimestamp(@Nonnull LocalDateTime eventTimestamp) {
 		this.eventTimestamp = eventTimestamp;
-	}
-
-	public int compareTo(Anmeldung newAnmeldung) {
-		int result = ANMELDUNG_COMPARATOR.compare(this, newAnmeldung);
-
-		//Compare JsonNode and Gesuchsperiode als Sicherheit if needed
-		if (result == 0) {
-			result = this.getGesuchsperiode().getId().compareTo(newAnmeldung.getGesuchsperiode().getId());
-			if (result == 0) {
-				if (!this.getKind().equals(newAnmeldung.getKind())) {
-					result = 1;
-				} else if (!this.getGesuchsteller().equals(newAnmeldung.getGesuchsteller())) {
-					result = 1;
-				}
-				else if (!this.getAnmeldungModule().equals(newAnmeldung.getAnmeldungModule())) {
-					result = 1;
-				}
-			}
-		}
-		return result;
-	}
-
-	@Nonnull
-	public static <T> Integer listComparator(
-		@Nonnull List<T> listA,
-		@Nonnull List<T> listB,
-		@Nonnull Comparator<T> comparator) {
-		int sizeDifference = listB.size() - listA.size();
-		if (sizeDifference != 0) {
-			return sizeDifference;
-		}
-		// Erstelle eine Kopie der Liste, damit die ursprüngliche Sortierung nicht verändert wird
-		List<T> aPos = new ArrayList<>(listA);
-		aPos.sort(comparator);
-		List<T> bPos = new ArrayList<>(listB);
-		bPos.sort(comparator);
-		return IntStream.range(0, aPos.size())
-			.allMatch(i -> comparator.compare(aPos.get(i), bPos.get(i)) == 0) ? 0 : 1;
-	}
-
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) {
-			return true;
-		}
-
-		if (o == null || !getClass().equals(o.getClass())) {
-			return false;
-		}
-
-		Anmeldung that = (Anmeldung) o;
-
-		return hashCode() == that.hashCode() &&
-			getAnmeldungZurueckgezogen() == that.getAnmeldungZurueckgezogen() &&
-			getEintrittsdatum().equals(that.getEintrittsdatum()) &&
-			getRefnr().equals(that.getRefnr());
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(getId(), getKind(), getGesuchsteller(), getFreigegebenAm(), getStatus(), getRefnr());
 	}
 
 	@Nonnull
@@ -339,11 +266,11 @@ public class Anmeldung {
 	}
 
 	@Nonnull
-	public JsonNode getAnmeldungModule() {
-		return anmeldungModule;
+	public JsonNode getModule() {
+		return module;
 	}
 
-	public void setAnmeldungModule(@Nonnull JsonNode anmeldungModule) {
-		this.anmeldungModule = anmeldungModule;
+	public void setModule(@Nonnull JsonNode anmeldungModule) {
+		this.module = anmeldungModule;
 	}
 }

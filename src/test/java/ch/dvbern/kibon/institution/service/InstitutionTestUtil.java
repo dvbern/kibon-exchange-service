@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,9 +34,9 @@ import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleModuleDTO;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
-import ch.dvbern.kibon.exchange.commons.types.Gesuchsperiode;
-import ch.dvbern.kibon.exchange.commons.types.ModulIntervall;
+import ch.dvbern.kibon.exchange.commons.types.Intervall;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
@@ -83,14 +82,14 @@ public final class InstitutionTestUtil {
 	}
 
 	@Nonnull
-	public static InstitutionEventDTO createInstitutionEvent(boolean isTagesschule) {
+	public static InstitutionEventDTO createInstitutionEvent() {
 		KontaktAngabenDTO adresse = fakeKontaktAngabenDTO();
 
 		return new InstitutionEventDTO(
 			"99",
 			FAKER.funnyName().name(),
 			FAKER.funnyName().name(),
-			isTagesschule ? BetreuungsangebotTyp.TAGESSCHULE : BetreuungsangebotTyp.TAGESFAMILIEN,
+			BetreuungsangebotTyp.TAGESFAMILIEN,
 			adresse,
 			Arrays.asList(fakeKontaktAngabenDTO(), fakeKontaktAngabenDTO()),
 			InstitutionStatus.AKTIV,
@@ -105,29 +104,44 @@ public final class InstitutionTestUtil {
 			BigDecimal.valueOf(13.23),
 			BigDecimal.valueOf(7.13),
 			TimestampConverter.fromLocalDateTime(LocalDateTime.now()),
-			isTagesschule ? createModule() : null
+			null
 		);
 	}
 
+	@Nonnull
+	public static InstitutionEventDTO createTagesschuleInstitutionEvent() {
+		InstitutionEventDTO institutionEvent = createInstitutionEvent();
+		institutionEvent.setBetreuungsArt(BetreuungsangebotTyp.TAGESSCHULE);
+		institutionEvent.setTagesschuleModule(createTagesschuleModule());
+
+		return institutionEvent;
+	}
+
+	@Nonnull
+	private static List<TagesschuleModuleDTO> createTagesschuleModule() {
+		TagesschuleModuleDTO tagesschuleModuleDTO = TagesschuleModuleDTO.newBuilder()
+			.setModule(createModule())
+			.setPeriodeVon(LocalDate.of(2020, 8, 1))
+			.setPeriodeBis(LocalDate.of(2021, 7, 31))
+			.build();
+
+		return List.of(tagesschuleModuleDTO);
+	}
+
+	@Nonnull
 	private static List<ModulDTO> createModule() {
-		List<ModulDTO> modulDTOS = new ArrayList<>();
 		ModulDTO modulDTO = new ModulDTO(
 			"100",
 			"bezeichnungDE",
 			"bezeichnungFR",
-			TimeConverter.serialize(LocalTime.of(7, 30)),
-			TimeConverter.serialize(LocalTime.of(8, 30)),
-			Arrays.asList(1, 2) ,
-			ModulIntervall.WOECHENTLICH,
+			LocalTime.of(7, 30),
+			LocalTime.of(8, 30),
+			List.of(MONDAY, TUESDAY),
+			List.of(Intervall.WOECHENTLICH),
 			true,
-			new BigDecimal(10.5),
-			new Gesuchsperiode("101",
-				LocalDate.of(2020,8,1),
-				LocalDate.of(2020,8,1))
+			BigDecimal.valueOf(10.5));
 
-		);
-		modulDTOS.add(modulDTO);
-		return modulDTOS;
+		return List.of(modulDTO);
 	}
 
 	@Nonnull

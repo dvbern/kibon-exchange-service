@@ -73,7 +73,6 @@ public class ClientAnmeldungDTO {
 	@Nonnull
 	private JsonNode module;
 
-	@Nonnull
 	private boolean anmeldungZurueckgezogen;
 
 	public ClientAnmeldungDTO(

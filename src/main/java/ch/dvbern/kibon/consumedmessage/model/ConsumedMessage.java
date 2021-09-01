@@ -26,11 +26,14 @@ import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 /**
  * Used to keep track of received events.
  */
+@Table(indexes = @Index(name = "consumedmessage_idx1", columnList = "eventId, timeOfReceiving"))
 @Entity
 public class ConsumedMessage {
 
