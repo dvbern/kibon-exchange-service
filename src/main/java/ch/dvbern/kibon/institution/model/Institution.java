@@ -47,6 +47,7 @@ import ch.dvbern.kibon.tagesschulen.model.TagesschuleModule;
 import ch.dvbern.kibon.util.ConstantsUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.quarkiverse.hibernate.types.json.JsonTypes;
 import org.hibernate.annotations.Type;
 
 @Table(indexes = @Index(name = "institution_idx1", columnList = "betreuungsArt, status"))
@@ -92,8 +93,8 @@ public class Institution {
 	 */
 	@SuppressWarnings("UnnecessaryFullyQualifiedName")
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb")
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN)
 	private JsonNode betreuungsAdressen = null;
 
 	/**
@@ -101,8 +102,8 @@ public class Institution {
 	 */
 	@SuppressWarnings("UnnecessaryFullyQualifiedName")
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb")
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN)
 	private JsonNode oeffnungsTage = null;
 
 	@Nullable
@@ -120,8 +121,8 @@ public class Institution {
 	 */
 	@SuppressWarnings("UnnecessaryFullyQualifiedName")
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb")
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN)
 	private JsonNode altersKategorien = null;
 
 	@Column(nullable = true)

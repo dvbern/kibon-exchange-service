@@ -36,6 +36,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.quarkiverse.hibernate.types.json.JsonTypes;
 import org.hibernate.annotations.Type;
 
 @Table(indexes = @Index(name = "modul_idx1", columnList = "parent_id"))
@@ -69,8 +70,8 @@ public class Modul {
 	 */
 	@SuppressWarnings("UnnecessaryFullyQualifiedName")
 	@Nonnull
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb")
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN)
 	private @NotNull JsonNode wochentage;
 
 	/**
@@ -78,8 +79,8 @@ public class Modul {
 	 */
 	@SuppressWarnings("UnnecessaryFullyQualifiedName")
 	@Nonnull
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb")
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN)
 	private @NotNull JsonNode erlaubteIntervalle;
 
 	private boolean wirdPaedagogischBetreut;

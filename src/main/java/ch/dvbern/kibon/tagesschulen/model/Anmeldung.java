@@ -41,6 +41,7 @@ import ch.dvbern.kibon.util.ComparatorUtil;
 import ch.dvbern.kibon.util.JsonNodeComparator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.quarkiverse.hibernate.types.json.JsonTypes;
 import org.hibernate.annotations.Type;
 
 @Table(indexes = {
@@ -65,13 +66,13 @@ public class Anmeldung extends AbstractInstitutionPeriodeEntity {
 		.thenComparing(Anmeldung::getModule, JsonNodeComparator.INSTANCE);
 
 	@Nonnull
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode kind;
 
 	@Nonnull
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode gesuchsteller;
 
 	@Nonnull
@@ -113,8 +114,8 @@ public class Anmeldung extends AbstractInstitutionPeriodeEntity {
 	private @Min(0) Integer version = -1;
 
 	@Nonnull
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode module;
 
 	@SuppressWarnings("checkstyle:CyclomaticComplexity")

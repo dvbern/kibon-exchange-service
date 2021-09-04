@@ -35,6 +35,7 @@ import javax.validation.constraints.NotNull;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.quarkiverse.hibernate.types.json.JsonTypes;
 import org.hibernate.annotations.Type;
 
 @Table(indexes = @Index(name = "verfuegung_idx1", columnList = "institutionId, verfuegtAm"))
@@ -63,23 +64,23 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 	private @NotNull String gemeindeName = "";
 
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode kind = null;
 
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode gesuchsteller = null;
 
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode zeitabschnitte = null;
 
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode ignorierteZeitabschnitte = null;
 
 	@SuppressWarnings("checkstyle:CyclomaticComplexity")

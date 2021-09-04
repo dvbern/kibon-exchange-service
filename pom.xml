@@ -136,9 +136,9 @@
             <version>${kibon.exchange.api.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.vladmihalcea</groupId>
-            <artifactId>hibernate-types-52</artifactId>
-            <version>2.12.1</version>
+            <groupId>io.quarkiverse.hibernatetypes</groupId>
+            <artifactId>quarkus-hibernate-types</artifactId>
+            <version>0.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
