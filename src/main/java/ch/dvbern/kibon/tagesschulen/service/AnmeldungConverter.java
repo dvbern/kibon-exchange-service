@@ -114,7 +114,7 @@ public class AnmeldungConverter {
 	private ObjectNode toAnmeldungModul(@Nonnull ModulAuswahlDTO modulAuswahlDTO) {
 		return mapper.createObjectNode()
 			.put("modulId", modulAuswahlDTO.getModulId())
-			.put("wochentag", modulAuswahlDTO.getWeekday().name())
+			.put("wochentag", modulAuswahlDTO.getWochentag().name())
 			.put("intervall", modulAuswahlDTO.getIntervall().name());
 	}
 }

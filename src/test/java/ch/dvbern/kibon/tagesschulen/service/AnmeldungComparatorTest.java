@@ -66,7 +66,7 @@ public class AnmeldungComparatorTest {
 	public void testCompareOtherModulInReceivedDTO() {
 		TagesschuleAnmeldungEventDTO dto = createTagesschuleAnmeldungTestDTO();
 		Anmeldung anmeldung = converter.create(dto, LocalDateTime.now());
-		dto.getAnmeldungsDetails().getModule().get(0).setWeekday(Wochentag.FRIDAY);
+		dto.getAnmeldungsDetails().getModule().get(0).setWochentag(Wochentag.FRIDAY);
 		Anmeldung sameAnmeldung = converter.create(dto, LocalDateTime.now());
 
 		assertThat(anmeldung, not(comparedBy(Anmeldung.COMPARATOR).comparesEqualTo(sameAnmeldung)));

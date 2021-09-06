@@ -96,7 +96,7 @@ public class AnmeldungConverterTest {
 	private Matcher<JsonNode> matchesAnmeldungModul(@Nonnull ModulAuswahlDTO modulAuswahlDTO) {
 		return is(jsonObject()
 			.where("intervall", is(jsonText(modulAuswahlDTO.getIntervall().name())))
-			.where("wochentag", is(jsonText(modulAuswahlDTO.getWeekday().name())))
+			.where("wochentag", is(jsonText(modulAuswahlDTO.getWochentag().name())))
 			.where("modulId", is(jsonText(modulAuswahlDTO.getModulId()))));
 	}
 

@@ -86,7 +86,7 @@ public final class AnmeldungTagesschuleTestUtil {
 		ModulAuswahlDTO modulAuswahlDTO = new ModulAuswahlDTO();
 		modulAuswahlDTO.setModulId(moduleId);
 		modulAuswahlDTO.setIntervall(Intervall.WOECHENTLICH);
-		modulAuswahlDTO.setWeekday(Wochentag.MONDAY);
+		modulAuswahlDTO.setWochentag(Wochentag.MONDAY);
 
 		return modulAuswahlDTO;
 	}
