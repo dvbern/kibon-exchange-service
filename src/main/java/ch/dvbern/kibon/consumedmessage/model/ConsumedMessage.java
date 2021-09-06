@@ -30,31 +30,33 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.persistence.BaseEntity;
+
 /**
  * Used to keep track of received events.
  */
 @Table(indexes = @Index(name = "consumedmessage_idx1", columnList = "eventId, timeOfReceiving"))
 @Entity
-public class ConsumedMessage {
+public class ConsumedMessage extends BaseEntity {
 
 	@Nonnull
-    @Id
-    @Column(nullable = false, unique = true)
-    private @NotNull UUID eventId;
+	@Id
+	@Column(nullable = false, unique = true)
+	private @NotNull UUID eventId;
 
-    @Nonnull
-    @Column(nullable = false)
-    private @NotNull Instant timeOfReceiving;
+	@Nonnull
+	@Column(nullable = false)
+	private @NotNull Instant timeOfReceiving;
 
 	public ConsumedMessage() {
-    	eventId = UUID.randomUUID();
-    	timeOfReceiving = Instant.now();
-    }
+		eventId = UUID.randomUUID();
+		timeOfReceiving = Instant.now();
+	}
 
-    public ConsumedMessage(@Nonnull UUID eventId, @Nonnull Instant timeOfReceiving) {
-        this.eventId = eventId;
-        this.timeOfReceiving = timeOfReceiving;
-    }
+	public ConsumedMessage(@Nonnull UUID eventId, @Nonnull Instant timeOfReceiving) {
+		this.eventId = eventId;
+		this.timeOfReceiving = timeOfReceiving;
+	}
 
 	@Override
 	public boolean equals(@Nullable Object o) {

@@ -43,6 +43,7 @@ import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.persistence.BaseEntity;
 import ch.dvbern.kibon.tagesschulen.model.TagesschuleModule;
 import ch.dvbern.kibon.util.ConstantsUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -52,7 +53,7 @@ import org.hibernate.annotations.Type;
 
 @Table(indexes = @Index(name = "institution_idx1", columnList = "betreuungsArt, status"))
 @Entity
-public class Institution {
+public class Institution extends BaseEntity {
 
 	@Id
 	@Nonnull

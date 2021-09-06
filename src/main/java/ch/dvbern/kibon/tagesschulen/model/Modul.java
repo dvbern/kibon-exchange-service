@@ -35,13 +35,14 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.persistence.BaseEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkiverse.hibernate.types.json.JsonTypes;
 import org.hibernate.annotations.Type;
 
 @Table(indexes = @Index(name = "modul_idx1", columnList = "parent_id"))
 @Entity
-public class Modul {
+public class Modul extends BaseEntity {
 
 	@Id
 	@Nonnull

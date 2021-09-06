@@ -32,10 +32,11 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.persistence.BaseEntity;
 
 @Table(indexes = @Index(name = "betreuungstornierunganfrage_idx1", columnList = "institutionId"))
 @Entity
-public class BetreuungStornierungAnfrage {
+public class BetreuungStornierungAnfrage extends BaseEntity {
 
 	@Nonnull
 	@Id
@@ -84,7 +85,9 @@ public class BetreuungStornierungAnfrage {
 	}
 
 	@Nonnull
-	public Long getId() { return this.id; }
+	public Long getId() {
+		return this.id;
+	}
 
 	public void setId(@Nonnull Long id) {
 		this.id = id;

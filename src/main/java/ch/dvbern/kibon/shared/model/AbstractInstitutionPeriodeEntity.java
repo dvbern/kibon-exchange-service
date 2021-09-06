@@ -30,8 +30,10 @@ import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.persistence.BaseEntity;
+
 @MappedSuperclass
-public abstract class AbstractInstitutionPeriodeEntity {
+public abstract class AbstractInstitutionPeriodeEntity extends BaseEntity {
 
 	@Nonnull
 	@Id

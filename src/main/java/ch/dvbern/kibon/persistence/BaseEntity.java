@@ -26,5 +26,5 @@ import org.hibernate.annotations.TypeDef;
 @SuppressWarnings("EmptyClass")
 @TypeDef(name = JsonTypes.JSON_OBJECT_BIN, typeClass = JsonNodeBinaryType.class)
 @MappedSuperclass
-public class TypeDefs {
+public abstract class BaseEntity {
 }

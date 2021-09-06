@@ -41,11 +41,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.institution.model.Institution;
+import ch.dvbern.kibon.persistence.BaseEntity;
 
 @Table(uniqueConstraints = @UniqueConstraint(name = "tagesschule_module_uc1",
 	columnNames = { "institution_id", "periodevon", "periodebis" }))
 @Entity
-public class TagesschuleModule {
+public class TagesschuleModule extends BaseEntity {
 
 	@Nonnull
 	@Id
