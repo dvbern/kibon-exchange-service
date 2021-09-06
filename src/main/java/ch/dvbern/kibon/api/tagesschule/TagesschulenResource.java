@@ -52,8 +52,8 @@ import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnme
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleBestaetigungDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TagesschuleTarifeDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleBestaetigungEventDTO;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import ch.dvbern.kibon.tagesschulen.facade.AnmeldungKafkaEventProducer;
-import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.service.AnmeldungService;
 import ch.dvbern.kibon.tagesschulen.service.filter.ClientAnmeldungFilter;
@@ -246,7 +246,7 @@ public class TagesschulenResource {
 			groups);
 
 		Optional<String> institutionId = anmeldungService.getLatestAnmeldung(refnr)
-			.map(a -> a.getInstitutionId());
+			.map(AbstractInstitutionPeriodeEntity::getInstitutionId);
 
 		if (institutionId.isEmpty()) {
 			return Uni.createFrom().item(Response.status(Status.NOT_FOUND).build());
@@ -258,23 +258,24 @@ public class TagesschulenResource {
 			return Uni.createFrom().item(Response.status(Status.FORBIDDEN).build());
 		}
 
-		TagesschuleBestaetigungEventDTO
-			tagesschuleBestaetigungEventDTO = objectMapper.convertValue(bestaetigungDTO, TagesschuleBestaetigungEventDTO.class);
+		TagesschuleBestaetigungEventDTO tagesschuleBestaetigungEventDTO =
+			objectMapper.convertValue(bestaetigungDTO, TagesschuleBestaetigungEventDTO.class);
 
-		if(!tagesschuleBestaetigungEventDTO.getRefnr().equals(refnr)) {
+		if (!tagesschuleBestaetigungEventDTO.getRefnr().equals(refnr)) {
 			return Uni.createFrom().item(Response.status(Status.BAD_REQUEST).build());
 		}
 
 		LOG.debug("generating message");
-		CompletionStage<Response> acked = anmeldungKafkaEventProducer.process(tagesschuleBestaetigungEventDTO, client.get())
-			.thenApply(Void -> {
-				LOG.debug("received ack");
-				return Response.ok().build();
-			})
-			.exceptionally(error -> {
-				LOG.error("failed", error);
-				return Response.serverError().build();
-			});
+		CompletionStage<Response> acked =
+			anmeldungKafkaEventProducer.process(tagesschuleBestaetigungEventDTO, client.get())
+				.thenApply(Void -> {
+					LOG.debug("received ack");
+					return Response.ok().build();
+				})
+				.exceptionally(error -> {
+					LOG.error("failed", error);
+					return Response.serverError().build();
+				});
 		LOG.debug("received completion stage");
 
 		return Uni.createFrom().completionStage(acked);

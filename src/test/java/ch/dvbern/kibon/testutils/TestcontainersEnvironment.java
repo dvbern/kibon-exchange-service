@@ -54,10 +54,13 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 	private static final int KEYCLOAK_PORT = 8080;
 
 	private static final List<String> SCHEMA_REGISTRY_URL_PROPERTIES = Arrays.asList(
+		"mp.messaging.incoming.InstitutionClientEvents.schema.registry.url",
 		"mp.messaging.incoming.VerfuegungEvents.schema.registry.url",
 		"mp.messaging.incoming.InstitutionEvents.schema.registry.url",
 		"mp.messaging.incoming.BetreuungAnfrageEvents.schema.registry.url",
+		"mp.messaging.incoming.AnmeldungEvents.schema.registry.url",
 		"mp.messaging.outgoing.PlatzbestaetigungBetreuungEvents.schema.registry.url",
+		"mp.messaging.outgoing.BetreuungStornierungEvents.schema.registry.url",
 		"mp.messaging.outgoing.AnmeldungBestaetigungEvents.schema.registry.url"
 	);
 

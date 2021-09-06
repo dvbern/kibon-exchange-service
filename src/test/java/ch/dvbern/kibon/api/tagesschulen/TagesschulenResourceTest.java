@@ -17,16 +17,12 @@
 
 package ch.dvbern.kibon.api.tagesschulen;
 
-import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 import javax.annotation.Nonnull;
 import javax.ws.rs.core.Response.Status;
 
-import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungDTO;
-import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungZeitabschnittDTO;
-import ch.dvbern.kibon.exchange.api.common.shared.Zeiteinheit;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.AbholungTagesschule;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.Intervall;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.ModulAuswahlDTO;
@@ -82,7 +78,7 @@ public class TagesschulenResourceTest {
 		TagesschuleBestaetigungDTO valid = create(createValidModul());
 
 		given()
-			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
+			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
 			.contentType(ContentType.JSON)
 			.body(valid)
 			.when()
@@ -97,7 +93,7 @@ public class TagesschulenResourceTest {
 		TagesschuleBestaetigungDTO invalid = create(createInvalidModul());
 
 		given()
-			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
+			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
 			.contentType(ContentType.JSON)
 			.body(invalid)
 			.when()
@@ -112,7 +108,7 @@ public class TagesschulenResourceTest {
 		TagesschuleBestaetigungDTO valid = create(createValidModul());
 
 		given()
-			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
+			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
 			.contentType(ContentType.JSON)
 			.body(valid)
 			.when()
