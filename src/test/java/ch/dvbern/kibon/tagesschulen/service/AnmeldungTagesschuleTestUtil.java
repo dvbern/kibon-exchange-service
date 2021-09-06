@@ -1,8 +1,27 @@
+/*
+ * Copyright (C) 2021 DV Bern AG, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package ch.dvbern.kibon.tagesschulen.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import ch.dvbern.kibon.exchange.commons.tagesschulen.AbholungTagesschule;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulAuswahlDTO;
@@ -11,13 +30,18 @@ import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDT
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungStatus;
 import ch.dvbern.kibon.exchange.commons.types.AdresseDTO;
 import ch.dvbern.kibon.exchange.commons.types.Geschlecht;
-import ch.dvbern.kibon.exchange.commons.types.Gesuchsperiode;
 import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.Intervall;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
+import ch.dvbern.kibon.exchange.commons.types.Wochentag;
 
-public class AnmeldungTagesschuleTestUtil {
+public final class AnmeldungTagesschuleTestUtil {
 
+	private AnmeldungTagesschuleTestUtil() {
+		// util
+	}
+
+	@Nonnull
 	public static TagesschuleAnmeldungEventDTO createTagesschuleAnmeldungTestDTO() {
 		TagesschuleAnmeldungEventDTO tagesschuleAnmeldungEventDTO = new TagesschuleAnmeldungEventDTO();
 		tagesschuleAnmeldungEventDTO.setInstitutionId("100");
@@ -26,13 +50,15 @@ public class AnmeldungTagesschuleTestUtil {
 		tagesschuleAnmeldungEventDTO.setAnmeldungZurueckgezogen(false);
 		tagesschuleAnmeldungEventDTO.setStatus(TagesschuleAnmeldungStatus.SCHULAMT_ANMELDUNG_AUSGELOEST);
 		tagesschuleAnmeldungEventDTO.setKind(createKindDTO());
-		tagesschuleAnmeldungEventDTO.setGesuchsperiode(createGesuchsperiodeDTO());
+		tagesschuleAnmeldungEventDTO.setPeriodeVon(LocalDate.of(2021, 8, 1));
+		tagesschuleAnmeldungEventDTO.setPeriodeBis(LocalDate.of(2022, 7, 31));
 		tagesschuleAnmeldungEventDTO.setAntragstellendePerson(createGesuchstellerDTO());
 		tagesschuleAnmeldungEventDTO.setAnmeldungsDetails(createAnmeldungsDetailsDTO());
 
 		return tagesschuleAnmeldungEventDTO;
 	}
 
+	@Nonnull
 	private static TagesschuleAnmeldungDetailsDTO createAnmeldungsDetailsDTO() {
 		TagesschuleAnmeldungDetailsDTO tagesschuleAnmeldungDetailsDTO = new TagesschuleAnmeldungDetailsDTO();
 		tagesschuleAnmeldungDetailsDTO.setAbholung(AbholungTagesschule.ALLEINE_NACH_HAUSE);
@@ -41,26 +67,31 @@ public class AnmeldungTagesschuleTestUtil {
 		tagesschuleAnmeldungDetailsDTO.setRefnr("21.000001.001.1.1");
 		tagesschuleAnmeldungDetailsDTO.setPlanKlasse("3a");
 		tagesschuleAnmeldungDetailsDTO.setAbweichungZweitesSemester(false);
-		tagesschuleAnmeldungDetailsDTO.setModulSelection(createModulAuswahlDTOList());
+		tagesschuleAnmeldungDetailsDTO.setModule(createModulAuswahlDTOList());
 
 		return tagesschuleAnmeldungDetailsDTO;
 	}
 
+	@Nonnull
 	private static List<ModulAuswahlDTO> createModulAuswahlDTOList() {
 		List<ModulAuswahlDTO> modulAuswahlDTOList = new ArrayList<>();
 		modulAuswahlDTOList.add(createModulAuswahlDTO("1"));
 		modulAuswahlDTOList.add(createModulAuswahlDTO("2"));
+
 		return modulAuswahlDTOList;
 	}
 
+	@Nonnull
 	private static ModulAuswahlDTO createModulAuswahlDTO(String moduleId) {
 		ModulAuswahlDTO modulAuswahlDTO = new ModulAuswahlDTO();
 		modulAuswahlDTO.setModulId(moduleId);
 		modulAuswahlDTO.setIntervall(Intervall.WOECHENTLICH);
-		modulAuswahlDTO.setWeekday(1);
+		modulAuswahlDTO.setWeekday(Wochentag.MONDAY);
+
 		return modulAuswahlDTO;
 	}
 
+	@Nonnull
 	private static GesuchstellerDTO createGesuchstellerDTO() {
 		GesuchstellerDTO gesuchstellerDTO = new GesuchstellerDTO();
 		gesuchstellerDTO.setGeschlecht(Geschlecht.MAENNLICH);
@@ -69,9 +100,11 @@ public class AnmeldungTagesschuleTestUtil {
 		gesuchstellerDTO.setVorname("Antragsteller Vorname");
 		gesuchstellerDTO.setEmail("email@test.dvbern.ch");
 		gesuchstellerDTO.setAdresse(createAdresseDTO());
+
 		return gesuchstellerDTO;
 	}
 
+	@Nonnull
 	private static AdresseDTO createAdresseDTO() {
 		AdresseDTO adresseDTO = new AdresseDTO();
 		adresseDTO.setOrt("Fribourg");
@@ -80,23 +113,18 @@ public class AnmeldungTagesschuleTestUtil {
 		adresseDTO.setHausnummer("1");
 		adresseDTO.setAdresszusatz("Zusatz");
 		adresseDTO.setPlz("1700");
+
 		return adresseDTO;
 	}
 
-	private static Gesuchsperiode createGesuchsperiodeDTO() {
-		Gesuchsperiode gesuchsperiode = new Gesuchsperiode();
-		gesuchsperiode.setGueltigAb(LocalDate.of(2021, 8, 1));
-		gesuchsperiode.setGueltigBis(LocalDate.of(2022, 7, 31));
-		gesuchsperiode.setId("101");
-		return gesuchsperiode;
-	}
-
+	@Nonnull
 	public static KindDTO createKindDTO() {
 		KindDTO kindDTO = new KindDTO();
 		kindDTO.setGeburtsdatum(LocalDate.of(2010, 1, 7));
 		kindDTO.setGeschlecht(Geschlecht.MAENNLICH);
 		kindDTO.setNachname("Kind Nachname");
 		kindDTO.setVorname("Kind Vorname");
+
 		return kindDTO;
 	}
 }

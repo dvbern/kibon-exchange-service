@@ -1,6 +1,22 @@
+/*
+ * Copyright (C) 2021 DV Bern AG, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package ch.dvbern.kibon.tagesschulen.service;
 
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,13 +25,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 
 import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulAuswahlDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
 import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
-import ch.dvbern.kibon.shared.model.Gesuchsperiode;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -24,44 +38,32 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @ApplicationScoped
 public class AnmeldungConverter {
 
-	private static final int SUNDAY_INT_VALUE = 0;
-	private static final int MONDAY_INT_VALUE = 1;
-	private static final int TUESDAY_INT_VALUE = 2;
-	private static final int WEDNESDAY_INT_VALUE = 3;
-	private static final int THURSDAY_INT_VALUE = 4;
-	private static final int FRIDAY_INT_VALUE = 5;
-	private static final int SATURDAY_INT_VALUE = 6;
-
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	ObjectMapper mapper;
 
-	@SuppressWarnings("checkstyle:VisibilityModifier")
-	@Inject
-	EntityManager em;
-
 	@Nonnull
 	public Anmeldung create(@Nonnull TagesschuleAnmeldungEventDTO dto, @Nonnull LocalDateTime eventTimestamp) {
 		Anmeldung anmeldung = new Anmeldung();
-		anmeldung.setInstitutionId(dto.getInstitutionId());
-		anmeldung.setRefnr(dto.getAnmeldungsDetails().getRefnr());
-		anmeldung.setAnmeldungZurueckgezogen(dto.getAnmeldungZurueckgezogen());
-		anmeldung.setAbholung(dto.getAnmeldungsDetails().getAbholung());
-		anmeldung.setBemerkung(dto.getAnmeldungsDetails().getBemerkung());
-		anmeldung.setEintrittsdatum(dto.getAnmeldungsDetails().getEintrittsdatum());
-		anmeldung.setEventTimestamp(eventTimestamp);
-		anmeldung.setGesuchsteller(toGesuchsteller(dto.getAntragstellendePerson()));
 		anmeldung.setKind(toKind(dto.getKind()));
-		anmeldung.setAbweichungZweitesSemester(dto.getAnmeldungsDetails().getAbweichungZweitesSemester());
+		anmeldung.setGesuchsteller(toGesuchsteller(dto.getAntragstellendePerson()));
 		anmeldung.setFreigegebenAm(dto.getFreigegebenAm());
-		anmeldung.setPlanKlasse(dto.getAnmeldungsDetails().getPlanKlasse());
 		anmeldung.setStatus(dto.getStatus());
 		anmeldung.setAnmeldungZurueckgezogen(dto.getAnmeldungZurueckgezogen());
+		anmeldung.setAnmeldungZurueckgezogen(dto.getAnmeldungZurueckgezogen());
+		anmeldung.setRefnr(dto.getAnmeldungsDetails().getRefnr());
+		anmeldung.setEintrittsdatum(dto.getAnmeldungsDetails().getEintrittsdatum());
+		anmeldung.setPlanKlasse(dto.getAnmeldungsDetails().getPlanKlasse());
+		anmeldung.setAbholung(dto.getAnmeldungsDetails().getAbholung());
+		anmeldung.setAbweichungZweitesSemester(dto.getAnmeldungsDetails().getAbweichungZweitesSemester());
+		anmeldung.setBemerkung(dto.getAnmeldungsDetails().getBemerkung());
+		anmeldung.setPeriodeVon(dto.getPeriodeVon());
+		anmeldung.setPeriodeBis(dto.getPeriodeBis());
+		anmeldung.setInstitutionId(dto.getInstitutionId());
+		anmeldung.setEventTimestamp(eventTimestamp);
 		anmeldung.setVersion(dto.getVersion());
+		anmeldung.setModule(toAnmeldungModule(dto.getAnmeldungsDetails().getModule()));
 
-		Gesuchsperiode gesuchsperiode = em.find(Gesuchsperiode.class, dto.getGesuchsperiode().getId());
-		anmeldung.setGesuchsperiode(gesuchsperiode);
-		anmeldung.setAnmeldungModule(toAnmeldungModule(dto.getAnmeldungsDetails().getModulSelection()));
 		return anmeldung;
 	}
 
@@ -112,27 +114,7 @@ public class AnmeldungConverter {
 	private ObjectNode toAnmeldungModul(@Nonnull ModulAuswahlDTO modulAuswahlDTO) {
 		return mapper.createObjectNode()
 			.put("modulId", modulAuswahlDTO.getModulId())
-			.put("wochentag", toDayOfWeek(modulAuswahlDTO.getWeekday()).name())
-			.put("intervall", modulAuswahlDTO.getIntervall().toString());
-	}
-
-	public DayOfWeek toDayOfWeek(int weekday) {
-		switch (weekday) {
-		case SUNDAY_INT_VALUE:
-			return DayOfWeek.SUNDAY;
-		case MONDAY_INT_VALUE:
-			return DayOfWeek.MONDAY;
-		case TUESDAY_INT_VALUE:
-			return DayOfWeek.TUESDAY;
-		case WEDNESDAY_INT_VALUE:
-			return DayOfWeek.WEDNESDAY;
-		case THURSDAY_INT_VALUE:
-			return DayOfWeek.THURSDAY;
-		case FRIDAY_INT_VALUE:
-			return DayOfWeek.FRIDAY;
-		case SATURDAY_INT_VALUE:
-		default:
-			return DayOfWeek.SATURDAY;
-		}
+			.put("wochentag", modulAuswahlDTO.getWeekday().name())
+			.put("intervall", modulAuswahlDTO.getIntervall().name());
 	}
 }

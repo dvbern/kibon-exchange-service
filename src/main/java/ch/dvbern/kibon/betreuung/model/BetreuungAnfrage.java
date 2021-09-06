@@ -17,8 +17,8 @@
 
 package ch.dvbern.kibon.betreuung.model;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
@@ -27,43 +27,19 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.quarkiverse.hibernate.types.json.JsonTypes;
 import org.hibernate.annotations.Type;
 
 @Table(indexes = @Index(name = "betreuunganfrage_idx1", columnList = "institutionId"))
 @Entity
-public class BetreuungAnfrage {
-
-	@Nonnull
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(updatable = false, nullable = false)
-	private @NotNull Long id = -1L;
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotEmpty String refnr = "";
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotEmpty String institutionId = "";
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotNull LocalDate periodeVon = LocalDate.MIN;
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotNull LocalDate periodeBis = LocalDate.MIN;
+public class BetreuungAnfrage extends AbstractInstitutionPeriodeEntity {
 
 	@Nonnull
 	@Column(nullable = false, updatable = false)
@@ -71,13 +47,13 @@ public class BetreuungAnfrage {
 	private @NotNull BetreuungsangebotTyp betreuungsArt = BetreuungsangebotTyp.KITA;
 
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode kind = null;
 
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode gesuchsteller = null;
 
 	@Nonnull
@@ -88,8 +64,6 @@ public class BetreuungAnfrage {
 	@Column(updatable = false)
 	private @NotNull LocalDateTime eventTimestamp = LocalDateTime.now();
 
-
-	@SuppressWarnings("checkstyle:CyclomaticComplexity")
 	@Override
 	public boolean equals(@Nullable Object o) {
 		if (this == o) {
@@ -102,12 +76,7 @@ public class BetreuungAnfrage {
 
 		BetreuungAnfrage that = (BetreuungAnfrage) o;
 
-		return getId() != -1L &&
-			getId().equals(that.getId()) &&
-			getRefnr().equals(that.getRefnr()) &&
-			getInstitutionId().equals(that.getInstitutionId()) &&
-			getPeriodeBis().equals(that.getPeriodeBis()) &&
-			getPeriodeVon().equals(that.getPeriodeVon()) &&
+		return super.equals(o) &&
 			getBetreuungsArt() == that.getBetreuungsArt() &&
 			isAbgelehntVonGesuchsteller() == that.isAbgelehntVonGesuchsteller() &&
 			getEventTimestamp().equals(that.getEventTimestamp());
@@ -116,58 +85,10 @@ public class BetreuungAnfrage {
 	@Override
 	public int hashCode() {
 		return Objects.hash(
-			getRefnr(),
-			getInstitutionId(),
-			getPeriodeVon(),
-			getPeriodeBis(),
+			Arrays.hashCode(baseHashCodeValues()),
 			getBetreuungsArt(),
 			isAbgelehntVonGesuchsteller(),
 			getEventTimestamp());
-	}
-
-	@Nonnull
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(@Nonnull Long id) {
-		this.id = id;
-	}
-
-	@Nonnull
-	public String getRefnr() {
-		return refnr;
-	}
-
-	public void setRefnr(@Nonnull String refnr) {
-		this.refnr = refnr;
-	}
-
-	@Nonnull
-	public String getInstitutionId() {
-		return institutionId;
-	}
-
-	public void setInstitutionId(@Nonnull String institutionId) {
-		this.institutionId = institutionId;
-	}
-
-	@Nonnull
-	public LocalDate getPeriodeVon() {
-		return periodeVon;
-	}
-
-	public void setPeriodeVon(@Nonnull LocalDate periodeVon) {
-		this.periodeVon = periodeVon;
-	}
-
-	@Nonnull
-	public LocalDate getPeriodeBis() {
-		return periodeBis;
-	}
-
-	public void setPeriodeBis(@Nonnull LocalDate periodeBis) {
-		this.periodeBis = periodeBis;
 	}
 
 	@Nonnull

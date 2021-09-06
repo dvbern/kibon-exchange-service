@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 DV Bern AG, Switzerland
+ * Copyright (C) 2021 DV Bern AG, Switzerland
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,28 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.betreuung.model;
+package ch.dvbern.kibon.shared.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.persistence.BaseEntity;
 
-@Table(indexes = @Index(name = "betreuungstornierunganfrage_idx1", columnList = "institutionId"))
-@Entity
-public class BetreuungStornierungAnfrage extends BaseEntity {
+@MappedSuperclass
+public abstract class AbstractInstitutionPeriodeEntity extends BaseEntity {
 
 	@Nonnull
 	@Id
@@ -53,40 +50,46 @@ public class BetreuungStornierungAnfrage extends BaseEntity {
 	private @NotEmpty String institutionId = "";
 
 	@Nonnull
-	@Column(updatable = false)
-	private @NotNull LocalDateTime eventTimestamp = LocalDateTime.now();
+	@Column(nullable = false, updatable = false)
+	private @NotNull LocalDate periodeVon = LocalDate.MIN;
 
-	@SuppressWarnings("checkstyle:CyclomaticComplexity")
+	@Nonnull
+	@Column(nullable = false, updatable = false)
+	private @NotNull LocalDate periodeBis = LocalDate.MIN;
+
 	@Override
 	public boolean equals(@Nullable Object o) {
 		if (this == o) {
 			return true;
 		}
 
-		if (!(o instanceof BetreuungStornierungAnfrage)) {
+		if (!(o instanceof AbstractInstitutionPeriodeEntity)) {
 			return false;
 		}
 
-		BetreuungStornierungAnfrage that = (BetreuungStornierungAnfrage) o;
+		AbstractInstitutionPeriodeEntity that = (AbstractInstitutionPeriodeEntity) o;
 
-		return getId() != -1L &&
-			getId().equals(that.getId()) &&
-			getRefnr().equals(that.getRefnr()) &&
-			getInstitutionId().equals(that.getInstitutionId()) &&
-			getEventTimestamp().equals(that.getEventTimestamp());
+		return getId() != -1L
+			&& getId().equals(that.getId())
+			&& getRefnr().equals(that.getRefnr())
+			&& getInstitutionId().equals(that.getInstitutionId())
+			&& getPeriodeVon().equals(that.getPeriodeVon())
+			&& getPeriodeBis().equals(that.getPeriodeBis());
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(
-			getRefnr(),
-			getInstitutionId(),
-			getEventTimestamp());
+		return Objects.hash(baseHashCodeValues());
+	}
+
+	@Nonnull
+	protected Object[] baseHashCodeValues() {
+		return new Object[] { getRefnr(), getInstitutionId(), getPeriodeVon(), getPeriodeBis() };
 	}
 
 	@Nonnull
 	public Long getId() {
-		return this.id;
+		return id;
 	}
 
 	public void setId(@Nonnull Long id) {
@@ -112,11 +115,20 @@ public class BetreuungStornierungAnfrage extends BaseEntity {
 	}
 
 	@Nonnull
-	public LocalDateTime getEventTimestamp() {
-		return eventTimestamp;
+	public LocalDate getPeriodeVon() {
+		return periodeVon;
 	}
 
-	public void setEventTimestamp(@Nonnull LocalDateTime eventTime) {
-		this.eventTimestamp = eventTime;
+	public void setPeriodeVon(@Nonnull LocalDate periodeVon) {
+		this.periodeVon = periodeVon;
+	}
+
+	@Nonnull
+	public LocalDate getPeriodeBis() {
+		return periodeBis;
+	}
+
+	public void setPeriodeBis(@Nonnull LocalDate periodeBis) {
+		this.periodeBis = periodeBis;
 	}
 }

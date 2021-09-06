@@ -32,12 +32,14 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.persistence.BaseEntity;
+
 /**
  * Information regarding a kibon-exchange client (kitAdmin etc.).<br>
  */
 @Table(indexes = @Index(name = "client_idx1", columnList = "clientname, institutionId, grantedSince"))
 @Entity
-public class Client {
+public class Client extends BaseEntity {
 
 	@Nonnull
 	@EmbeddedId

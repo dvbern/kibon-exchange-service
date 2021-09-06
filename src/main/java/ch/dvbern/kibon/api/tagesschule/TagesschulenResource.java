@@ -182,9 +182,11 @@ public class TagesschulenResource {
 
 		TagesschuleAnmeldungenDTO anmeldungenDTO = new TagesschuleAnmeldungenDTO();
 		anmeldungenDTO.setAnmeldungen(tagesschuleAnmeldungDTOS);
+
 		return anmeldungenDTO;
 	}
 
+	@Nonnull
 	private TagesschuleAnmeldungDTO convert(@Nonnull ClientAnmeldungDTO model) {
 		return objectMapper.convertValue(model, TagesschuleAnmeldungDTO.class);
 	}
@@ -243,15 +245,14 @@ public class TagesschulenResource {
 			clientName,
 			groups);
 
-		//Check if Refnummer exisitert in Anmeldung
-		Anmeldung anmeldung = anmeldungService.getLatestAnmeldung(refnr);
+		Optional<String> institutionId = anmeldungService.getLatestAnmeldung(refnr)
+			.map(a -> a.getInstitutionId());
 
-		if(anmeldung == null) {
+		if (institutionId.isEmpty()) {
 			return Uni.createFrom().item(Response.status(Status.NOT_FOUND).build());
 		}
 
-		String institutionId = anmeldung.getInstitutionId();
-		Optional<Client> client = clientService.findActive(new ClientId(clientName, institutionId));
+		Optional<Client> client = clientService.findActive(new ClientId(clientName, institutionId.get()));
 
 		if (client.isEmpty()) {
 			return Uni.createFrom().item(Response.status(Status.FORBIDDEN).build());

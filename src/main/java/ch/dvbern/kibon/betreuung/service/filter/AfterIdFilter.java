@@ -27,10 +27,10 @@ import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import ch.dvbern.kibon.persistence.Restriction;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage_;
+import ch.dvbern.kibon.persistence.Restriction;
 
 /**
  * Utility class for filtering criteria queries to only deliver entries with an ID > the specified one.
