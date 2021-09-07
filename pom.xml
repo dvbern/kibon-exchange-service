@@ -11,19 +11,16 @@
     <version>1.4.7-SNAPSHOT</version>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <quarkus-plugin.version>1.13.7.Final</quarkus-plugin.version>
-        <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <quarkus.platform.version>1.13.7.Final</quarkus.platform.version>
+        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
+        <quarkus.platform.version>2.2.1.Final</quarkus.platform.version>
         <hamcrest.version>2.2</hamcrest.version>
         <spotify.hamcrest.version>1.2.0</spotify.hamcrest.version>
         <testcontainers.version>1.15.3</testcontainers.version>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
-        <kibon.exchange.api.commons.version>2.3.0</kibon.exchange.api.commons.version>
+        <kibon.exchange.api.commons.version>2.4.0-SNAPSHOT</kibon.exchange.api.commons.version>
+        <kibon.exchange.api.version>3.0.3-SNAPSHOT</kibon.exchange.api.version>
 
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <maven.compiler.source>11</maven.compiler.source>
@@ -132,12 +129,12 @@
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
             <artifactId>kibon-exchange-api</artifactId>
-            <version>3.0.3-SNAPSHOT</version>
+            <version>${kibon.exchange.api.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.vladmihalcea</groupId>
-            <artifactId>hibernate-types-52</artifactId>
-            <version>2.12.1</version>
+            <groupId>io.quarkiverse.hibernatetypes</groupId>
+            <artifactId>quarkus-hibernate-types</artifactId>
+            <version>0.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -215,7 +212,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-authz-client</artifactId>
-            <version>14.0.0</version>
+            <version>15.0.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -244,9 +241,9 @@
                 <artifactId>spotbugs-maven-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>io.quarkus</groupId>
+                <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
-                <version>${quarkus-plugin.version}</version>
+                <version>${quarkus.platform.version}</version>
                 <extensions>true</extensions>
                 <executions>
                     <execution>

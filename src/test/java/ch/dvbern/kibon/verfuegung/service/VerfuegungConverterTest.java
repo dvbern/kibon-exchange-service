@@ -70,15 +70,15 @@ class VerfuegungConverterTest {
 	private IsPojo<Verfuegung> matchesDTO(@Nonnull VerfuegungEventDTO dto) {
 
 		return pojo(Verfuegung.class)
-			.withProperty("refnr", is(dto.getRefnr()))
-			.withProperty("institutionId", is(dto.getInstitutionId()))
-			.withProperty("von", is(dto.getVon()))
-			.withProperty("bis", is(dto.getBis()))
-			.withProperty("version", is(dto.getVersion()))
-			.withProperty("verfuegtAm", is(TimestampConverter.of(dto.getVerfuegtAm())))
-			.withProperty("betreuungsArt", is(dto.getBetreuungsArt()))
-			.withProperty("kind", matchesKindDTO(dto.getKind()))
-			.withProperty("gesuchsteller", matchesGesuchstellerDTO(dto.getGesuchsteller()))
+			.where(Verfuegung::getRefnr, is(dto.getRefnr()))
+			.where(Verfuegung::getInstitutionId, is(dto.getInstitutionId()))
+			.where(Verfuegung::getPeriodeVon, is(dto.getVon()))
+			.where(Verfuegung::getPeriodeBis, is(dto.getBis()))
+			.where(Verfuegung::getVersion, is(dto.getVersion()))
+			.where(Verfuegung::getVerfuegtAm, is(TimestampConverter.of(dto.getVerfuegtAm())))
+			.where(Verfuegung::getBetreuungsArt, is(dto.getBetreuungsArt()))
+			.where(Verfuegung::getKind, matchesKindDTO(dto.getKind()))
+			.where(Verfuegung::getGesuchsteller, matchesGesuchstellerDTO(dto.getGesuchsteller()))
 			.where(
 				Verfuegung::getZeitabschnitte,
 				is(jsonArray(containsInAnyOrder(toMatchers(dto.getZeitabschnitte())))))

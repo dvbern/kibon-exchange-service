@@ -48,8 +48,8 @@ public class VerfuegungConverter {
 
 		verfuegung.setRefnr(dto.getRefnr());
 		verfuegung.setInstitutionId(dto.getInstitutionId());
-		verfuegung.setVon(dto.getVon());
-		verfuegung.setBis(dto.getBis());
+		verfuegung.setPeriodeVon(dto.getVon());
+		verfuegung.setPeriodeBis(dto.getBis());
 		verfuegung.setVersion(dto.getVersion());
 		verfuegung.setVerfuegtAm(TimestampConverter.of(dto.getVerfuegtAm()));
 		verfuegung.setBetreuungsArt(dto.getBetreuungsArt());

@@ -17,7 +17,9 @@
 
 package ch.dvbern.kibon.institution.service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -27,11 +29,15 @@ import javax.inject.Inject;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleModuleDTO;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
+import ch.dvbern.kibon.tagesschulen.model.Modul;
+import ch.dvbern.kibon.tagesschulen.model.TagesschuleModule;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -78,6 +84,10 @@ public class InstitutionConverter {
 		institution.setAnzahlPlaetzeFirmen(dto.getAnzahlPlaetzeFirmen());
 		if (dto.getTimestampMutiert() != null) {
 			institution.setTimestampMutiert(TimestampConverter.toLocalDateTime(dto.getTimestampMutiert()));
+		}
+
+		if (dto.getTagesschuleModule() != null) {
+			update(institution, dto.getTagesschuleModule());
 		}
 	}
 
@@ -137,5 +147,87 @@ public class InstitutionConverter {
 			.put("bfsNummer", dto.getGemeinde().getBfsNummer());
 
 		return result;
+	}
+
+	private void update(@Nonnull Institution institution, @Nonnull List<TagesschuleModuleDTO> tagesschuleModule) {
+		// at the moment, this is only appending & updating new TagesschuleModule.
+		// There is no use case to remove TagesschuleModule, since there might be existing Anmeldungen
+		List<TagesschuleModule> convertedModule = tagesschuleModule.stream()
+			.map(dtoT -> toTageschuleModule(institution, dtoT))
+			.collect(Collectors.toList());
+
+		institution.getTagesschuleModule().addAll(convertedModule);
+	}
+
+	@Nonnull
+	private TagesschuleModule toTageschuleModule(@Nonnull Institution institution, @Nonnull TagesschuleModuleDTO dto) {
+		TagesschuleModule entity = getOrCreateTagesschuleModule(institution, dto);
+
+		Set<Modul> existingModule = new HashSet<>(entity.getModule());
+
+		List<Modul> module = dto.getModule().stream()
+			.map(m -> getOrCreateModul(existingModule, m))
+			.collect(Collectors.toList());
+
+		module.forEach(m -> m.setParent(entity));
+		entity.getModule().clear();
+		entity.getModule().addAll(module);
+
+		return entity;
+	}
+
+	@Nonnull
+	private TagesschuleModule getOrCreateTagesschuleModule(
+		@Nonnull Institution institution,
+		@Nonnull TagesschuleModuleDTO dto) {
+
+		return institution.getTagesschuleModule().stream()
+			.filter(t -> t.getPeriodeVon().equals(dto.getPeriodeVon()) && t.getPeriodeBis().equals(dto.getPeriodeBis()))
+			.findAny()
+			.orElseGet(() -> createTagesschuleModule(institution, dto));
+	}
+
+	@Nonnull
+	private TagesschuleModule createTagesschuleModule(
+		@Nonnull Institution institution,
+		@Nonnull TagesschuleModuleDTO dto) {
+
+		TagesschuleModule tagesschuleModule = new TagesschuleModule();
+		tagesschuleModule.setInstitution(institution);
+		tagesschuleModule.setPeriodeVon(dto.getPeriodeVon());
+		tagesschuleModule.setPeriodeBis(dto.getPeriodeBis());
+
+		return tagesschuleModule;
+	}
+
+	@Nonnull
+	private Modul getOrCreateModul(@Nonnull Set<Modul> existingModule, @Nonnull ModulDTO modulDTO) {
+		Modul modul = existingModule.stream()
+			.filter(e -> e.getId().equals(modulDTO.getId()))
+			.findAny()
+			.orElseGet(() -> newModul(modulDTO));
+
+		updateModul(modul, modulDTO);
+
+		return modul;
+	}
+
+	@Nonnull
+	private Modul newModul(@Nonnull ModulDTO modulDTO) {
+		Modul modul = new Modul();
+		modul.setId(modulDTO.getId());
+
+		return modul;
+	}
+
+	private void updateModul(@Nonnull Modul modul, @Nonnull ModulDTO modulDTO) {
+		modul.setBezeichnungDE(modulDTO.getBezeichnungDE());
+		modul.setBezeichnungFR(modulDTO.getBezeichnungFR());
+		modul.setErlaubteIntervalle(mapper.valueToTree(modulDTO.getErlaubteIntervalle()));
+		modul.setWochentage(mapper.valueToTree(modulDTO.getWochentage()));
+		modul.setWirdPaedagogischBetreut(modulDTO.getWirdPaedagogischBetreut());
+		modul.setVerpflegungsKosten(modulDTO.getVerpflegungsKosten());
+		modul.setZeitVon(modulDTO.getZeitVon());
+		modul.setZeitBis(modulDTO.getZeitBis());
 	}
 }

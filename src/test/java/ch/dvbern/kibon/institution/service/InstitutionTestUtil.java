@@ -18,11 +18,13 @@
 package ch.dvbern.kibon.institution.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -31,7 +33,10 @@ import ch.dvbern.kibon.exchange.commons.institution.GemeindeDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleModuleDTO;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.exchange.commons.types.Intervall;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
@@ -98,8 +103,45 @@ public final class InstitutionTestUtil {
 			true,
 			BigDecimal.valueOf(13.23),
 			BigDecimal.valueOf(7.13),
-			TimestampConverter.fromLocalDateTime(LocalDateTime.now())
+			TimestampConverter.fromLocalDateTime(LocalDateTime.now()),
+			null
 		);
+	}
+
+	@Nonnull
+	public static InstitutionEventDTO createTagesschuleInstitutionEvent() {
+		InstitutionEventDTO institutionEvent = createInstitutionEvent();
+		institutionEvent.setBetreuungsArt(BetreuungsangebotTyp.TAGESSCHULE);
+		institutionEvent.setTagesschuleModule(createTagesschuleModule());
+
+		return institutionEvent;
+	}
+
+	@Nonnull
+	private static List<TagesschuleModuleDTO> createTagesschuleModule() {
+		TagesschuleModuleDTO tagesschuleModuleDTO = TagesschuleModuleDTO.newBuilder()
+			.setModule(createModule())
+			.setPeriodeVon(LocalDate.of(2020, 8, 1))
+			.setPeriodeBis(LocalDate.of(2021, 7, 31))
+			.build();
+
+		return List.of(tagesschuleModuleDTO);
+	}
+
+	@Nonnull
+	private static List<ModulDTO> createModule() {
+		ModulDTO modulDTO = new ModulDTO(
+			"100",
+			"bezeichnungDE",
+			"bezeichnungFR",
+			LocalTime.of(7, 30),
+			LocalTime.of(8, 30),
+			List.of(MONDAY, TUESDAY),
+			List.of(Intervall.WOECHENTLICH),
+			true,
+			BigDecimal.valueOf(10.5));
+
+		return List.of(modulDTO);
 	}
 
 	@Nonnull

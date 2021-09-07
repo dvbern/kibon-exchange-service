@@ -17,9 +17,11 @@
 
 package ch.dvbern.kibon.api.tagesschule;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
+import java.util.concurrent.CompletionStage;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,11 +44,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import ch.dvbern.kibon.clients.model.Client;
+import ch.dvbern.kibon.clients.model.ClientId;
+import ch.dvbern.kibon.clients.service.ClientService;
+import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnmeldungDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnmeldungenDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleBestaetigungDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TagesschuleTarifeDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleBestaetigungEventDTO;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
+import ch.dvbern.kibon.tagesschulen.facade.AnmeldungKafkaEventProducer;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
+import ch.dvbern.kibon.tagesschulen.service.AnmeldungService;
+import ch.dvbern.kibon.tagesschulen.service.filter.ClientAnmeldungFilter;
 import ch.dvbern.kibon.util.OpenApiTag;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
+import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Timed;
@@ -83,6 +97,22 @@ public class TagesschulenResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	TagesschulenMockResponses mockResponses;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	AnmeldungService anmeldungService;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	ClientService clientService;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	AnmeldungKafkaEventProducer anmeldungKafkaEventProducer;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	ObjectMapper objectMapper;
 
 	@GET
 	@Path("/anmeldungen")
@@ -142,18 +172,23 @@ public class TagesschulenResource {
 			limit,
 			afterId);
 
+		ClientAnmeldungFilter queryFilter = new ClientAnmeldungFilter(clientName, afterId, limit);
+
+		List<ClientAnmeldungDTO> clientAnmeldungen = anmeldungService.getAllForClient(queryFilter);
+
+		List<TagesschuleAnmeldungDTO> tagesschuleAnmeldungDTOS = clientAnmeldungen.stream()
+			.map(this::convert)
+			.collect(Collectors.toList());
+
 		TagesschuleAnmeldungenDTO anmeldungenDTO = new TagesschuleAnmeldungenDTO();
-
-		Long maxSize = Optional.ofNullable(limit)
-			.map(Long::valueOf)
-			.orElse(Long.MAX_VALUE);
-
-		Stream.of(mockResponses.createAnmeldung1(REF_NR_1), mockResponses.createAnmeldung2(REF_NR_2))
-			.filter(a -> afterId == null || a.getId() > afterId)
-			.limit(maxSize)
-			.forEach(a -> anmeldungenDTO.getAnmeldungen().add(a));
+		anmeldungenDTO.setAnmeldungen(tagesschuleAnmeldungDTOS);
 
 		return anmeldungenDTO;
+	}
+
+	@Nonnull
+	private TagesschuleAnmeldungDTO convert(@Nonnull ClientAnmeldungDTO model) {
+		return objectMapper.convertValue(model, TagesschuleAnmeldungDTO.class);
 	}
 
 	@DELETE
@@ -196,11 +231,54 @@ public class TagesschulenResource {
 	@NoCache
 	@Nonnull
 	@RolesAllowed("tagesschule")
-	public Response confirm(
+	public Uni<Response> confirm(
 		@NotEmpty @PathParam("refnr") String refnr,
 		@NotNull @Valid TagesschuleBestaetigungDTO bestaetigungDTO) {
 
-		return mockResponse(refnr);
+		String clientName = jsonWebToken.getClaim("clientId");
+		Set<String> groups = identity.getRoles();
+		String userName = identity.getPrincipal().getName();
+
+		LOG.info(
+			"TagesschuleBestaetigung received by '{}' with clientName '{}', roles '{}'",
+			userName,
+			clientName,
+			groups);
+
+		Optional<String> institutionId = anmeldungService.getLatestAnmeldung(refnr)
+			.map(AbstractInstitutionPeriodeEntity::getInstitutionId);
+
+		if (institutionId.isEmpty()) {
+			return Uni.createFrom().item(Response.status(Status.NOT_FOUND).build());
+		}
+
+		Optional<Client> client = clientService.findActive(new ClientId(clientName, institutionId.get()));
+
+		if (client.isEmpty()) {
+			return Uni.createFrom().item(Response.status(Status.FORBIDDEN).build());
+		}
+
+		TagesschuleBestaetigungEventDTO tagesschuleBestaetigungEventDTO =
+			objectMapper.convertValue(bestaetigungDTO, TagesschuleBestaetigungEventDTO.class);
+
+		if (!tagesschuleBestaetigungEventDTO.getRefnr().equals(refnr)) {
+			return Uni.createFrom().item(Response.status(Status.BAD_REQUEST).build());
+		}
+
+		LOG.debug("generating message");
+		CompletionStage<Response> acked =
+			anmeldungKafkaEventProducer.process(tagesschuleBestaetigungEventDTO, client.get())
+				.thenApply(Void -> {
+					LOG.debug("received ack");
+					return Response.ok().build();
+				})
+				.exceptionally(error -> {
+					LOG.error("failed", error);
+					return Response.serverError().build();
+				});
+		LOG.debug("received completion stage");
+
+		return Uni.createFrom().completionStage(acked);
 	}
 
 	@GET

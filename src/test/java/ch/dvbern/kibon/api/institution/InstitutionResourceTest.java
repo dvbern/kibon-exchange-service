@@ -88,7 +88,7 @@ class InstitutionResourceTest {
 			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
 			.contentType(ContentType.JSON)
 			.when()
-			.get("/institutions/4")
+			.get("/institutions/5")
 			.then()
 			.assertThat()
 			// Even though the Institution actually exists, NOT_FOUND shall be returned when the client lacks

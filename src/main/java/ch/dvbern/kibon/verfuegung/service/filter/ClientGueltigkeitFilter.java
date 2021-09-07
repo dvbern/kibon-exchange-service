@@ -30,18 +30,20 @@ import javax.persistence.criteria.Root;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.Client_;
 import ch.dvbern.kibon.persistence.Restriction;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
-import ch.dvbern.kibon.verfuegung.model.Verfuegung_;
 
 public class ClientGueltigkeitFilter implements Restriction<ClientVerfuegung, ClientVerfuegungDTO> {
 
 	@Nonnull
 	@Override
 	public Optional<Predicate> getPredicate(@Nonnull Root<ClientVerfuegung> root, @Nonnull CriteriaBuilder cb) {
-		Path<LocalDate> entityVon = root.get(ClientVerfuegung_.verfuegung).get(Verfuegung_.von);
-		Path<LocalDate> entityBis = root.get(ClientVerfuegung_.verfuegung).get(Verfuegung_.bis);
+		Path<LocalDate> entityVon = root.get(ClientVerfuegung_.verfuegung)
+			.get(AbstractInstitutionPeriodeEntity_.periodeVon);
+		Path<LocalDate> entityBis = root.get(ClientVerfuegung_.verfuegung)
+			.get(AbstractInstitutionPeriodeEntity_.periodeBis);
 
 		Path<Client> clientPath = root.get(ClientVerfuegung_.client);
 		Path<LocalDate> gueltigAb = clientPath.get(Client_.gueltigAb);

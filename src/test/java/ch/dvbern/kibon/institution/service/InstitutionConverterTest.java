@@ -38,6 +38,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static ch.dvbern.kibon.institution.service.InstitutionTestUtil.createInstitutionEvent;
+import static ch.dvbern.kibon.institution.service.InstitutionTestUtil.createTagesschuleInstitutionEvent;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonNull;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
@@ -70,6 +71,26 @@ class InstitutionConverterTest {
 	@Test
 	public void testUpdate() {
 		InstitutionEventDTO dto = createInstitutionEvent();
+		Institution institution = new Institution();
+		// id is not updated, set manually for correct test setup
+		institution.setId(dto.getId());
+
+		converter.update(institution, dto);
+
+		assertThat(institution, matchesDTO(dto));
+	}
+
+	@Test
+	public void testCreateTagesschule() {
+		InstitutionEventDTO dto = createTagesschuleInstitutionEvent();
+		Institution institution = converter.create(dto);
+
+		assertThat(institution, matchesDTO(dto));
+	}
+
+	@Test
+	public void testUpdateTagesschule() {
+		InstitutionEventDTO dto = createTagesschuleInstitutionEvent();
 		Institution institution = new Institution();
 		// id is not updated, set manually for correct test setup
 		institution.setId(dto.getId());
