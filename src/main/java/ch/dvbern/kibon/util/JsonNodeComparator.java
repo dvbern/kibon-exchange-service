@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 DV Bern AG, Switzerland
+ * Copyright (C) 2021 DV Bern AG, Switzerland
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,25 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.testutils;
+package ch.dvbern.kibon.util;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.Serializable;
+import java.util.Comparator;
 
-import javax.enterprise.inject.Stereotype;
-import javax.transaction.Transactional;
+import javax.annotation.Nonnull;
 
-import io.quarkus.test.junit.QuarkusTest;
+import com.fasterxml.jackson.databind.JsonNode;
 
-/**
- * Can be used instead of the annotation @QuarkusTest to make every test method transactional.
- */
-@QuarkusTest
-@Stereotype
-@Transactional
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface TransactionalQuarkusTest {
+public class JsonNodeComparator implements Comparator<JsonNode>, Serializable {
+
+	private static final long serialVersionUID = 5487082947413815262L;
+
+	public static final JsonNodeComparator INSTANCE = new JsonNodeComparator();
+
+	@Override
+	public int compare(@Nonnull JsonNode o1, @Nonnull JsonNode o2) {
+		if (o1.equals(o2)) {
+			return 0;
+		}
+
+		return 1;
+	}
 }

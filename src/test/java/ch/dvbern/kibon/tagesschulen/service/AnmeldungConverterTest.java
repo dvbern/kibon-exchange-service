@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2021 DV Bern AG, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package ch.dvbern.kibon.tagesschulen.service;
 
 import java.time.LocalDateTime;
@@ -6,52 +23,31 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
-import javax.persistence.EntityManager;
 
-import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulAuswahlDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
-import ch.dvbern.kibon.exchange.commons.types.Gesuchsperiode;
 import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
-import ch.dvbern.kibon.tagesschulen.model.Modul;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spotify.hamcrest.pojo.IsPojo;
-import org.easymock.EasyMockExtension;
-import org.easymock.Mock;
-import org.easymock.MockType;
-import org.easymock.TestSubject;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
+import static ch.dvbern.kibon.tagesschulen.service.AnmeldungTagesschuleTestUtil.createTagesschuleAnmeldungTestDTO;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
-import static com.spotify.hamcrest.jackson.JsonMatchers.jsonInt;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static com.spotify.hamcrest.pojo.IsPojo.pojo;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static ch.dvbern.kibon.tagesschulen.service.AnmeldungTagesschuleTestUtil.createTagesschuleAnmeldungTestDTO;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 
-@ExtendWith(EasyMockExtension.class)
 public class AnmeldungConverterTest {
 
-	@TestSubject
-	private AnmeldungConverter converter = new AnmeldungConverter();
-
-	@SuppressWarnings("InstanceVariableMayNotBeInitialized")
-	@Mock(MockType.NICE)
-	private EntityManager em;
+	private final AnmeldungConverter converter = new AnmeldungConverter();
 
 	@BeforeEach
 	public void setup() {
@@ -61,23 +57,9 @@ public class AnmeldungConverterTest {
 	@Test
 	public void testCreate() {
 		TagesschuleAnmeldungEventDTO dto = createTagesschuleAnmeldungTestDTO();
-		replayAll(dto);
 		Anmeldung anmeldung = converter.create(dto, LocalDateTime.now());
-		assertThat(anmeldung, matchesDTO(dto));
-	}
 
-	private void replayAll(TagesschuleAnmeldungEventDTO dto) {
-		ch.dvbern.kibon.shared.model.Gesuchsperiode gesuchsperiode = new ch.dvbern.kibon.shared.model.Gesuchsperiode();
-		gesuchsperiode.setId(dto.getGesuchsperiode().getId());
-		gesuchsperiode.setGueltigAb(dto.getGesuchsperiode().getGueltigAb());
-		gesuchsperiode.setGueltigBis(dto.getGesuchsperiode().getGueltigBis());
-		expect(em.find(ch.dvbern.kibon.shared.model.Gesuchsperiode.class, dto.getGesuchsperiode().getId())).andReturn(
-			gesuchsperiode);
-		dto.getAnmeldungsDetails().getModulSelection().forEach(
-			modulAuswahlDTO -> expect(em.find(Modul.class, modulAuswahlDTO.getModulId())).andReturn(new Modul(
-				modulAuswahlDTO.getModulId())));
-		expectLastCall();
-		replay(em);
+		assertThat(anmeldung, matchesDTO(dto));
 	}
 
 	@Nonnull
@@ -94,33 +76,28 @@ public class AnmeldungConverterTest {
 			.withProperty("abholung", is(dto.getAnmeldungsDetails().getAbholung()))
 			.withProperty("abweichungZweitesSemester", is(dto.getAnmeldungsDetails().getAbweichungZweitesSemester()))
 			.withProperty("bemerkung", is(dto.getAnmeldungsDetails().getBemerkung()))
-			.withProperty("gesuchsperiode", matchesGesuchperiode(dto.getGesuchsperiode()))
+			.withProperty("periodeVon", is(dto.getPeriodeVon()))
+			.withProperty("periodeBis", is(dto.getPeriodeBis()))
 			.withProperty("institutionId", is(dto.getInstitutionId()))
-			.where(
-				Anmeldung::getAnmeldungModule,
-				is(jsonArray(containsInAnyOrder(toMatchers(dto.getAnmeldungsDetails().getModulSelection())))))
+			.withProperty(
+				"module",
+				is(jsonArray(containsInAnyOrder(toMatchers(dto.getAnmeldungsDetails().getModule())))))
 			;
 	}
 
+	@Nonnull
 	private Collection<Matcher<? super JsonNode>> toMatchers(@Nonnull List<ModulAuswahlDTO> modulAuswahlDTOS) {
 		return modulAuswahlDTOS.stream()
 			.map(this::matchesAnmeldungModul)
 			.collect(Collectors.toList());
 	}
 
-	private Matcher<JsonNode> matchesAnmeldungModul(ModulAuswahlDTO modulAuswahlDTO) {
+	@Nonnull
+	private Matcher<JsonNode> matchesAnmeldungModul(@Nonnull ModulAuswahlDTO modulAuswahlDTO) {
 		return is(jsonObject()
 			.where("intervall", is(jsonText(modulAuswahlDTO.getIntervall().name())))
-			.where("wochentag", is(jsonText(converter.toDayOfWeek(modulAuswahlDTO.getWeekday()).name())))
+			.where("wochentag", is(jsonText(modulAuswahlDTO.getWochentag().name())))
 			.where("modulId", is(jsonText(modulAuswahlDTO.getModulId()))));
-	}
-
-	private Matcher<?> matchesGesuchperiode(Gesuchsperiode gesuchsperiode) {
-		return is(pojo(ch.dvbern.kibon.shared.model.Gesuchsperiode.class)
-			.withProperty("id", is(gesuchsperiode.getId()))
-			.withProperty("gueltigAb", is(gesuchsperiode.getGueltigAb()))
-			.withProperty("gueltigBis", is(gesuchsperiode.getGueltigBis()))
-		);
 	}
 
 	@Nonnull

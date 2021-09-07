@@ -48,20 +48,25 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleManager {
 
-	private static final String CONFLUENT_PLATFORM_VERSION = "5.5.3";
-	private static final String KEYCLOAK_VERSION = "14.0.0";
+	private static final String CONFLUENT_PLATFORM_VERSION = "5.5.5";
+	private static final String KEYCLOAK_VERSION = "15.0.2";
 
 	private static final int KEYCLOAK_PORT = 8080;
 
 	private static final List<String> SCHEMA_REGISTRY_URL_PROPERTIES = Arrays.asList(
+		"mp.messaging.incoming.InstitutionClientEvents.schema.registry.url",
 		"mp.messaging.incoming.VerfuegungEvents.schema.registry.url",
 		"mp.messaging.incoming.InstitutionEvents.schema.registry.url",
 		"mp.messaging.incoming.BetreuungAnfrageEvents.schema.registry.url",
-		"mp.messaging.outgoing.PlatzbestaetigungBetreuungEvents.schema.registry.url"
+		"mp.messaging.incoming.AnmeldungEvents.schema.registry.url",
+		"mp.messaging.outgoing.PlatzbestaetigungBetreuungEvents.schema.registry.url",
+		"mp.messaging.outgoing.BetreuungStornierungEvents.schema.registry.url",
+		"mp.messaging.outgoing.AnmeldungBestaetigungEvents.schema.registry.url"
 	);
 
 	private static AuthzClient authzClient = null;
 	private static AuthzClient authzClientFambe = null;
+	private static AuthzClient authzClientTagesschule = null;
 
 	@Container
 	private final KafkaContainer kafka =
@@ -85,6 +90,11 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 	@Nonnull
 	public static String getFamilyPortalAccessToken() {
 		return authzClientFambe.obtainAccessToken().getToken();
+	}
+
+	@Nonnull
+	public static String getTagesschuleAccessToken() {
+		return authzClientTagesschule.obtainAccessToken().getToken();
 	}
 
 	@Override
@@ -135,6 +145,7 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 
 		authzClient = createKeycloakClientConfiguration(keycloakURL, "kitAdmin", dummyPassword);
 		authzClientFambe = createKeycloakClientConfiguration(keycloakURL, "fambe", dummyPassword);
+		authzClientTagesschule = createKeycloakClientConfiguration(keycloakURL, "tagesschuleTest", dummyPassword);
 
 		return systemProps;
 	}

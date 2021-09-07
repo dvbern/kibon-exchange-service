@@ -60,7 +60,7 @@ class InstitutionServiceTest {
 
 	@Test
 	public void testOnInstitutionChanged_persistNew() {
-		InstitutionEventDTO dto = createInstitutionEvent(false);
+		InstitutionEventDTO dto = createInstitutionEvent();
 
 		expect(em.find(Institution.class, dto.getId())).andReturn(null);
 
@@ -79,7 +79,7 @@ class InstitutionServiceTest {
 
 	@Test
 	public void testOnInstitutionChanged_mergeExisting() {
-		InstitutionEventDTO dto = createInstitutionEvent(false);
+		InstitutionEventDTO dto = createInstitutionEvent();
 
 		Institution existingInstitution = fromDTO(dto);
 		expect(em.find(Institution.class, dto.getId())).andReturn(existingInstitution);

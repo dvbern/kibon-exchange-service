@@ -32,6 +32,7 @@ import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
@@ -73,15 +74,17 @@ public class VerfuegungService {
 		CriteriaQuery<ClientVerfuegungDTO> query = cb.createQuery(ClientVerfuegungDTO.class);
 		Root<ClientVerfuegung> root = query.from(ClientVerfuegung.class);
 		Join<ClientVerfuegung, Verfuegung> verfuegung = root.join(ClientVerfuegung_.verfuegung);
+		// is used by ClientGueltigkeitFilter (included in ClientVerfuegungFilter)
+		root.join(ClientVerfuegung_.client);
 
 		query.select(cb.construct(
 			ClientVerfuegungDTO.class,
 			root.get(ClientVerfuegung_.id),
 			root.get(ClientVerfuegung_.since),
-			verfuegung.get(Verfuegung_.refnr),
-			verfuegung.get(Verfuegung_.institutionId),
-			verfuegung.get(Verfuegung_.von),
-			verfuegung.get(Verfuegung_.bis),
+			verfuegung.get(AbstractInstitutionPeriodeEntity_.refnr),
+			verfuegung.get(AbstractInstitutionPeriodeEntity_.institutionId),
+			verfuegung.get(AbstractInstitutionPeriodeEntity_.periodeVon),
+			verfuegung.get(AbstractInstitutionPeriodeEntity_.periodeBis),
 			verfuegung.get(Verfuegung_.version),
 			verfuegung.get(Verfuegung_.verfuegtAm),
 			verfuegung.get(Verfuegung_.betreuungsArt),

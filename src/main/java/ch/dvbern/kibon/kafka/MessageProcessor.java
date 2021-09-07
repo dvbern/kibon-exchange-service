@@ -27,8 +27,8 @@ import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 
-import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.util.EventUtil;
+import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import io.smallrye.reactive.messaging.kafka.IncomingKafkaRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
@@ -45,7 +45,7 @@ public class MessageProcessor {
 	 * For some reason there is a method signature missing for @Blocking, posts-processing acknowledgement and
 	 * Message parameters.
 	 * <br>
-	 * This construct wraps the original KafkaMessage to extract the metadata, such that wee can finally use a simple
+	 * This construct wraps the original KafkaMessage to extract the metadata, such that we can finally use a simple
 	 * payload-only method signature.
 	 * <br>
 	 * <a href="https://github.com/smallrye/smallrye-reactive-messaging/issues/628#issuecomment-652800542">see</a>

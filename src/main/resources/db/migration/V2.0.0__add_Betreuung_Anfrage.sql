@@ -1,30 +1,26 @@
 CREATE TABLE betreuunganfrage (
-	id                       BIGSERIAL    NOT NULL
-		CONSTRAINT betreuunganfrage_pkey
-			PRIMARY KEY,
-	refnr                    VARCHAR(255) NOT NULL,
-	institutionid            VARCHAR(255) NOT NULL,
-	periodevon                      DATE         NOT NULL,
-	periodebis                      DATE         NOT NULL,
-	betreuungsart            VARCHAR(255) NOT NULL,
-	kind                     JSONB        NOT NULL,
-	gesuchsteller            JSONB        NOT NULL,
-	abgelehntVonGesuchsteller BOOLEAN        NOT NULL
+	id                        BIGSERIAL    NOT NULL
+		CONSTRAINT betreuunganfrage_pkey PRIMARY KEY,
+	refnr                     VARCHAR(255) NOT NULL,
+	institutionid             VARCHAR(255) NOT NULL,
+	periodevon                DATE         NOT NULL,
+	periodebis                DATE         NOT NULL,
+	betreuungsart             VARCHAR(255) NOT NULL,
+	kind                      JSONB        NOT NULL,
+	gesuchsteller             JSONB        NOT NULL,
+	abgelehntVonGesuchsteller BOOLEAN      NOT NULL
 );
 
 CREATE TABLE clientbetreuunganfrage (
 	id                   BIGSERIAL    NOT NULL
-		CONSTRAINT clientbetreuunganfrage_pkey
-			PRIMARY KEY,
+		CONSTRAINT clientbetreuunganfrage_pkey PRIMARY KEY,
 	active               BOOLEAN      NOT NULL,
 	since                TIMESTAMP    NOT NULL,
 	client_clientname    VARCHAR(255) NOT NULL,
 	client_institutionid VARCHAR(255) NOT NULL,
-	betreuunganfrage_id        BIGINT       NOT NULL
-		CONSTRAINT betreuunganfrage_fk
-			REFERENCES betreuunganfrage,
-	CONSTRAINT client_fk
-		FOREIGN KEY (client_clientname, client_institutionid) REFERENCES client
+	betreuunganfrage_id  BIGINT       NOT NULL
+		CONSTRAINT betreuunganfrage_fk REFERENCES betreuunganfrage,
+	CONSTRAINT client_fk FOREIGN KEY (client_clientname, client_institutionid) REFERENCES client
 );
 
 CREATE INDEX clientbetreuunganfrage_idx1
@@ -64,8 +60,8 @@ AS
 $$
 BEGIN
 	INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, betreuunganfrage_id, since)
-		(SELECT nextval('clientbetreuunganfrage_id_seq'), new.active, new.clientname, new.institutionid, ba.id, new
-		.grantedsince
+		(SELECT nextval('clientbetreuunganfrage_id_seq'), new.active, new.clientname, new.institutionid, ba.id,
+				new.grantedsince
 		 FROM betreuunganfrage ba
 		 WHERE ba.institutionid = new.institutionid
 		 ORDER BY new.grantedsince, ba.id);

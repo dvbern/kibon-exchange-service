@@ -33,10 +33,10 @@ public enum EventType {
 	BETREUUNG_ANFRAGE_ADDED("BetreuungAnfrageAdded"),
 	ANMELDUNG_TAGESSCHULE("AnmeldungTagesschule");
 
+	@Nonnull
 	private final String name;
 
-	@Nonnull
-	EventType(String name) {
+	EventType(@Nonnull String name) {
 		this.name = name;
 	}
 

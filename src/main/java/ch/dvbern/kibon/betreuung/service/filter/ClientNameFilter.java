@@ -28,12 +28,12 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import ch.dvbern.kibon.clients.model.ClientId_;
-import ch.dvbern.kibon.clients.model.Client_;
-import ch.dvbern.kibon.persistence.Restriction;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage_;
+import ch.dvbern.kibon.clients.model.ClientId_;
+import ch.dvbern.kibon.clients.model.Client_;
+import ch.dvbern.kibon.persistence.Restriction;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 
 /**
