@@ -159,7 +159,7 @@ public class TagesschulenMockResponses {
 	public TagesschuleTarifeDTO createTarif1(@Nonnull String refnr) {
 		TagesschuleTarifeDTO dto = new TagesschuleTarifeDTO();
 		dto.setRefnr(refnr);
-		dto.setEventTimestamp(LocalDateTime.now());
+		dto.setTarifeDefinitivAkzeptiert(false);
 		TarifDTO tarif1 = createTarif1();
 		tarif1.setVon(LocalDate.of(2020, 11, 1));
 		tarif1.setBis(LocalDate.of(2020, 12, 31));
@@ -180,10 +180,9 @@ public class TagesschulenMockResponses {
 	public TagesschuleTarifeDTO createTarif2(@Nonnull String refnr) {
 		TagesschuleTarifeDTO dto = new TagesschuleTarifeDTO();
 		dto.setRefnr(refnr);
-		dto.setEventTimestamp(EVENT_TIMESTAMP.plusDays(2));
+		dto.setTarifeDefinitivAkzeptiert(true);
 		dto.getTarifePaedagogisch().add(createTarif1());
 		dto.getTarifeNichtPaedagogisch().add(createTarif2());
-		dto.setFinanzielleSituationAkzeptiert(true);
 
 		return dto;
 	}
