@@ -21,10 +21,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -32,6 +35,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -39,14 +43,17 @@ import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.persistence.BaseEntity;
+import ch.dvbern.kibon.tagesschulen.model.TagesschuleModule;
 import ch.dvbern.kibon.util.ConstantsUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.quarkiverse.hibernate.types.json.JsonTypes;
 import org.hibernate.annotations.Type;
 
 @Table(indexes = @Index(name = "institution_idx1", columnList = "betreuungsArt, status"))
 @Entity
-public class Institution {
+public class Institution extends BaseEntity {
 
 	@Id
 	@Nonnull
@@ -87,8 +94,8 @@ public class Institution {
 	 */
 	@SuppressWarnings("UnnecessaryFullyQualifiedName")
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb")
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN)
 	private JsonNode betreuungsAdressen = null;
 
 	/**
@@ -96,8 +103,8 @@ public class Institution {
 	 */
 	@SuppressWarnings("UnnecessaryFullyQualifiedName")
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb")
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN)
 	private JsonNode oeffnungsTage = null;
 
 	@Nullable
@@ -115,8 +122,8 @@ public class Institution {
 	 */
 	@SuppressWarnings("UnnecessaryFullyQualifiedName")
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb")
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN)
 	private JsonNode altersKategorien = null;
 
 	@Column(nullable = true)
@@ -129,8 +136,11 @@ public class Institution {
 	private BigDecimal anzahlPlaetzeFirmen = null;
 
 	@Nonnull
-	@NotNull
-	private LocalDateTime timestampMutiert = LocalDateTime.now();
+	private @NotNull LocalDateTime timestampMutiert = LocalDateTime.now();
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "institution")
+	@Nonnull
+	private @NotNull @Valid Set<TagesschuleModule> tagesschuleModule = new HashSet<>();
 
 	@Override
 	public boolean equals(@Nullable Object o) {
@@ -315,5 +325,14 @@ public class Institution {
 
 	public void setTimestampMutiert(@Nonnull LocalDateTime timestampMutiert) {
 		this.timestampMutiert = timestampMutiert;
+	}
+
+	@Nonnull
+	public Set<TagesschuleModule> getTagesschuleModule() {
+		return tagesschuleModule;
+	}
+
+	public void setTagesschuleModule(@Nonnull Set<TagesschuleModule> tagesschuleModule) {
+		this.tagesschuleModule = tagesschuleModule;
 	}
 }

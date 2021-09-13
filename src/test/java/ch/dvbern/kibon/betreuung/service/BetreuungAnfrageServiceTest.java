@@ -24,6 +24,7 @@ import javax.persistence.EntityManager;
 import ch.dvbern.kibon.betreuung.model.BetreuungAnfrage;
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
 import org.easymock.EasyMockExtension;
+import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
 import org.easymock.MockType;
 import org.easymock.TestSubject;
@@ -32,11 +33,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 
 @ExtendWith(EasyMockExtension.class)
-class BetreuungAnfrageServiceTest {
+class BetreuungAnfrageServiceTest extends EasyMockSupport {
 
 	@TestSubject
 	private final BetreuungAnfrageService service = new BetreuungAnfrageService();
@@ -60,10 +59,10 @@ class BetreuungAnfrageServiceTest {
 		em.persist(betreuungAnfrage);
 		expectLastCall();
 
-		replay(em, converter);
+		replayAll();
 
 		service.onBetreuungAnfrageCreated(dto, eventTime);
 
-		verify(em, converter);
+		verifyAll();
 	}
 }

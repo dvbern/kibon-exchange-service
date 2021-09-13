@@ -17,8 +17,8 @@
 
 package ch.dvbern.kibon.verfuegung.model;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
@@ -27,44 +27,20 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.quarkiverse.hibernate.types.json.JsonTypes;
 import org.hibernate.annotations.Type;
 
 @Table(indexes = @Index(name = "verfuegung_idx1", columnList = "institutionId, verfuegtAm"))
 @Entity
-public class Verfuegung {
-
-	@Nonnull
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(updatable = false, nullable = false)
-	private @NotNull Long id = -1L;
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotEmpty String refnr = "";
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotEmpty String institutionId = "";
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotNull LocalDate von = LocalDate.MIN;
-
-	@Nonnull
-	@Column(nullable = false, updatable = false)
-	private @NotNull LocalDate bis = LocalDate.MIN;
+public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 
 	@Nonnull
 	@Column(nullable = false, updatable = false)
@@ -88,23 +64,23 @@ public class Verfuegung {
 	private @NotNull String gemeindeName = "";
 
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode kind = null;
 
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode gesuchsteller = null;
 
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode zeitabschnitte = null;
 
 	@Nullable
-	@Type(type = "jsonb-node")
-	@Column(columnDefinition = "jsonb", nullable = false, updatable = false)
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode ignorierteZeitabschnitte = null;
 
 	@SuppressWarnings("checkstyle:CyclomaticComplexity")
@@ -120,76 +96,23 @@ public class Verfuegung {
 
 		Verfuegung that = (Verfuegung) o;
 
-		return getId() != -1L &&
-			getId().equals(that.getId()) &&
-			getVersion().equals(that.getVersion()) &&
-			getRefnr().equals(that.getRefnr()) &&
-			getInstitutionId().equals(that.getInstitutionId()) &&
-			getVon().equals(that.getVon()) &&
-			getBis().equals(that.getBis()) &&
-			getVerfuegtAm().equals(that.getVerfuegtAm()) &&
-			getBetreuungsArt() == that.getBetreuungsArt() &&
-			getGemeindeBfsNr().equals(that.getGemeindeBfsNr()) &&
-			getGemeindeName().equals(that.getGemeindeName());
+		return super.equals(o)
+			&& getVersion().equals(that.getVersion())
+			&& getVerfuegtAm().equals(that.getVerfuegtAm())
+			&& getBetreuungsArt() == that.getBetreuungsArt()
+			&& getGemeindeBfsNr().equals(that.getGemeindeBfsNr())
+			&& getGemeindeName().equals(that.getGemeindeName());
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(
-			getRefnr(),
-			getInstitutionId(),
-			getVon(),
-			getBis(),
+			Arrays.hashCode(baseHashCodeValues()),
 			getVersion(),
 			getVerfuegtAm(),
 			getBetreuungsArt(),
 			getGemeindeBfsNr(),
 			getGemeindeName());
-	}
-
-	@Nonnull
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(@Nonnull Long id) {
-		this.id = id;
-	}
-
-	@Nonnull
-	public String getRefnr() {
-		return refnr;
-	}
-
-	public void setRefnr(@Nonnull String refnr) {
-		this.refnr = refnr;
-	}
-
-	@Nonnull
-	public String getInstitutionId() {
-		return institutionId;
-	}
-
-	public void setInstitutionId(@Nonnull String institutionId) {
-		this.institutionId = institutionId;
-	}
-
-	@Nonnull
-	public LocalDate getVon() {
-		return von;
-	}
-
-	public void setVon(@Nonnull LocalDate von) {
-		this.von = von;
-	}
-
-	@Nonnull
-	public LocalDate getBis() {
-		return bis;
-	}
-
-	public void setBis(@Nonnull LocalDate bis) {
-		this.bis = bis;
 	}
 
 	@Nonnull

@@ -88,7 +88,6 @@ services:
       - kibon_exchange_backbone
     depends_on:
       - kafka
-      - keycloak
     volumes:
       - ${CONF_DIR}/service/certs/key.pem:/key.pem:ro
       - ${CONF_DIR}/service/certs/cert.pem:/cert.pem:ro
@@ -101,8 +100,6 @@ services:
       QUARKUS_DATASOURCE_PASSWORD: ${QUARKUS_DATASOURCE_PASSWORD}
       QUARKUS_OIDC_AUTH_SERVER_URL: ${QUARKUS_OIDC_AUTH_SERVER_URL}
       QUARKUS_OIDC_TOKEN_ISSUER: ${QUARKUS_OIDC_TOKEN_ISSUER}
-      # we have to wait until keycloak is up and running
-      QUARKUS_OIDC_CONNECTION_DELAY: "30s"
       QUARKUS_OIDC_CREDENTIALS_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
       QUARKUS_LOG_SENTRY: ${QUARKUS_LOG_SENTRY}
       QUARKUS_LOG_SENTRY_DSN: ${QUARKUS_LOG_SENTRY_DSN}

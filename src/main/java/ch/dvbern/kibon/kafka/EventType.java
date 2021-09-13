@@ -30,12 +30,13 @@ public enum EventType {
 	CLIENT_MODIFIED("ClientModified"),
 	INSTITUTION_CHANGED("InstitutionChanged"),
 	VERFUEGUNG_VERFUEGT("VerfuegungVerfuegt"),
-	BETREUUNG_ANFRAGE_ADDED("BetreuungAnfrageAdded");
-
-	private final String name;
+	BETREUUNG_ANFRAGE_ADDED("BetreuungAnfrageAdded"),
+	ANMELDUNG_TAGESSCHULE("AnmeldungTagesschule");
 
 	@Nonnull
-	EventType(String name) {
+	private final String name;
+
+	EventType(@Nonnull String name) {
 		this.name = name;
 	}
 
