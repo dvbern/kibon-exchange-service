@@ -8,7 +8,7 @@
     </parent>
     <groupId>ch.dvbern.kibon</groupId>
     <artifactId>kibon-exchange-service</artifactId>
-    <version>1.5.1-SNAPSHOT</version>
+    <version>1.5.2-SNAPSHOT</version>
 
     <properties>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
