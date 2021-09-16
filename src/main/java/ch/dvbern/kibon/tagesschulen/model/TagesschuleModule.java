@@ -69,7 +69,7 @@ public class TagesschuleModule extends BaseEntity {
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "parent")
 	@Nonnull
-	private @NotNull @Valid Set<Modul> module = new HashSet<>();
+	private @Valid Set<Modul> module = new HashSet<>();
 
 	@Override
 	public boolean equals(@Nullable Object o) {
