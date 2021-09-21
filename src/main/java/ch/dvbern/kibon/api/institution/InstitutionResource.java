@@ -19,6 +19,7 @@ package ch.dvbern.kibon.api.institution;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -169,8 +170,10 @@ public class InstitutionResource {
 			return Response.status(Status.FORBIDDEN).build();
 		}
 
-		ClientInstitutionDTO institutionDTO = institutionService.get(client);
+		Optional<ClientInstitutionDTO> institutionDTO = institutionService.get(client);
 
-		return Response.ok(institutionDTO).build();
+		return institutionDTO.map(Response::ok)
+			.orElseGet(() -> Response.status(Status.NOT_FOUND))
+			.build();
 	}
 }
