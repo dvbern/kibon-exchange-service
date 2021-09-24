@@ -226,11 +226,12 @@ public class TagesschulenResource {
 		//Find institution linked with refnummer
 		Optional<Anmeldung> anmeldung = anmeldungService.getLatestAnmeldung(refnr);
 
-		if(!anmeldung.isPresent()){
+		if (anmeldung.isEmpty()) {
 			return Uni.createFrom().item(Response.status(Status.NOT_FOUND).build());
 		}
 
-		Optional<Client> client = clientService.findActive(new ClientId(clientName, anmeldung.get().getInstitutionId()));
+		ClientId clientId = new ClientId(clientName, anmeldung.get().getInstitutionId());
+		Optional<Client> client = clientService.findActive(clientId);
 
 		if (client.isEmpty()) {
 			return Uni.createFrom().item(Response.status(Status.FORBIDDEN).build());
@@ -248,7 +249,6 @@ public class TagesschulenResource {
 					LOG.error("failed", error);
 					return Response.serverError().build();
 				});
-
 
 		return Uni.createFrom().completionStage(acked);
 	}
