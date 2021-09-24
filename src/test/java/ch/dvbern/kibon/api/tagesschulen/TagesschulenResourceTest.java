@@ -118,6 +118,41 @@ public class TagesschulenResourceTest {
 			.statusCode(Status.OK.getStatusCode());
 	}
 
+	@Test
+	void testDeleteRejectRequiresAuthorisation() {
+		given()
+			.contentType(ContentType.JSON)
+			.when()
+			.delete("/tagesschulen/anmeldungen/refnr/" + REFNR)
+			.then()
+			.assertThat()
+			.statusCode(Status.UNAUTHORIZED.getStatusCode());
+	}
+
+	@Test
+	void testDeleteRejectAnmeldungNotFound() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.delete("/tagesschulen/anmeldungen/refnr/20.000102.001.1.1")
+			.then()
+			.assertThat()
+			.statusCode(Status.NOT_FOUND.getStatusCode());
+	}
+
+	@Test
+	void testDeleteRejectAcceptsValidRefnummer() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.delete("/tagesschulen/anmeldungen/refnr/" + REFNR)
+			.then()
+			.assertThat()
+			.statusCode(Status.OK.getStatusCode());
+	}
+
 	@Nonnull
 	private TagesschuleBestaetigungDTO create(@Nonnull ModulAuswahlDTO modulAuswahlDTO) {
 		TagesschuleBestaetigungDTO dto = new TagesschuleBestaetigungDTO();

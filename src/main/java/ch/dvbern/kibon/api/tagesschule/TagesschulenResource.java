@@ -53,7 +53,9 @@ import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleBest
 import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TagesschuleTarifeDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleBestaetigungEventDTO;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
+import ch.dvbern.kibon.tagesschulen.facade.AblehnenAnmeldungKafkaEventProducer;
 import ch.dvbern.kibon.tagesschulen.facade.AnmeldungKafkaEventProducer;
+import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.service.AnmeldungService;
 import ch.dvbern.kibon.tagesschulen.service.filter.ClientAnmeldungFilter;
@@ -109,6 +111,10 @@ public class TagesschulenResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	AnmeldungKafkaEventProducer anmeldungKafkaEventProducer;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	AblehnenAnmeldungKafkaEventProducer ablehnenAnmeldungKafkaEventProducer;
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
@@ -206,9 +212,45 @@ public class TagesschulenResource {
 	@NoCache
 	@Nonnull
 	@RolesAllowed("tagesschule")
-	public Response reject(@NotEmpty @PathParam("refnr") String refnr) {
+	public Uni<Response> reject(@NotEmpty @PathParam("refnr") String refnr) {
+		String clientName = jsonWebToken.getClaim("clientId");
+		Set<String> groups = identity.getRoles();
+		String userName = identity.getPrincipal().getName();
 
-		return mockResponse(refnr);
+		LOG.info(
+			"Tagesschule Ablehnung received by '{}' with clientName '{}', roles '{}'",
+			userName,
+			clientName,
+			groups);
+
+		//Find institution linked with refnummer
+		Optional<Anmeldung> anmeldung = anmeldungService.getLatestAnmeldung(refnr);
+
+		if(!anmeldung.isPresent()){
+			return Uni.createFrom().item(Response.status(Status.NOT_FOUND).build());
+		}
+
+		Optional<Client> client = clientService.findActive(new ClientId(clientName, anmeldung.get().getInstitutionId()));
+
+		if (client.isEmpty()) {
+			return Uni.createFrom().item(Response.status(Status.FORBIDDEN).build());
+		}
+
+		LOG.debug("Generating message");
+
+		CompletionStage<Response> acked =
+			ablehnenAnmeldungKafkaEventProducer.process(refnr, client.get())
+				.thenApply(Void -> {
+					LOG.debug("received ack");
+					return Response.ok().build();
+				})
+				.exceptionally(error -> {
+					LOG.error("failed", error);
+					return Response.serverError().build();
+				});
+
+
+		return Uni.createFrom().completionStage(acked);
 	}
 
 	@POST
@@ -309,15 +351,6 @@ public class TagesschulenResource {
 
 		if (REF_NR_2.equals(refnr)) {
 			return Response.ok(mockResponses.createTarif2(refnr)).build();
-		}
-
-		return Response.status(Status.NOT_FOUND).build();
-	}
-
-	@Nonnull
-	private Response mockResponse(@Nonnull String refnr) {
-		if (REF_NR_1.equals(refnr) || REF_NR_2.equals(refnr)) {
-			return Response.ok().build();
 		}
 
 		return Response.status(Status.NOT_FOUND).build();
