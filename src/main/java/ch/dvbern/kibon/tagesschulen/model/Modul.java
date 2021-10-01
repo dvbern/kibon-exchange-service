@@ -55,10 +55,10 @@ public class Modul extends BaseEntity {
 	private @NotNull TagesschuleModule parent = new TagesschuleModule();
 
 	@Nonnull
-	private @NotEmpty String bezeichnungDE = "";
+	private @NotNull String bezeichnungDE = "";
 
 	@Nonnull
-	private @NotEmpty String bezeichnungFR = "";
+	private @NotNull String bezeichnungFR = "";
 
 	@Nonnull
 	private @NotNull LocalTime zeitVon = LocalTime.MIN;

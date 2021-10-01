@@ -119,6 +119,7 @@ public class AnmeldungService {
 			anmeldungJoin.get(AbstractInstitutionPeriodeEntity_.periodeBis),
 			anmeldungJoin.get(Anmeldung_.kind),
 			anmeldungJoin.get(Anmeldung_.gesuchsteller),
+			anmeldungJoin.get(Anmeldung_.gesuchsteller2),
 			anmeldungJoin.get(Anmeldung_.planKlasse),
 			anmeldungJoin.get(Anmeldung_.abholung),
 			anmeldungJoin.get(Anmeldung_.abweichungZweitesSemester),

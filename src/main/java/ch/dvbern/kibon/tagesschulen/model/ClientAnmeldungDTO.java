@@ -70,6 +70,9 @@ public class ClientAnmeldungDTO {
 	@Nonnull
 	private final JsonNode antragsteller;
 
+	@Nullable
+	private final JsonNode antragsteller2;
+
 	@Nonnull
 	private JsonNode module;
 
@@ -85,6 +88,7 @@ public class ClientAnmeldungDTO {
 		@Nonnull LocalDate periodeBis,
 		@Nonnull JsonNode kind,
 		@Nonnull JsonNode antragsteller,
+		@Nullable JsonNode antragsteller2,
 		@Nullable String planKlasse,
 		@Nullable AbholungTagesschule abholung,
 		@Nonnull Boolean abweichungZweitesSemester,
@@ -101,6 +105,7 @@ public class ClientAnmeldungDTO {
 		this.periodeBis = periodeBis;
 		this.kind = kind;
 		this.antragsteller = antragsteller;
+		this.antragsteller2 = antragsteller2;
 		this.planKlasse = planKlasse;
 		this.abholung = abholung;
 		this.abweichungZweitesSemester = abweichungZweitesSemester;
@@ -198,6 +203,11 @@ public class ClientAnmeldungDTO {
 	@Nonnull
 	public JsonNode getAntragsteller() {
 		return antragsteller;
+	}
+
+	@Nullable
+	public JsonNode getAntragsteller2() {
+		return antragsteller2;
 	}
 
 	public boolean isAnmeldungZurueckgezogen() {

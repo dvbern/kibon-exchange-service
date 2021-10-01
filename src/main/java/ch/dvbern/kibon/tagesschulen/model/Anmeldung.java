@@ -63,6 +63,7 @@ public class Anmeldung extends AbstractInstitutionPeriodeEntity {
 		.thenComparing(Anmeldung::getVersion)
 		.thenComparing(Anmeldung::getKind, JsonNodeComparator.INSTANCE)
 		.thenComparing(Anmeldung::getGesuchsteller, JsonNodeComparator.INSTANCE)
+		.thenComparing(Anmeldung::getGesuchsteller2, Comparator.nullsLast(JsonNodeComparator.INSTANCE))
 		.thenComparing(Anmeldung::getModule, JsonNodeComparator.INSTANCE);
 
 	@Nonnull
@@ -74,6 +75,11 @@ public class Anmeldung extends AbstractInstitutionPeriodeEntity {
 	@Type(type = JsonTypes.JSON_OBJECT_BIN)
 	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode gesuchsteller;
+
+	@Nullable
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = true, updatable = false)
+	private JsonNode gesuchsteller2;
 
 	@Nonnull
 	@Column(nullable = false)
@@ -176,6 +182,15 @@ public class Anmeldung extends AbstractInstitutionPeriodeEntity {
 
 	public void setGesuchsteller(@Nonnull JsonNode gesuchsteller) {
 		this.gesuchsteller = gesuchsteller;
+	}
+
+	@Nullable
+	public JsonNode getGesuchsteller2() {
+		return gesuchsteller2;
+	}
+
+	public void setGesuchsteller2(@Nullable JsonNode gesuchsteller2) {
+		this.gesuchsteller2 = gesuchsteller2;
 	}
 
 	@Nonnull
