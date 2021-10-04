@@ -46,9 +46,9 @@ public class AnmeldungConverter {
 	public Anmeldung create(@Nonnull TagesschuleAnmeldungEventDTO dto, @Nonnull LocalDateTime eventTimestamp) {
 		Anmeldung anmeldung = new Anmeldung();
 		anmeldung.setKind(toKind(dto.getKind()));
-		anmeldung.setGesuchsteller(toGesuchsteller(dto.getAntragstellendePerson()));
-		anmeldung.setGesuchsteller2(dto.getAntragstellendePerson2() != null ?
-			toGesuchsteller(dto.getAntragstellendePerson2()) :
+		anmeldung.setGesuchsteller(toGesuchsteller(dto.getGesuchsteller()));
+		anmeldung.setGesuchsteller2(dto.getGesuchsteller2() != null ?
+			toGesuchsteller(dto.getGesuchsteller2()) :
 			null);
 		anmeldung.setFreigegebenAm(dto.getFreigegebenAm());
 		anmeldung.setStatus(dto.getStatus());

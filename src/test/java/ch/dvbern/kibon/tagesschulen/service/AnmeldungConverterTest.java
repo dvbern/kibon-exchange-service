@@ -66,7 +66,7 @@ public class AnmeldungConverterTest {
 	private IsPojo<Anmeldung> matchesDTO(@Nonnull TagesschuleAnmeldungEventDTO dto) {
 		return pojo(Anmeldung.class)
 			.withProperty("kind", matchesKindDTO(dto.getKind()))
-			.withProperty("gesuchsteller", matchesGesuchstellerDTO(dto.getAntragstellendePerson()))
+			.withProperty("gesuchsteller", matchesGesuchstellerDTO(dto.getGesuchsteller()))
 			.withProperty("freigegebenAm", is(dto.getFreigegebenAm()))
 			.withProperty("status", is(dto.getStatus()))
 			.withProperty("anmeldungZurueckgezogen", is(dto.getAnmeldungZurueckgezogen()))

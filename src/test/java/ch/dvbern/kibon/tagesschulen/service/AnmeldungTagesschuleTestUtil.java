@@ -52,7 +52,7 @@ public final class AnmeldungTagesschuleTestUtil {
 		tagesschuleAnmeldungEventDTO.setKind(createKindDTO());
 		tagesschuleAnmeldungEventDTO.setPeriodeVon(LocalDate.of(2021, 8, 1));
 		tagesschuleAnmeldungEventDTO.setPeriodeBis(LocalDate.of(2022, 7, 31));
-		tagesschuleAnmeldungEventDTO.setAntragstellendePerson(createGesuchstellerDTO());
+		tagesschuleAnmeldungEventDTO.setGesuchsteller(createGesuchstellerDTO());
 		tagesschuleAnmeldungEventDTO.setAnmeldungsDetails(createAnmeldungsDetailsDTO());
 
 		return tagesschuleAnmeldungEventDTO;
