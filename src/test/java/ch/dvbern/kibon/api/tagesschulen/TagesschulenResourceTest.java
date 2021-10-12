@@ -153,6 +153,21 @@ public class TagesschulenResourceTest {
 			.statusCode(Status.OK.getStatusCode());
 	}
 
+	@Test
+	void testGetTarife() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.get("/tagesschulen/tarife/refnr/" + REFNR)
+			.then()
+			.assertThat()
+			.statusCode(Status.OK.getStatusCode())
+			.body(isJsonStringMatching(jsonObject()
+				.where("tarifePaedagogisch", is(jsonArray(is(not(empty())))))
+			));
+	}
+
 	@Nonnull
 	private TagesschuleBestaetigungDTO create(@Nonnull ModulAuswahlDTO modulAuswahlDTO) {
 		TagesschuleBestaetigungDTO dto = new TagesschuleBestaetigungDTO();

@@ -277,7 +277,7 @@ CREATE TRIGGER clientanmeldung_active_toggle
 INSERT INTO anmeldung (kind, gesuchsteller, freigegebenam, status, anmeldungzurueckgezogen, refnr, eintrittsdatum,
 					   planklasse, abholung, abweichungzweitessemester, bemerkung, module, periodevon,
 					   periodebis, institutionid,
-					   eventtimestamp, version)
+					   eventtimestamp, version, tarifepedagogisch, tarifenichtpedagogisch)
 VALUES ('{
 	"vorname": "Simon",
 	"nachname": "Wälti",
@@ -313,4 +313,6 @@ VALUES ('{
 		'2020-07-31'::DATE,
 		'5',
 		now(),
-		0);
+		0,
+		'[{"bis": "2021-07-31", "von": "2020-08-01", "totalKostenProWoche": 9.68, "betreuungsKostenProStunde": 1.84, "betreuungsMinutenProWoche": 120, "verpflegungsKostenProWoche": 6, "verpflegungsKostenVerguenstigung": 0}]'::JSONB,
+		'[]'::JSONB,);
