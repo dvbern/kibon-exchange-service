@@ -17,6 +17,8 @@
 
 package ch.dvbern.kibon.api.tagesschule;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -51,6 +53,8 @@ import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnme
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnmeldungenDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleBestaetigungDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TagesschuleTarifeDTO;
+import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TarifDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungStatus;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleBestaetigungEventDTO;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import ch.dvbern.kibon.tagesschulen.facade.AblehnenAnmeldungKafkaEventProducer;
@@ -60,6 +64,7 @@ import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.service.AnmeldungService;
 import ch.dvbern.kibon.tagesschulen.service.filter.ClientAnmeldungFilter;
 import ch.dvbern.kibon.util.OpenApiTag;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
@@ -85,8 +90,7 @@ public class TagesschulenResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TagesschulenResource.class);
 
-	private static final String REF_NR_1 = "20.007420.001.1.3";
-	private static final String REF_NR_2 = "20.007404.002.1.3";
+	private static final String CLIENT_ID = "clientId";
 
 	@SuppressWarnings({ "checkstyle:VisibilityModifier", "CdiInjectionPointsInspection" })
 	@Inject
@@ -166,7 +170,7 @@ public class TagesschulenResource {
 		@Parameter(description = "Erweiterung für zusätzliche Filter - wird momentan nicht verwendet")
 		@QueryParam("$filter") @Nullable String filter) {
 
-		String clientName = jsonWebToken.getClaim("clientId");
+		String clientName = jsonWebToken.getClaim(CLIENT_ID);
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
 
@@ -213,7 +217,7 @@ public class TagesschulenResource {
 	@Nonnull
 	@RolesAllowed("tagesschule")
 	public Uni<Response> reject(@NotEmpty @PathParam("refnr") String refnr) {
-		String clientName = jsonWebToken.getClaim("clientId");
+		String clientName = jsonWebToken.getClaim(CLIENT_ID);
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
 
@@ -277,7 +281,7 @@ public class TagesschulenResource {
 		@NotEmpty @PathParam("refnr") String refnr,
 		@NotNull @Valid TagesschuleBestaetigungDTO bestaetigungDTO) {
 
-		String clientName = jsonWebToken.getClaim("clientId");
+		String clientName = jsonWebToken.getClaim(CLIENT_ID);
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
 
@@ -330,29 +334,61 @@ public class TagesschulenResource {
 		description = "Gibt die Tarife einer bestätigten Tagesschulen-Betreuung zurück."
 			+ "\n\n"
 			+ "Die Tarife sind abhängig von der finanziellen Situation der Familie und müssen durch die Gemeinde "
-			+ "verfügt werden."
-			+ "\n\n"
-			+ "Solange die Anmledung noch nicht vollständig geprüft wurde, wird der Maximaltarif zurückgegeben.")
+			+ "verfügt werden.")
 	@SecurityRequirement(name = "OAuth2", scopes = "tagesschule")
 	@APIResponse(responseCode = "200",
 		content = @Content(schema = @Schema(implementation = TagesschuleTarifeDTO.class)))
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
 	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
+	@APIResponse(responseCode = "404", ref = "#/components/responses/NotFound")
 	@Transactional
 	@NoCache
 	@Nonnull
 	@RolesAllowed("tagesschule")
 	public Response getTarife(@NotEmpty @PathParam("refnr") String refnr) {
+		String clientName = jsonWebToken.getClaim(CLIENT_ID);
+		Set<String> groups = identity.getRoles();
+		String userName = identity.getPrincipal().getName();
 
-		if (REF_NR_1.equals(refnr)) {
-			return Response.ok(mockResponses.createTarif1(refnr)).build();
+		LOG.info(
+			"Tagesschule Tarife accessed by '{}' with clientName '{}', roles '{}'",
+			userName,
+			clientName,
+			groups,
+			refnr);
+
+		//Find institution linked with refnummer
+		Optional<Anmeldung> anmeldung = anmeldungService.getLatestAnmeldung(refnr);
+
+		if (anmeldung.isEmpty()) {
+			return Response.status(Status.NOT_FOUND).build();
 		}
 
-		if (REF_NR_2.equals(refnr)) {
-			return Response.ok(mockResponses.createTarif2(refnr)).build();
+		ClientId clientId = new ClientId(clientName, anmeldung.get().getInstitutionId());
+		Optional<Client> client = clientService.findActive(clientId);
+
+		if (client.isEmpty()) {
+			return Response.status(Status.FORBIDDEN).build();
 		}
 
-		return Response.status(Status.NOT_FOUND).build();
+		return Response.ok(convertToTagesschuleTarifeDTO(anmeldung.get())).build();
+	}
+
+	private TagesschuleTarifeDTO convertToTagesschuleTarifeDTO(Anmeldung anmeldung) {
+		TagesschuleTarifeDTO tagesschuleTarifeDTO = new TagesschuleTarifeDTO();
+		tagesschuleTarifeDTO.setRefnr(anmeldung.getRefnr());
+		tagesschuleTarifeDTO.setTarifeDefinitivAkzeptiert(anmeldung.getStatus().equals(TagesschuleAnmeldungStatus.SCHULAMT_ANMELDUNG_UEBERNOMMEN
+		));
+		tagesschuleTarifeDTO.setTarifePaedagogisch(convertTarife(anmeldung.getTarifePedagogisch()));
+		tagesschuleTarifeDTO.setTarifeNichtPaedagogisch(convertTarife(anmeldung.getTarifeNichtPedagogisch()));
+		return  tagesschuleTarifeDTO;
+	}
+
+	private List<TarifDTO> convertTarife(@Nullable JsonNode model) {
+		if(model == null) {
+			return Collections.emptyList();
+		}
+		return Arrays.asList(objectMapper.convertValue(model, TarifDTO[].class));
 	}
 }

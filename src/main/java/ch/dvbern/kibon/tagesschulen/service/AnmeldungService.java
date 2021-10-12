@@ -70,6 +70,9 @@ public class AnmeldungService {
 		if (Anmeldung.COMPARATOR.compare(last, newAnmeldung) == 0) {
 			// don't trigger a new entry in ClientAnmeldung table: just update status & tarife of lastExistingAnmeldung
 			last.setStatus(newAnmeldung.getStatus());
+			last.setEventTimestamp(eventTime);
+			last.setTarifePedagogisch(newAnmeldung.getTarifePedagogisch());
+			last.setTarifeNichtPedagogisch(newAnmeldung.getTarifeNichtPedagogisch());
 			em.merge(last);
 		} else {
 			// some essential data in anmelung changed -> re-export

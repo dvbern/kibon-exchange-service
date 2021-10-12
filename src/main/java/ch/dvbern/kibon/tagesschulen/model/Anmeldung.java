@@ -118,6 +118,16 @@ public class Anmeldung extends AbstractInstitutionPeriodeEntity {
 	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode module;
 
+	@Nullable
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = true, updatable = false)
+	private JsonNode tarifePedagogisch;
+
+	@Nullable
+	@Type(type = JsonTypes.JSON_OBJECT_BIN)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = true, updatable = false)
+	private JsonNode tarifeNichtPedagogisch;
+
 	@SuppressWarnings("checkstyle:CyclomaticComplexity")
 	@Override
 	public boolean equals(@Nullable Object o) {
@@ -273,5 +283,23 @@ public class Anmeldung extends AbstractInstitutionPeriodeEntity {
 
 	public void setModule(@Nonnull JsonNode anmeldungModule) {
 		this.module = anmeldungModule;
+	}
+
+	@Nullable
+	public JsonNode getTarifePedagogisch() {
+		return tarifePedagogisch;
+	}
+
+	public void setTarifePedagogisch(@Nullable JsonNode tarifePedagogisch) {
+		this.tarifePedagogisch = tarifePedagogisch;
+	}
+
+	@Nullable
+	public JsonNode getTarifeNichtPedagogisch() {
+		return tarifeNichtPedagogisch;
+	}
+
+	public void setTarifeNichtPedagogisch(@Nullable JsonNode tarifeNichtPedagogisch) {
+		this.tarifeNichtPedagogisch = tarifeNichtPedagogisch;
 	}
 }

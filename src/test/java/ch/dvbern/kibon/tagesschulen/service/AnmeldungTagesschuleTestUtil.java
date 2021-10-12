@@ -17,6 +17,7 @@
 
 package ch.dvbern.kibon.tagesschulen.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,8 @@ import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulAuswahlDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungDetailsDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungStatus;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungTarifeDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TarifDTO;
 import ch.dvbern.kibon.exchange.commons.types.AdresseDTO;
 import ch.dvbern.kibon.exchange.commons.types.Geschlecht;
 import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
@@ -39,6 +42,23 @@ public final class AnmeldungTagesschuleTestUtil {
 
 	private AnmeldungTagesschuleTestUtil() {
 		// util
+	}
+
+	public static TagesschuleAnmeldungTarifeDTO createPedagogischeTarife() {
+		TagesschuleAnmeldungTarifeDTO tagesschuleAnmeldungTarifeDTO = new TagesschuleAnmeldungTarifeDTO();
+		List<TarifDTO> pedagogischeTarife = new ArrayList();
+		TarifDTO tarifDTO = new TarifDTO();
+		tarifDTO.setVon(LocalDate.of(2020, 8, 1));
+		tarifDTO.setBis(LocalDate.of(2021,7,31));
+		tarifDTO.setBetreuungsKostenProStunde(BigDecimal.ONE);
+		tarifDTO.setBetreuungsMinutenProWoche(500);
+		tarifDTO.setTotalKostenProWoche(BigDecimal.ONE);
+		tarifDTO.setVerpflegungsKostenProWoche(BigDecimal.ZERO);
+		tarifDTO.setVerpflegungsKostenVerguenstigung(BigDecimal.ZERO);
+		pedagogischeTarife.add(tarifDTO);
+
+		tagesschuleAnmeldungTarifeDTO.setTarifePaedagogisch(pedagogischeTarife);
+		return tagesschuleAnmeldungTarifeDTO;
 	}
 
 	@Nonnull

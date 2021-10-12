@@ -28,6 +28,7 @@ import javax.inject.Inject;
 
 import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulAuswahlDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TarifDTO;
 import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
@@ -63,7 +64,10 @@ public class AnmeldungConverter {
 		anmeldung.setEventTimestamp(eventTimestamp);
 		anmeldung.setVersion(dto.getVersion());
 		anmeldung.setModule(toAnmeldungModule(dto.getAnmeldungsDetails().getModule()));
-
+		if (dto.getTarife() != null) {
+			anmeldung.setTarifePedagogisch(toAnmeldungTarife(dto.getTarife().getTarifePaedagogisch()));
+			anmeldung.setTarifeNichtPedagogisch(toAnmeldungTarife(dto.getTarife().getTarifeNichtPaedagogisch()));
+		}
 		return anmeldung;
 	}
 
@@ -116,5 +120,33 @@ public class AnmeldungConverter {
 			.put("modulId", modulAuswahlDTO.getModulId())
 			.put("wochentag", modulAuswahlDTO.getWochentag().name())
 			.put("intervall", modulAuswahlDTO.getIntervall().name());
+	}
+
+	@Nonnull
+	private ArrayNode toAnmeldungTarife(@Nullable List<TarifDTO> tagesschuleAnmeldungTarifeDTOS) {
+		if (tagesschuleAnmeldungTarifeDTOS == null) {
+			return mapper.createArrayNode();
+		}
+
+		List<ObjectNode> mapped = tagesschuleAnmeldungTarifeDTOS.stream()
+			.map(this::toTarif)
+			.collect(Collectors.toList());
+
+		return mapper.createArrayNode()
+			.addAll(mapped);
+	}
+
+	@Nonnull
+	private ObjectNode toTarif(@Nonnull TarifDTO tagesschuleAnmeldungTarifeDTO) {
+		return mapper.createObjectNode()
+			.put("von", tagesschuleAnmeldungTarifeDTO.getVon().toString())
+			.put("bis", tagesschuleAnmeldungTarifeDTO.getBis().toString())
+			.put("betreuungsKostenProStunde", tagesschuleAnmeldungTarifeDTO.getBetreuungsKostenProStunde())
+			.put("betreuungsMinutenProWoche", tagesschuleAnmeldungTarifeDTO.getBetreuungsMinutenProWoche())
+			.put("totalKostenProWoche", tagesschuleAnmeldungTarifeDTO.getTotalKostenProWoche())
+			.put("verpflegungsKostenProWoche", tagesschuleAnmeldungTarifeDTO.getVerpflegungsKostenProWoche())
+			.put(
+				"verpflegungsKostenVerguenstigung",
+				tagesschuleAnmeldungTarifeDTO.getVerpflegungsKostenVerguenstigung());
 	}
 }
