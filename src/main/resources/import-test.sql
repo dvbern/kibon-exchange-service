@@ -315,4 +315,4 @@ VALUES ('{
 		now(),
 		0,
 		'[{"bis": "2021-07-31", "von": "2020-08-01", "totalKostenProWoche": 9.68, "betreuungsKostenProStunde": 1.84, "betreuungsMinutenProWoche": 120, "verpflegungsKostenProWoche": 6, "verpflegungsKostenVerguenstigung": 0}]'::JSONB,
-		'[]'::JSONB,);
+		'[]'::JSONB);
