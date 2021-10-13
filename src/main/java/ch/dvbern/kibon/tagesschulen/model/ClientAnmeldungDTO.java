@@ -24,6 +24,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import ch.dvbern.kibon.exchange.commons.tagesschulen.AbholungTagesschule;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class ClientAnmeldungDTO {
@@ -39,6 +40,9 @@ public class ClientAnmeldungDTO {
 
 	@Nonnull
 	private final Integer version;
+
+	@Nonnull
+	private final TagesschuleAnmeldungStatus status;
 
 	@Nonnull
 	private final LocalDateTime eventTimestamp;
@@ -83,6 +87,7 @@ public class ClientAnmeldungDTO {
 		@Nonnull String institutionId,
 		@Nonnull String refnr,
 		@Nonnull Integer version,
+		@Nonnull TagesschuleAnmeldungStatus status,
 		@Nonnull LocalDateTime eventTimestamp,
 		@Nonnull LocalDate periodeVon,
 		@Nonnull LocalDate periodeBis,
@@ -100,6 +105,7 @@ public class ClientAnmeldungDTO {
 		this.institutionId = institutionId;
 		this.refnr = refnr;
 		this.version = version;
+		this.status = status;
 		this.eventTimestamp = eventTimestamp;
 		this.periodeVon = periodeVon;
 		this.periodeBis = periodeBis;
@@ -133,6 +139,11 @@ public class ClientAnmeldungDTO {
 	@Nonnull
 	public Integer getVersion() {
 		return version;
+	}
+
+	@Nonnull
+	public TagesschuleAnmeldungStatus getStatus() {
+		return status;
 	}
 
 	@Nonnull

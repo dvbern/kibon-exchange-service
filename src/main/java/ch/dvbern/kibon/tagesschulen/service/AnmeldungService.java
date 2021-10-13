@@ -116,6 +116,7 @@ public class AnmeldungService {
 			anmeldungJoin.get(AbstractInstitutionPeriodeEntity_.institutionId),
 			anmeldungJoin.get(AbstractInstitutionPeriodeEntity_.refnr),
 			anmeldungJoin.get(Anmeldung_.version),
+			anmeldungJoin.get(Anmeldung_.status),
 			anmeldungJoin.get(Anmeldung_.eventTimestamp),
 			anmeldungJoin.get(AbstractInstitutionPeriodeEntity_.periodeVon),
 			anmeldungJoin.get(AbstractInstitutionPeriodeEntity_.periodeBis),
