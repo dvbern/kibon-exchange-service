@@ -17,7 +17,6 @@
 
 package ch.dvbern.kibon.verfuegung.service;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,14 +37,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventTestUtil.createDTO;
+import static ch.dvbern.kibon.testutils.MatcherUtil.jsonBigDecimalLike;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
-import static com.spotify.hamcrest.jackson.JsonMatchers.jsonBigDecimal;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonInt;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static com.spotify.hamcrest.pojo.IsPojo.pojo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.comparesEqualTo;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 
@@ -116,25 +114,19 @@ class VerfuegungConverterTest {
 			.where("von", is(jsonText(dto.getVon().toString())))
 			.where("bis", is(jsonText(dto.getBis().toString())))
 			.where("verfuegungNr", is(jsonInt(dto.getVerfuegungNr())))
-			.where("effektiveBetreuungPct", is(matchesBigDecimal(dto.getEffektiveBetreuungPct())))
+			.where("effektiveBetreuungPct", is(jsonBigDecimalLike(dto.getEffektiveBetreuungPct())))
 			.where("anspruchPct", is(jsonInt((dto.getAnspruchPct()))))
-			.where("verguenstigtPct", is(matchesBigDecimal(dto.getVerguenstigtPct())))
-			.where("vollkosten", is(matchesBigDecimal(dto.getVollkosten())))
-			.where("betreuungsgutschein", is(matchesBigDecimal(dto.getBetreuungsgutschein())))
-			.where("minimalerElternbeitrag", is(matchesBigDecimal(dto.getMinimalerElternbeitrag())))
-			.where("verguenstigung", is(matchesBigDecimal(dto.getVerguenstigung())))
-			.where("verfuegteAnzahlZeiteinheiten", is(matchesBigDecimal(dto.getVerfuegteAnzahlZeiteinheiten())))
+			.where("verguenstigtPct", is(jsonBigDecimalLike(dto.getVerguenstigtPct())))
+			.where("vollkosten", is(jsonBigDecimalLike(dto.getVollkosten())))
+			.where("betreuungsgutschein", is(jsonBigDecimalLike(dto.getBetreuungsgutschein())))
+			.where("minimalerElternbeitrag", is(jsonBigDecimalLike(dto.getMinimalerElternbeitrag())))
+			.where("verguenstigung", is(jsonBigDecimalLike(dto.getVerguenstigung())))
+			.where("verfuegteAnzahlZeiteinheiten", is(jsonBigDecimalLike(dto.getVerfuegteAnzahlZeiteinheiten())))
 			.where(
 				"anspruchsberechtigteAnzahlZeiteinheiten",
-				is(matchesBigDecimal(dto.getAnspruchsberechtigteAnzahlZeiteinheiten())))
+				is(jsonBigDecimalLike(dto.getAnspruchsberechtigteAnzahlZeiteinheiten())))
 			.where("zeiteinheit", is(jsonText(dto.getZeiteinheit().name())))
 			.where("regelwerk", is(jsonText(dto.getRegelwerk().name())))
 		);
-	}
-
-	@Nonnull
-	private Matcher<JsonNode> matchesBigDecimal(@Nonnull BigDecimal expected) {
-		// Jackson uses scientific representation of BigDecimal, such that comparesEqual must be used for the match
-		return jsonBigDecimal(comparesEqualTo(expected));
 	}
 }

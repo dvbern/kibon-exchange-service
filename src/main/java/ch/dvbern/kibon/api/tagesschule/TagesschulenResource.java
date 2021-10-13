@@ -17,7 +17,6 @@
 
 package ch.dvbern.kibon.api.tagesschule;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -53,8 +52,6 @@ import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnme
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnmeldungenDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleBestaetigungDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TagesschuleTarifeDTO;
-import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TarifDTO;
-import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungStatus;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleBestaetigungEventDTO;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import ch.dvbern.kibon.tagesschulen.facade.AblehnenAnmeldungKafkaEventProducer;
@@ -64,7 +61,6 @@ import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.service.AnmeldungService;
 import ch.dvbern.kibon.tagesschulen.service.filter.ClientAnmeldungFilter;
 import ch.dvbern.kibon.util.OpenApiTag;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
@@ -99,10 +95,6 @@ public class TagesschulenResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	SecurityIdentity identity;
-
-	@SuppressWarnings("checkstyle:VisibilityModifier")
-	@Inject
-	TagesschulenMockResponses mockResponses;
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
@@ -222,10 +214,11 @@ public class TagesschulenResource {
 		String userName = identity.getPrincipal().getName();
 
 		LOG.info(
-			"Tagesschule Ablehnung received by '{}' with clientName '{}', roles '{}'",
+			"Tagesschule Ablehnung received by '{}' with clientName '{}', roles '{}', refNr '{}'",
 			userName,
 			clientName,
-			groups);
+			groups,
+			refnr);
 
 		//Find institution linked with refnummer
 		Optional<Anmeldung> anmeldung = anmeldungService.getLatestAnmeldung(refnr);
@@ -286,10 +279,11 @@ public class TagesschulenResource {
 		String userName = identity.getPrincipal().getName();
 
 		LOG.info(
-			"TagesschuleBestaetigung received by '{}' with clientName '{}', roles '{}'",
+			"TagesschuleBestaetigung received by '{}' with clientName '{}', roles '{}', refNr '{}'",
 			userName,
 			clientName,
-			groups);
+			groups,
+			refnr);
 
 		Optional<String> institutionId = anmeldungService.getLatestAnmeldung(refnr)
 			.map(AbstractInstitutionPeriodeEntity::getInstitutionId);
@@ -352,13 +346,12 @@ public class TagesschulenResource {
 		String userName = identity.getPrincipal().getName();
 
 		LOG.info(
-			"Tagesschule Tarife accessed by '{}' with clientName '{}', roles '{}'",
+			"Tagesschule Tarife accessed by '{}' with clientName '{}', roles '{}'. refNr '{}'",
 			userName,
 			clientName,
 			groups,
 			refnr);
 
-		//Find institution linked with refnummer
 		Optional<Anmeldung> anmeldung = anmeldungService.getLatestAnmeldung(refnr);
 
 		if (anmeldung.isEmpty()) {
@@ -375,20 +368,15 @@ public class TagesschulenResource {
 		return Response.ok(convertToTagesschuleTarifeDTO(anmeldung.get())).build();
 	}
 
-	private TagesschuleTarifeDTO convertToTagesschuleTarifeDTO(Anmeldung anmeldung) {
-		TagesschuleTarifeDTO tagesschuleTarifeDTO = new TagesschuleTarifeDTO();
-		tagesschuleTarifeDTO.setRefnr(anmeldung.getRefnr());
-		tagesschuleTarifeDTO.setTarifeDefinitivAkzeptiert(anmeldung.getStatus().equals(TagesschuleAnmeldungStatus.SCHULAMT_ANMELDUNG_UEBERNOMMEN
-		));
-		tagesschuleTarifeDTO.setTarifePaedagogisch(convertTarife(anmeldung.getTarifePedagogisch()));
-		tagesschuleTarifeDTO.setTarifeNichtPaedagogisch(convertTarife(anmeldung.getTarifeNichtPedagogisch()));
-		return  tagesschuleTarifeDTO;
-	}
-
-	private List<TarifDTO> convertTarife(@Nullable JsonNode model) {
-		if(model == null) {
-			return Collections.emptyList();
+	@Nonnull
+	private TagesschuleTarifeDTO convertToTagesschuleTarifeDTO(@Nonnull Anmeldung anmeldung) {
+		if (anmeldung.getTarife() == null) {
+			return new TagesschuleTarifeDTO(anmeldung.getRefnr(), Collections.emptyList(), false);
 		}
-		return Arrays.asList(objectMapper.convertValue(model, TarifDTO[].class));
+
+		TagesschuleTarifeDTO result = objectMapper.convertValue(anmeldung.getTarife(), TagesschuleTarifeDTO.class);
+		result.setRefnr(anmeldung.getRefnr());
+
+		return result;
 	}
 }

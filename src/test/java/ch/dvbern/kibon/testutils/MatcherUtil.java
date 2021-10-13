@@ -15,4 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-ALTER TABLE anmeldung ADD COLUMN tarife JSONB;
+package ch.dvbern.kibon.testutils;
+
+import java.math.BigDecimal;
+
+import javax.annotation.Nonnull;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.spotify.hamcrest.jackson.JsonMatchers;
+import org.hamcrest.Matcher;
+
+import static org.hamcrest.Matchers.comparesEqualTo;
+
+public final class MatcherUtil {
+
+	private MatcherUtil() {
+	}
+
+	@Nonnull
+	public static Matcher<JsonNode> jsonBigDecimalLike(@Nonnull BigDecimal expected) {
+		// Jackson uses scientific representation of BigDecimal, such that comparesEqual must be used for the match
+		return JsonMatchers.jsonBigDecimal(comparesEqualTo(expected));
+	}
+}
