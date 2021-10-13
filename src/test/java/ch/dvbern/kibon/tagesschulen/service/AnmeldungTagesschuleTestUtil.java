@@ -72,7 +72,7 @@ public final class AnmeldungTagesschuleTestUtil {
 		tagesschuleAnmeldungEventDTO.setKind(createKindDTO());
 		tagesschuleAnmeldungEventDTO.setPeriodeVon(LocalDate.of(2021, 8, 1));
 		tagesschuleAnmeldungEventDTO.setPeriodeBis(LocalDate.of(2022, 7, 31));
-		tagesschuleAnmeldungEventDTO.setAntragstellendePerson(createGesuchstellerDTO());
+		tagesschuleAnmeldungEventDTO.setGesuchsteller(createGesuchstellerDTO());
 		tagesschuleAnmeldungEventDTO.setAnmeldungsDetails(createAnmeldungsDetailsDTO());
 
 		return tagesschuleAnmeldungEventDTO;
@@ -116,8 +116,8 @@ public final class AnmeldungTagesschuleTestUtil {
 		GesuchstellerDTO gesuchstellerDTO = new GesuchstellerDTO();
 		gesuchstellerDTO.setGeschlecht(Geschlecht.MAENNLICH);
 		gesuchstellerDTO.setGeburtsdatum(LocalDate.of(1990, 10, 10));
-		gesuchstellerDTO.setNachname("Antragsteller Nachname");
-		gesuchstellerDTO.setVorname("Antragsteller Vorname");
+		gesuchstellerDTO.setNachname("Gesuchsteller Nachname");
+		gesuchstellerDTO.setVorname("Gesuchsteller Vorname");
 		gesuchstellerDTO.setEmail("email@test.dvbern.ch");
 		gesuchstellerDTO.setAdresse(createAdresseDTO());
 

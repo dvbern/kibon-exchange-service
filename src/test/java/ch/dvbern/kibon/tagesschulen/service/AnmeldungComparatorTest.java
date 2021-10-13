@@ -87,7 +87,7 @@ public class AnmeldungComparatorTest {
 	public void testCompareOtherGesuchstellerDataInReceivedDTO() {
 		TagesschuleAnmeldungEventDTO dto = createTagesschuleAnmeldungTestDTO();
 		Anmeldung anmeldung = converter.create(dto, LocalDateTime.now());
-		dto.getAntragstellendePerson().setVorname("Peter");
+		dto.getGesuchsteller().setVorname("Peter");
 		Anmeldung sameAnmeldung = converter.create(dto, LocalDateTime.now());
 
 		assertThat(anmeldung, not(comparedBy(Anmeldung.COMPARATOR).comparesEqualTo(sameAnmeldung)));
