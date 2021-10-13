@@ -227,7 +227,7 @@ public class InstitutionConverter {
 		modul.setWochentage(mapper.valueToTree(modulDTO.getWochentage()));
 		modul.setWirdPaedagogischBetreut(modulDTO.getWirdPaedagogischBetreut());
 		modul.setVerpflegungsKosten(modulDTO.getVerpflegungsKosten());
-		modul.setZeitVon(modulDTO.getZeitVon());
-		modul.setZeitBis(modulDTO.getZeitBis());
+		modul.setZeitVon(TimeConverter.deserialize(modulDTO.getZeitVon()));
+		modul.setZeitBis(TimeConverter.deserialize(modulDTO.getZeitBis()));
 	}
 }

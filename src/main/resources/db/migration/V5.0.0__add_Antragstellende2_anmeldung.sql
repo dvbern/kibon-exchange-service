@@ -16,3 +16,5 @@
  */
 
 ALTER TABLE anmeldung ADD COLUMN gesuchsteller2 JSONB;
+ALTER TABLE modul ALTER COLUMN zeitvon DROP NOT NULL;
+ALTER TABLE modul ALTER COLUMN zeitbis DROP NOT NULL;
