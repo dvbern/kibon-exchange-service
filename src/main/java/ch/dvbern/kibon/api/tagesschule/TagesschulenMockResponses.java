@@ -36,7 +36,7 @@ import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.Intervall;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.ModulAuswahlDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.ModulDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnmeldungDTO;
-import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAntragstellerDTO;
+import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleGesuchstellerDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleKindDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TagesschuleTarifeDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TarifDTO;
@@ -53,7 +53,7 @@ public class TagesschulenMockResponses {
 
 	private static final AdresseDTO ADRESSE_DTO = new AdresseDTO("Testweg", "10", null, "3000", "Bern", "CH");
 
-	private static final TagesschuleAntragstellerDTO ANTRAGSTELLER_DTO = new TagesschuleAntragstellerDTO(
+	private static final TagesschuleGesuchstellerDTO ANTRAGSTELLER_DTO = new TagesschuleGesuchstellerDTO(
 		"Dagmar",
 		"Wälti",
 		"test@mailbucket.dvbern.ch",
@@ -111,7 +111,7 @@ public class TagesschulenMockResponses {
 		dto.setPlanKlasse(null);
 		dto.setAbholung(AbholungTagesschule.ALLEINE_NACH_HAUSE);
 		dto.setKind(KIND_DTO);
-		dto.setAntragsteller(ANTRAGSTELLER_DTO);
+		dto.setGesuchsteller(ANTRAGSTELLER_DTO);
 
 		dto.setModule(Arrays.asList(
 			new ModulAuswahlDTO(MODUL_MORGEN.getId(), DayOfWeek.MONDAY, Intervall.WOECHENTLICH),
@@ -137,7 +137,7 @@ public class TagesschulenMockResponses {
 		dto.setPlanKlasse("3. Klasse");
 		dto.setAbholung(null);
 		dto.setKind(KIND_DTO);
-		dto.setAntragsteller(ANTRAGSTELLER_DTO);
+		dto.setGesuchsteller(ANTRAGSTELLER_DTO);
 		dto.setBemerkung("TEST");
 
 		dto.setModule(Arrays.asList(
