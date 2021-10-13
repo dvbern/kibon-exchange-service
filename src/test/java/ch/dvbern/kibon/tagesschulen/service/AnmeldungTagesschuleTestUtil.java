@@ -96,8 +96,8 @@ public final class AnmeldungTagesschuleTestUtil {
 		GesuchstellerDTO gesuchstellerDTO = new GesuchstellerDTO();
 		gesuchstellerDTO.setGeschlecht(Geschlecht.MAENNLICH);
 		gesuchstellerDTO.setGeburtsdatum(LocalDate.of(1990, 10, 10));
-		gesuchstellerDTO.setNachname("Antragsteller Nachname");
-		gesuchstellerDTO.setVorname("Antragsteller Vorname");
+		gesuchstellerDTO.setNachname("Gesuchsteller Nachname");
+		gesuchstellerDTO.setVorname("Gesuchsteller Vorname");
 		gesuchstellerDTO.setEmail("email@test.dvbern.ch");
 		gesuchstellerDTO.setAdresse(createAdresseDTO());
 
