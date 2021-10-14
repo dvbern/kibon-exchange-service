@@ -34,7 +34,7 @@ import static org.testcontainers.containers.BindMode.READ_ONLY;
 public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
 
 	public KeycloakContainer(@Nonnull String keycloakVersion) {
-		super("quay.io/keycloak/keycloak:" + keycloakVersion);
+		super("docker-registry.dvbern.ch/dockerhub/jboss/keycloak:" + keycloakVersion);
 
 		String realPath = "/tmp/kibon_realm.json";
 
