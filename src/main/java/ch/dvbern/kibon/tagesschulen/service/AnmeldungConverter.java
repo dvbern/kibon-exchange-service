@@ -31,6 +31,7 @@ import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDT
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungTarifeDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TarifDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TarifZeitabschnittDTO;
+import ch.dvbern.kibon.exchange.commons.types.AdresseDTO;
 import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
@@ -96,13 +97,7 @@ public class AnmeldungConverter {
 			.put("telefon", gesuchsteller.getTelefon())
 			.put("telefonAusland", gesuchsteller.getTelefonAusland());
 
-		result.putObject("adresse")
-			.put("ort", gesuchsteller.getAdresse().getOrt())
-			.put("land", gesuchsteller.getAdresse().getLand())
-			.put("strasse", gesuchsteller.getAdresse().getStrasse())
-			.put("hausnummer", gesuchsteller.getAdresse().getHausnummer())
-			.put("adresszusatz", gesuchsteller.getAdresse().getAdresszusatz())
-			.put("plz", gesuchsteller.getAdresse().getPlz());
+		addAdresse(result, gesuchsteller.getAdresse());
 
 		return result;
 	}
@@ -169,5 +164,21 @@ public class AnmeldungConverter {
 			.put("totalKostenProWoche", dto.getTotalKostenProWoche())
 			.put("verpflegungsKostenProWoche", dto.getVerpflegungsKostenProWoche())
 			.put("verpflegungsKostenVerguenstigung", dto.getVerpflegungsKostenVerguenstigung());
+	}
+
+	private void addAdresse(@Nonnull ObjectNode parentNode, @Nullable AdresseDTO dto) {
+		if (dto == null) {
+			parentNode.putNull("adresse");
+
+			return;
+		}
+
+		parentNode.putObject("adresse")
+			.put("ort", dto.getOrt())
+			.put("land", dto.getLand())
+			.put("strasse", dto.getStrasse())
+			.put("hausnummer", dto.getHausnummer())
+			.put("adresszusatz", dto.getAdresszusatz())
+			.put("plz", dto.getPlz());
 	}
 }
