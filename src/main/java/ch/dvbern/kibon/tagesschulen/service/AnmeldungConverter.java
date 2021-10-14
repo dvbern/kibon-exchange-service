@@ -91,7 +91,10 @@ public class AnmeldungConverter {
 			.put("nachname", gesuchsteller.getNachname())
 			.put("geburtsdatum", gesuchsteller.getGeburtsdatum().toString())
 			.put("geschlecht", gesuchsteller.getGeschlecht().name())
-			.put("email", gesuchsteller.getEmail());
+			.put("email", gesuchsteller.getEmail())
+			.put("mobile", gesuchsteller.getMobile())
+			.put("telefon", gesuchsteller.getTelefon())
+			.put("telefonAusland", gesuchsteller.getTelefonAusland());
 
 		result.putObject("adresse")
 			.put("ort", gesuchsteller.getAdresse().getOrt())
