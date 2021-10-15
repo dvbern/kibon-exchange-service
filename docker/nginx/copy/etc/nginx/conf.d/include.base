@@ -10,7 +10,7 @@ client_body_timeout 300s;
 set $cspDefault "default-src 'self'";
 # the sha value is for swagger-ui. It will likely fail with quarkus updates. Never versions of swagger-ui should not
 # require csp exceptions though: https://github.com/swagger-api/swagger-ui/issues/4187
-set $cspScript  "script-src 'self' 'sha256-R7EzpY7+fLzjjm6uO7IAk72Cxlpqhk26QOfyVA3ncD4='";
+set $cspScript  "script-src 'self' 'sha256-IUuuGTEeiv1Tse2HClJTNMBox9IksxauF9Zyws4u5Ns='";
 set $cspStyle   "style-src 'self' 'unsafe-inline'";
 set $cspFont    "font-src 'self' data:";
 set $cspImg     "img-src 'self' * data: blob:";
