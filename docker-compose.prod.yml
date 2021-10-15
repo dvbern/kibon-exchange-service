@@ -3,7 +3,7 @@ version: '2'
 services:
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION}
+    image: docker-registry.dvbern.ch/dockerhub/confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION}
     user: ${HOST_USER}
     networks:
       - kibon_exchange_backbone
@@ -18,7 +18,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
 
   kafka:
-    image: confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION}
+    image: docker-registry.dvbern.ch/dockerhub/confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION}
     user: ${HOST_USER}
     networks:
       - kibon_exchange_backbone
@@ -39,7 +39,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:${CONFLUENT_PLATFORM_VERSION}
+    image: docker-registry.dvbern.ch/dockerhub/confluentinc/cp-schema-registry:${CONFLUENT_PLATFORM_VERSION}
     user: ${HOST_USER}
     hostname: schema-registry
     networks:
@@ -57,7 +57,7 @@ services:
       SCHEMA_REGISTRY_DEBUG: 'true'
 
   keycloak:
-    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
+    image: docker-registry.dvbern.ch/dockerhub/jboss/keycloak:${KEYCLOAK_VERSION}
     user: ${HOST_USER}
     networks:
       - kibon_exchange_backbone

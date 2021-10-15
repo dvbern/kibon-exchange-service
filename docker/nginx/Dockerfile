@@ -1,4 +1,4 @@
-FROM nginx:stable-alpine
+FROM docker-registry.dvbern.ch/dockerhub/library/nginx:stable-alpine
 
 MAINTAINER Fabio Heer <fabio.heer@dvbern.ch>
 LABEL product="kibon"
