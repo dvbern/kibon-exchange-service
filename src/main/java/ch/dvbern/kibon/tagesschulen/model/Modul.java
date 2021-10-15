@@ -55,16 +55,16 @@ public class Modul extends BaseEntity {
 	private @NotNull TagesschuleModule parent = new TagesschuleModule();
 
 	@Nonnull
-	private @NotEmpty String bezeichnungDE = "";
+	private @NotNull String bezeichnungDE = "";
 
 	@Nonnull
-	private @NotEmpty String bezeichnungFR = "";
+	private @NotNull String bezeichnungFR = "";
 
-	@Nonnull
-	private @NotNull LocalTime zeitVon = LocalTime.MIN;
+	@Nullable
+	private LocalTime zeitVon = null;
 
-	@Nonnull
-	private @NotNull LocalTime zeitBis = LocalTime.MAX;
+	@Nullable
+	private LocalTime zeitBis = null;
 
 	/**
 	 * A {@link java.util.List<ch.dvbern.kibon.exchange.commons.types.Wochentag>}
@@ -146,21 +146,21 @@ public class Modul extends BaseEntity {
 		this.bezeichnungFR = bezeichnungFR;
 	}
 
-	@Nonnull
+	@Nullable
 	public LocalTime getZeitVon() {
 		return zeitVon;
 	}
 
-	public void setZeitVon(@Nonnull LocalTime zeitVon) {
+	public void setZeitVon(@Nullable LocalTime zeitVon) {
 		this.zeitVon = zeitVon;
 	}
 
-	@Nonnull
+	@Nullable
 	public LocalTime getZeitBis() {
 		return zeitBis;
 	}
 
-	public void setZeitBis(@Nonnull LocalTime zeitBis) {
+	public void setZeitBis(@Nullable LocalTime zeitBis) {
 		this.zeitBis = zeitBis;
 	}
 

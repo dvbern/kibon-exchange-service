@@ -28,6 +28,9 @@ import javax.inject.Inject;
 
 import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulAuswahlDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungTarifeDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TarifDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TarifZeitabschnittDTO;
 import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
@@ -46,7 +49,10 @@ public class AnmeldungConverter {
 	public Anmeldung create(@Nonnull TagesschuleAnmeldungEventDTO dto, @Nonnull LocalDateTime eventTimestamp) {
 		Anmeldung anmeldung = new Anmeldung();
 		anmeldung.setKind(toKind(dto.getKind()));
-		anmeldung.setGesuchsteller(toGesuchsteller(dto.getAntragstellendePerson()));
+		anmeldung.setGesuchsteller(toGesuchsteller(dto.getGesuchsteller()));
+		anmeldung.setGesuchsteller2(dto.getGesuchsteller2() != null ?
+			toGesuchsteller(dto.getGesuchsteller2()) :
+			null);
 		anmeldung.setFreigegebenAm(dto.getFreigegebenAm());
 		anmeldung.setStatus(dto.getStatus());
 		anmeldung.setAnmeldungZurueckgezogen(dto.getAnmeldungZurueckgezogen());
@@ -63,7 +69,9 @@ public class AnmeldungConverter {
 		anmeldung.setEventTimestamp(eventTimestamp);
 		anmeldung.setVersion(dto.getVersion());
 		anmeldung.setModule(toAnmeldungModule(dto.getAnmeldungsDetails().getModule()));
-
+		if (dto.getTarife() != null) {
+			anmeldung.setTarife(toAnmeldungTarife(dto.getTarife()));
+		}
 		return anmeldung;
 	}
 
@@ -116,5 +124,47 @@ public class AnmeldungConverter {
 			.put("modulId", modulAuswahlDTO.getModulId())
 			.put("wochentag", modulAuswahlDTO.getWochentag().name())
 			.put("intervall", modulAuswahlDTO.getIntervall().name());
+	}
+
+	@Nonnull
+	private ObjectNode toAnmeldungTarife(@Nonnull TagesschuleAnmeldungTarifeDTO dto) {
+		ObjectNode result = mapper.createObjectNode()
+			.put("tarifeDefinitivAkzeptiert", dto.getTarifeDefinitivAkzeptiert());
+
+		List<ObjectNode> tarifZeitabschnitte = dto.getTarifZeitabschnitte().stream()
+			.map(this::toTarifZeitabschnitt)
+			.collect(Collectors.toList());
+
+		result.putArray("tarifZeitabschnitte").addAll(tarifZeitabschnitte);
+
+		return result;
+	}
+
+	@Nonnull
+	private ObjectNode toTarifZeitabschnitt(@Nonnull TarifZeitabschnittDTO dto) {
+		ObjectNode result = mapper.createObjectNode()
+			.put("von", dto.getVon().toString())
+			.put("bis", dto.getBis().toString())
+			.put("massgebendesEinkommen", dto.getMassgebendesEinkommen());
+
+		addTarif(result, "tarifPaedagogisch", dto.getTarifPaedagogisch());
+		addTarif(result, "tarifNichtPaedagogisch", dto.getTarifNichtPaedagogisch());
+
+		return result;
+	}
+
+	private void addTarif(@Nonnull ObjectNode parentNode, @Nonnull String fieldName, @Nullable TarifDTO dto) {
+		if (dto == null) {
+			parentNode.putNull(fieldName);
+
+			return;
+		}
+
+		parentNode.putObject(fieldName)
+			.put("betreuungsKostenProStunde", dto.getBetreuungsKostenProStunde())
+			.put("betreuungsMinutenProWoche", dto.getBetreuungsMinutenProWoche())
+			.put("totalKostenProWoche", dto.getTotalKostenProWoche())
+			.put("verpflegungsKostenProWoche", dto.getVerpflegungsKostenProWoche())
+			.put("verpflegungsKostenVerguenstigung", dto.getVerpflegungsKostenVerguenstigung());
 	}
 }

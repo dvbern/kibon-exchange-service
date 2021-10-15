@@ -24,6 +24,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import ch.dvbern.kibon.exchange.commons.tagesschulen.AbholungTagesschule;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class ClientAnmeldungDTO {
@@ -39,6 +40,9 @@ public class ClientAnmeldungDTO {
 
 	@Nonnull
 	private final Integer version;
+
+	@Nonnull
+	private final TagesschuleAnmeldungStatus status;
 
 	@Nonnull
 	private final LocalDateTime eventTimestamp;
@@ -68,7 +72,10 @@ public class ClientAnmeldungDTO {
 	private final JsonNode kind;
 
 	@Nonnull
-	private final JsonNode antragsteller;
+	private final JsonNode gesuchsteller;
+
+	@Nullable
+	private final JsonNode gesuchsteller2;
 
 	@Nonnull
 	private JsonNode module;
@@ -80,11 +87,13 @@ public class ClientAnmeldungDTO {
 		@Nonnull String institutionId,
 		@Nonnull String refnr,
 		@Nonnull Integer version,
+		@Nonnull TagesschuleAnmeldungStatus status,
 		@Nonnull LocalDateTime eventTimestamp,
 		@Nonnull LocalDate periodeVon,
 		@Nonnull LocalDate periodeBis,
 		@Nonnull JsonNode kind,
-		@Nonnull JsonNode antragsteller,
+		@Nonnull JsonNode gesuchsteller,
+		@Nullable JsonNode gesuchsteller2,
 		@Nullable String planKlasse,
 		@Nullable AbholungTagesschule abholung,
 		@Nonnull Boolean abweichungZweitesSemester,
@@ -96,11 +105,13 @@ public class ClientAnmeldungDTO {
 		this.institutionId = institutionId;
 		this.refnr = refnr;
 		this.version = version;
+		this.status = status;
 		this.eventTimestamp = eventTimestamp;
 		this.periodeVon = periodeVon;
 		this.periodeBis = periodeBis;
 		this.kind = kind;
-		this.antragsteller = antragsteller;
+		this.gesuchsteller = gesuchsteller;
+		this.gesuchsteller2 = gesuchsteller2;
 		this.planKlasse = planKlasse;
 		this.abholung = abholung;
 		this.abweichungZweitesSemester = abweichungZweitesSemester;
@@ -128,6 +139,11 @@ public class ClientAnmeldungDTO {
 	@Nonnull
 	public Integer getVersion() {
 		return version;
+	}
+
+	@Nonnull
+	public TagesschuleAnmeldungStatus getStatus() {
+		return status;
 	}
 
 	@Nonnull
@@ -196,8 +212,13 @@ public class ClientAnmeldungDTO {
 	}
 
 	@Nonnull
-	public JsonNode getAntragsteller() {
-		return antragsteller;
+	public JsonNode getGesuchsteller() {
+		return gesuchsteller;
+	}
+
+	@Nullable
+	public JsonNode getGesuchsteller2() {
+		return gesuchsteller2;
 	}
 
 	public boolean isAnmeldungZurueckgezogen() {
