@@ -19,8 +19,8 @@
         <testcontainers.version>1.16.0</testcontainers.version>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
-        <kibon.exchange.api.commons.version>3.0.1-SNAPSHOT</kibon.exchange.api.commons.version>
-        <kibon.exchange.api.version>4.0.1-SNAPSHOT</kibon.exchange.api.version>
+        <kibon.exchange.api.commons.version>5.0.0</kibon.exchange.api.commons.version>
+        <kibon.exchange.api.version>5.0.0</kibon.exchange.api.version>
 
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <maven.compiler.source>11</maven.compiler.source>
