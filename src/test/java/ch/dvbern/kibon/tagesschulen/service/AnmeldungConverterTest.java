@@ -23,9 +23,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulAuswahlDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungTarifeDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TarifDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TarifZeitabschnittDTO;
 import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
@@ -37,11 +41,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static ch.dvbern.kibon.tagesschulen.service.AnmeldungTagesschuleTestUtil.createTagesschuleAnmeldungTestDTO;
+import static ch.dvbern.kibon.tagesschulen.service.AnmeldungTagesschuleTestUtil.createTarife;
+import static ch.dvbern.kibon.testutils.MatcherUtil.jsonBigDecimalLike;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonBoolean;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonInt;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonNull;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static com.spotify.hamcrest.pojo.IsPojo.pojo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 
@@ -62,11 +73,20 @@ public class AnmeldungConverterTest {
 		assertThat(anmeldung, matchesDTO(dto));
 	}
 
+	@Test
+	public void testTarife() {
+		TagesschuleAnmeldungEventDTO dto = createTagesschuleAnmeldungTestDTO();
+		dto.setTarife(createTarife());
+		Anmeldung anmeldung = converter.create(dto, LocalDateTime.now());
+
+		assertThat(anmeldung, matchesDTO(dto));
+	}
+
 	@Nonnull
 	private IsPojo<Anmeldung> matchesDTO(@Nonnull TagesschuleAnmeldungEventDTO dto) {
 		return pojo(Anmeldung.class)
 			.withProperty("kind", matchesKindDTO(dto.getKind()))
-			.withProperty("gesuchsteller", matchesGesuchstellerDTO(dto.getAntragstellendePerson()))
+			.withProperty("gesuchsteller", matchesGesuchstellerDTO(dto.getGesuchsteller()))
 			.withProperty("freigegebenAm", is(dto.getFreigegebenAm()))
 			.withProperty("status", is(dto.getStatus()))
 			.withProperty("anmeldungZurueckgezogen", is(dto.getAnmeldungZurueckgezogen()))
@@ -82,7 +102,7 @@ public class AnmeldungConverterTest {
 			.withProperty(
 				"module",
 				is(jsonArray(containsInAnyOrder(toMatchers(dto.getAnmeldungsDetails().getModule())))))
-			;
+			.withProperty("tarife", matchesTarife(dto.getTarife()));
 	}
 
 	@Nonnull
@@ -124,5 +144,45 @@ public class AnmeldungConverterTest {
 				.where("adresszusatz", is(jsonText(gesuchsteller.getAdresse().getAdresszusatz())))
 				.where("plz", is(jsonText(gesuchsteller.getAdresse().getPlz())))
 			)));
+	}
+
+	@Nonnull
+	private Matcher<JsonNode> matchesTarife(@Nullable TagesschuleAnmeldungTarifeDTO tarife) {
+		if (tarife == null) {
+			return is(nullValue(JsonNode.class));
+		}
+
+		return is(jsonObject()
+			.where("tarifeDefinitivAkzeptiert", is(jsonBoolean(tarife.getTarifeDefinitivAkzeptiert())))
+			.where("tarifZeitabschnitte", is(jsonArray(contains(tarife.getTarifZeitabschnitte().stream()
+				.map(this::toTarifZeitabschnitteMatcher)
+				.collect(Collectors.toList())))))
+		);
+	}
+
+	@Nonnull
+	private Matcher<JsonNode> toTarifZeitabschnitteMatcher(@Nonnull TarifZeitabschnittDTO dto) {
+		return is(jsonObject()
+			.where("von", is(jsonText(dto.getVon().toString())))
+			.where("bis", is(jsonText(dto.getBis().toString())))
+			.where("massgebendesEinkommen", jsonBigDecimalLike(dto.getMassgebendesEinkommen()))
+			.where("tarifPaedagogisch", matchesTarif(dto.getTarifPaedagogisch()))
+			.where("tarifNichtPaedagogisch", matchesTarif(dto.getTarifNichtPaedagogisch()))
+		);
+	}
+
+	@Nonnull
+	private Matcher<JsonNode> matchesTarif(@Nullable TarifDTO dto) {
+		if (dto == null) {
+			return is(jsonNull());
+		}
+
+		return is(jsonObject()
+			.where("betreuungsMinutenProWoche", is(jsonInt(dto.getBetreuungsMinutenProWoche())))
+			.where("betreuungsKostenProStunde", jsonBigDecimalLike(dto.getBetreuungsKostenProStunde()))
+			.where("totalKostenProWoche", jsonBigDecimalLike(dto.getTotalKostenProWoche()))
+			.where("verpflegungsKostenProWoche", jsonBigDecimalLike(dto.getVerpflegungsKostenProWoche()))
+			.where("verpflegungsKostenVerguenstigung", jsonBigDecimalLike(dto.getVerpflegungsKostenVerguenstigung()))
+		);
 	}
 }

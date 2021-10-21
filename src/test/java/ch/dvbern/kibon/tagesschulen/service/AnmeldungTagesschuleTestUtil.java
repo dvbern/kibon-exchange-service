@@ -17,6 +17,7 @@
 
 package ch.dvbern.kibon.tagesschulen.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,17 +29,59 @@ import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulAuswahlDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungDetailsDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungStatus;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungTarifeDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TarifDTO;
+import ch.dvbern.kibon.exchange.commons.tagesschulen.TarifZeitabschnittDTO;
 import ch.dvbern.kibon.exchange.commons.types.AdresseDTO;
 import ch.dvbern.kibon.exchange.commons.types.Geschlecht;
 import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.Intervall;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
 import ch.dvbern.kibon.exchange.commons.types.Wochentag;
+import com.github.javafaker.Faker;
 
 public final class AnmeldungTagesschuleTestUtil {
 
+	private static final Faker FAKER = new Faker();
+
 	private AnmeldungTagesschuleTestUtil() {
 		// util
+	}
+
+	@Nonnull
+	public static TagesschuleAnmeldungTarifeDTO createTarife() {
+		TarifZeitabschnittDTO zeitabschnittDTO1 = new TarifZeitabschnittDTO(
+			LocalDate.of(2020, 8, 1),
+			LocalDate.of(2021, 3, 31),
+			BigDecimal.valueOf(88231.05),
+			null,
+			null
+		);
+
+		TarifZeitabschnittDTO zeitabschnittDTO2 = new TarifZeitabschnittDTO(
+			LocalDate.of(2021, 4, 1),
+			LocalDate.of(2021, 7, 31),
+			BigDecimal.valueOf(55645),
+			createTarifDTO(),
+			createTarifDTO()
+		);
+
+		TagesschuleAnmeldungTarifeDTO tagesschuleAnmeldungTarifeDTO = new TagesschuleAnmeldungTarifeDTO();
+		tagesschuleAnmeldungTarifeDTO.setTarifeDefinitivAkzeptiert(true);
+		tagesschuleAnmeldungTarifeDTO.setTarifZeitabschnitte(List.of(zeitabschnittDTO1, zeitabschnittDTO2));
+
+		return tagesschuleAnmeldungTarifeDTO;
+	}
+
+	@Nonnull
+	private static TarifDTO createTarifDTO() {
+		return new TarifDTO(
+			FAKER.number().numberBetween(1, 10080),
+			BigDecimal.valueOf(FAKER.number().randomDouble(2, 5000, 150000)),
+			BigDecimal.valueOf(FAKER.number().randomDouble(2, 1, 100)),
+			BigDecimal.valueOf(FAKER.number().randomDouble(2, 1, 100)),
+			BigDecimal.valueOf(FAKER.number().randomDouble(2, 1, 500))
+		);
 	}
 
 	@Nonnull
@@ -52,7 +95,7 @@ public final class AnmeldungTagesschuleTestUtil {
 		tagesschuleAnmeldungEventDTO.setKind(createKindDTO());
 		tagesschuleAnmeldungEventDTO.setPeriodeVon(LocalDate.of(2021, 8, 1));
 		tagesschuleAnmeldungEventDTO.setPeriodeBis(LocalDate.of(2022, 7, 31));
-		tagesschuleAnmeldungEventDTO.setAntragstellendePerson(createGesuchstellerDTO());
+		tagesschuleAnmeldungEventDTO.setGesuchsteller(createGesuchstellerDTO());
 		tagesschuleAnmeldungEventDTO.setAnmeldungsDetails(createAnmeldungsDetailsDTO());
 
 		return tagesschuleAnmeldungEventDTO;
@@ -96,8 +139,8 @@ public final class AnmeldungTagesschuleTestUtil {
 		GesuchstellerDTO gesuchstellerDTO = new GesuchstellerDTO();
 		gesuchstellerDTO.setGeschlecht(Geschlecht.MAENNLICH);
 		gesuchstellerDTO.setGeburtsdatum(LocalDate.of(1990, 10, 10));
-		gesuchstellerDTO.setNachname("Antragsteller Nachname");
-		gesuchstellerDTO.setVorname("Antragsteller Vorname");
+		gesuchstellerDTO.setNachname("Gesuchsteller Nachname");
+		gesuchstellerDTO.setVorname("Gesuchsteller Vorname");
 		gesuchstellerDTO.setEmail("email@test.dvbern.ch");
 		gesuchstellerDTO.setAdresse(createAdresseDTO());
 

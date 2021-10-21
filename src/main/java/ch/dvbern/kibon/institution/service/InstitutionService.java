@@ -20,6 +20,7 @@ package ch.dvbern.kibon.institution.service;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -156,7 +157,7 @@ public class InstitutionService {
 	}
 
 	@Nonnull
-	public ClientInstitutionDTO get(@Nonnull Client client) {
+	public Optional<ClientInstitutionDTO> get(@Nonnull Client client) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<ClientInstitutionDTO> query = cb.createQuery(ClientInstitutionDTO.class);
 		Root<Institution> root = query.from(Institution.class);
@@ -180,12 +181,15 @@ public class InstitutionService {
 
 		query.where(idPredicate);
 
-		ClientInstitutionDTO result = em.createQuery(query)
+		Optional<ClientInstitutionDTO> result = em.createQuery(query)
 			.setParameter(idParam, client.getId().getInstitutionId())
-			.getSingleResult();
+			.getResultStream()
+			.findAny();
 
-		result.getClientBerechtigung().setVon(client.getGueltigAb());
-		result.getClientBerechtigung().setBis(client.getGueltigBis());
+		result.map(ClientInstitutionDTO::getClientBerechtigung).ifPresent(berechtigung -> {
+			berechtigung.setVon(client.getGueltigAb());
+			berechtigung.setBis(client.getGueltigBis());
+		});
 
 		return result;
 	}

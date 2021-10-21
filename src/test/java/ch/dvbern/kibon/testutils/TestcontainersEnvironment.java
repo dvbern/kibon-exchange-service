@@ -61,7 +61,8 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 		"mp.messaging.incoming.AnmeldungEvents.schema.registry.url",
 		"mp.messaging.outgoing.PlatzbestaetigungBetreuungEvents.schema.registry.url",
 		"mp.messaging.outgoing.BetreuungStornierungEvents.schema.registry.url",
-		"mp.messaging.outgoing.AnmeldungBestaetigungEvents.schema.registry.url"
+		"mp.messaging.outgoing.AnmeldungBestaetigungEvents.schema.registry.url",
+		"mp.messaging.outgoing.AnmeldungAblehnenEvents.schema.registry.url"
 	);
 
 	private static AuthzClient authzClient = null;
@@ -70,14 +71,17 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 
 	@Container
 	private final KafkaContainer kafka =
-		new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:" + CONFLUENT_PLATFORM_VERSION));
+		new KafkaContainer(DockerImageName.parse("docker-registry.dvbern.ch/dockerhub/confluentinc/cp-kafka:"
+			+ CONFLUENT_PLATFORM_VERSION).asCompatibleSubstituteFor("confluentinc/cp-kafka"));
 
 	@Container
 	private final SchemaRegistryContainer schemaRegistry = new SchemaRegistryContainer(CONFLUENT_PLATFORM_VERSION);
 
 	@SuppressWarnings("rawtypes")
 	@Container
-	private final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:11-alpine");
+	private final PostgreSQLContainer postgres =
+		new PostgreSQLContainer(DockerImageName.parse("docker-registry.dvbern.ch/dockerhub/library/postgres:11-alpine")
+			.asCompatibleSubstituteFor("postgres"));
 
 	@Container
 	private final KeycloakContainer keycloak = new KeycloakContainer(KEYCLOAK_VERSION);

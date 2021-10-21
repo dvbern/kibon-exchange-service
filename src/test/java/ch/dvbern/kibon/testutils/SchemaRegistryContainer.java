@@ -32,7 +32,7 @@ public class SchemaRegistryContainer extends GenericContainer<SchemaRegistryCont
 	private static final int SCHEMA_REGISTRY_INTERNAL_PORT = 8081;
 
 	public SchemaRegistryContainer(@Nonnull String confluentPlatformVersion) {
-		super("confluentinc/cp-schema-registry:" + confluentPlatformVersion);
+		super("docker-registry.dvbern.ch/dockerhub/confluentinc/cp-schema-registry:" + confluentPlatformVersion);
 
 		withExposedPorts(SCHEMA_REGISTRY_INTERNAL_PORT)
 			.withLogConsumer(new Slf4jLogConsumer(LOG))

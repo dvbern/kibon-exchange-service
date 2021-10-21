@@ -70,6 +70,8 @@ public class AnmeldungService {
 		if (Anmeldung.COMPARATOR.compare(last, newAnmeldung) == 0) {
 			// don't trigger a new entry in ClientAnmeldung table: just update status & tarife of lastExistingAnmeldung
 			last.setStatus(newAnmeldung.getStatus());
+			last.setEventTimestamp(eventTime);
+			last.setTarife(newAnmeldung.getTarife());
 			em.merge(last);
 		} else {
 			// some essential data in anmelung changed -> re-export
@@ -114,11 +116,13 @@ public class AnmeldungService {
 			anmeldungJoin.get(AbstractInstitutionPeriodeEntity_.institutionId),
 			anmeldungJoin.get(AbstractInstitutionPeriodeEntity_.refnr),
 			anmeldungJoin.get(Anmeldung_.version),
+			anmeldungJoin.get(Anmeldung_.status),
 			anmeldungJoin.get(Anmeldung_.eventTimestamp),
 			anmeldungJoin.get(AbstractInstitutionPeriodeEntity_.periodeVon),
 			anmeldungJoin.get(AbstractInstitutionPeriodeEntity_.periodeBis),
 			anmeldungJoin.get(Anmeldung_.kind),
 			anmeldungJoin.get(Anmeldung_.gesuchsteller),
+			anmeldungJoin.get(Anmeldung_.gesuchsteller2),
 			anmeldungJoin.get(Anmeldung_.planKlasse),
 			anmeldungJoin.get(Anmeldung_.abholung),
 			anmeldungJoin.get(Anmeldung_.abweichungZweitesSemester),

@@ -28,6 +28,8 @@ import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.Intervall;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.ModulAuswahlDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleBestaetigungDTO;
 import ch.dvbern.kibon.testutils.TestcontainersEnvironment;
+import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.IntNode;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -35,8 +37,13 @@ import org.junit.jupiter.api.Test;
 
 import static com.spotify.hamcrest.jackson.JsonMatchers.isJsonStringMatching;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonBoolean;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonNull;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonNumber;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -116,6 +123,70 @@ public class TagesschulenResourceTest {
 			.then()
 			.assertThat()
 			.statusCode(Status.OK.getStatusCode());
+	}
+
+	@Test
+	void testDeleteRejectRequiresAuthorisation() {
+		given()
+			.contentType(ContentType.JSON)
+			.when()
+			.delete("/tagesschulen/anmeldungen/refnr/" + REFNR)
+			.then()
+			.assertThat()
+			.statusCode(Status.UNAUTHORIZED.getStatusCode());
+	}
+
+	@Test
+	void testDeleteRejectAnmeldungNotFound() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.delete("/tagesschulen/anmeldungen/refnr/20.000102.001.1.1")
+			.then()
+			.assertThat()
+			.statusCode(Status.NOT_FOUND.getStatusCode());
+	}
+
+	@Test
+	void testDeleteRejectAcceptsValidRefnummer() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.delete("/tagesschulen/anmeldungen/refnr/" + REFNR)
+			.then()
+			.assertThat()
+			.statusCode(Status.OK.getStatusCode());
+	}
+
+	@Test
+	void testGetTarife() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.get("/tagesschulen/tarife/refnr/" + REFNR)
+			.then()
+			.assertThat()
+			.statusCode(Status.OK.getStatusCode())
+			.body(isJsonStringMatching(jsonObject()
+				.where("tarifeDefinitivAkzeptiert", is(jsonBoolean(true)))
+				.where("tarifZeitabschnitte", is(jsonArray(contains(
+					jsonObject()
+						.where("von", is(jsonText("2020-08-01")))
+						.where("bis", is(jsonText("2021-07-31")))
+						.where("massgebendesEinkommen", jsonNumber(DoubleNode.valueOf(88341.05)))
+						.where("tarifPaedagogisch", is(jsonObject()
+							.where("totalKostenProWoche", jsonNumber(DoubleNode.valueOf(9.68)))
+							.where("betreuungsKostenProStunde", jsonNumber(DoubleNode.valueOf(1.84)))
+							.where("betreuungsMinutenProWoche", jsonNumber(IntNode.valueOf(120)))
+							.where("verpflegungsKostenProWoche", jsonNumber(DoubleNode.valueOf(6)))
+							.where("verpflegungsKostenVerguenstigung", jsonNumber(DoubleNode.valueOf(0)))
+						))
+						.where("tarifNichtPaedagogisch", is(jsonNull()))
+				))))
+			));
 	}
 
 	@Nonnull

@@ -3,7 +3,7 @@ version: '2'
 services:
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION}
+    image: docker-registry.dvbern.ch/dockerhub/confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION}
     networks:
       - kibon-exchange
     ports:
@@ -13,7 +13,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
 
   kafka:
-    image: confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION}
+    image: docker-registry.dvbern.ch/dockerhub/confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION}
     networks:
       - kibon-exchange
     depends_on:
@@ -31,7 +31,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:${CONFLUENT_PLATFORM_VERSION}
+    image: docker-registry.dvbern.ch/dockerhub/confluentinc/cp-schema-registry:${CONFLUENT_PLATFORM_VERSION}
     hostname: schema-registry
     networks:
       - kibon-exchange
@@ -48,7 +48,7 @@ services:
       SCHEMA_REGISTRY_DEBUG: 'true'
 
   db:
-    image: postgres:11-alpine
+    image: docker-registry.dvbern.ch/dockerhub/library/postgres:11-alpine
     networks:
       - kibon-exchange
     ports:
@@ -60,7 +60,7 @@ services:
       POSTGRES_DB: ${PG_EXCHANGE_SERVICE_DB}
 
   keycloak:
-    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
+    image: docker-registry.dvbern.ch/dockerhub/jboss/keycloak:${KEYCLOAK_VERSION}
     networks:
       - kibon-exchange
     ports:
