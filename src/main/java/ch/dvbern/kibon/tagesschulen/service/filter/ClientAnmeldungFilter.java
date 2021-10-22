@@ -63,6 +63,7 @@ public class ClientAnmeldungFilter {
 		restrictions.add(new ClientActiveFilter());
 		restrictions.add(new ClientNameFilter(clientName));
 		restrictions.add(new AfterIdFilter(afterId));
+		restrictions.add(new ClientGueltigkeitFilter());
 
 		this.limit = limit;
 	}
