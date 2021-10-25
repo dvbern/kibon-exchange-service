@@ -15,34 +15,43 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.verfuegung.service.filter;
+package ch.dvbern.kibon.shared.filter;
 
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
 import ch.dvbern.kibon.persistence.Restriction;
-import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
-import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
-import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
 
 /**
- * Utility class for filtering criteria queries to only deliver {@link ClientVerfuegung}en that are active.
+ * Utility class for filtering criteria queries to only deliver {@link ClientAnmeldung}en that are active.
  */
-public class ClientActiveFilter implements Restriction<ClientVerfuegung, ClientVerfuegungDTO> {
+public class ClientActiveFilter<X, Y> implements Restriction<X, Y> {
+
+	@Nonnull
+	private final SingularAttribute<? super X, Boolean> z;
+
+	public ClientActiveFilter(@Nonnull SingularAttribute<? super X, Boolean> z) {
+		this.z = z;
+	}
 
 	@Nonnull
 	@Override
-	public Optional<Predicate> getPredicate(@Nonnull Root<ClientVerfuegung> root, @Nonnull CriteriaBuilder cb) {
-		return Optional.of(cb.isTrue(root.get(ClientVerfuegung_.active)));
+	public Optional<Predicate> getPredicate(@Nonnull Root<X> root, @Nonnull CriteriaBuilder cb) {
+		return Optional.of(cb.isTrue(root.get(z)));
 	}
 
 	@Override
-	public void setParameter(@Nonnull TypedQuery<ClientVerfuegungDTO> query) {
+	public void setParameter(@Nonnull TypedQuery<Y> query) {
 		// nop
 	}
 }

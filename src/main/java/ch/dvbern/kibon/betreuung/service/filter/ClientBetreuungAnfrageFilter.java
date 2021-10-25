@@ -31,7 +31,11 @@ import javax.persistence.criteria.Root;
 
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
+import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage_;
 import ch.dvbern.kibon.persistence.Restriction;
+import ch.dvbern.kibon.shared.filter.AfterIdFilter;
+import ch.dvbern.kibon.shared.filter.ClientActiveFilter;
+import ch.dvbern.kibon.shared.filter.ClientNameFilter;
 
 /**
  * Helper class for filtering {@link ClientBetreuungAnfrage}.
@@ -60,9 +64,9 @@ public class ClientBetreuungAnfrageFilter {
 		@Nullable Long afterId,
 		@Nullable Integer limit) {
 
-		restrictions.add(new ClientActiveFilter());
-		restrictions.add(new ClientNameFilter(clientName));
-		restrictions.add(new AfterIdFilter(afterId));
+		restrictions.add(new ClientActiveFilter(ClientBetreuungAnfrage_.active));
+		restrictions.add(new ClientNameFilter(clientName, ClientBetreuungAnfrage_.client));
+		restrictions.add(new AfterIdFilter(afterId, ClientBetreuungAnfrage_.id));
 		restrictions.add(new ClientGueltigkeitFilter());
 
 		this.limit = limit;

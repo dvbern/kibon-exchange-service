@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.verfuegung.service.filter;
+package ch.dvbern.kibon.shared.filter;
 
 import java.util.Optional;
 
@@ -26,41 +26,45 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
 import ch.dvbern.kibon.persistence.Restriction;
-import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
-import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
-import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 
 /**
  * Utility class for filtering criteria queries to only deliver entries with an ID > the specified one.
  */
-public class AfterIdFilter implements Restriction<ClientVerfuegung, ClientVerfuegungDTO> {
+public class AfterIdFilter<X, Y> implements Restriction<X, Y> {
 
 	@Nullable
 	private final Long afterId;
 
+	@Nonnull
+	private final SingularAttribute<? super X, Long> z;
+
 	@Nullable
 	private ParameterExpression<Long> param;
 
-	public AfterIdFilter(@Nullable Long afterId) {
+	public AfterIdFilter(@Nullable Long afterId, @Nonnull SingularAttribute<? super X, Long> z) {
 		this.afterId = afterId;
+		this.z = z;
 	}
 
 	@Override
 	@Nonnull
-	public Optional<Predicate> getPredicate(@Nonnull Root<ClientVerfuegung> root, @Nonnull CriteriaBuilder cb) {
+	public Optional<Predicate> getPredicate(@Nonnull Root<X> root, @Nonnull CriteriaBuilder cb) {
 		if (afterId == null) {
 			return Optional.empty();
 		}
 
 		param = cb.parameter(Long.class, "id");
 
-		return Optional.of(cb.greaterThan(root.get(ClientVerfuegung_.id), param));
+
+		return Optional.of(cb.greaterThan(root.get(z), param));
 	}
 
+
 	@Override
-	public void setParameter(@Nonnull TypedQuery<ClientVerfuegungDTO> query) {
+	public void setParameter(@Nonnull TypedQuery<Y> query) {
 		if (afterId == null) {
 			return;
 		}
