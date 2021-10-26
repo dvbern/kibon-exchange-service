@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.tagesschulen.service.filter;
+package ch.dvbern.kibon.shared.filter;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -26,26 +26,36 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.Client_;
 import ch.dvbern.kibon.persistence.Restriction;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
 
-public class ClientGueltigkeitFilter implements Restriction<ClientAnmeldung, ClientAnmeldungDTO> {
+public class ClientGueltigkeitFilter<X extends AbstractInstitutionPeriodeEntity, Y> implements Restriction<X, Y> {
+
+	@Nonnull
+	private final SingularAttribute<? super X, X> z;
+
+	@Nonnull
+	private final SingularAttribute<? super X, Client> c;
+
+	public ClientGueltigkeitFilter(@Nonnull SingularAttribute<? super X, X> z, @Nonnull SingularAttribute<? super X, Client> c) {
+		this.z = z;
+		this.c = c;
+	}
 
 	@Nonnull
 	@Override
-	public Optional<Predicate> getPredicate(@Nonnull Root<ClientAnmeldung> root, @Nonnull CriteriaBuilder cb) {
-		Path<LocalDate> entityVon = root.get(ClientAnmeldung_.anmeldung)
+	public Optional<Predicate> getPredicate(@Nonnull Root<X> root, @Nonnull CriteriaBuilder cb) {
+		Path<LocalDate> entityVon = root.get(z)
 			.get(AbstractInstitutionPeriodeEntity_.periodeVon);
-		Path<LocalDate> entityBis = root.get(ClientAnmeldung_.anmeldung)
+		Path<LocalDate> entityBis = root.get(z)
 			.get(AbstractInstitutionPeriodeEntity_.periodeBis);
 
-		Path<Client> clientPath = root.get(ClientAnmeldung_.client);
+		Path<Client> clientPath = root.get(c);
 		Path<LocalDate> gueltigAb = clientPath.get(Client_.gueltigAb);
 		Path<LocalDate> gueltigBis = clientPath.get(Client_.gueltigBis);
 
@@ -57,7 +67,7 @@ public class ClientGueltigkeitFilter implements Restriction<ClientAnmeldung, Cli
 	}
 
 	@Override
-	public void setParameter(@Nonnull TypedQuery<ClientAnmeldungDTO> query) {
+	public void setParameter(@Nonnull TypedQuery<Y> query) {
 
 	}
 }

@@ -32,6 +32,7 @@ import javax.persistence.criteria.Root;
 import ch.dvbern.kibon.persistence.Restriction;
 import ch.dvbern.kibon.shared.filter.AfterIdFilter;
 import ch.dvbern.kibon.shared.filter.ClientActiveFilter;
+import ch.dvbern.kibon.shared.filter.ClientGueltigkeitFilter;
 import ch.dvbern.kibon.shared.filter.ClientNameFilter;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
@@ -67,7 +68,7 @@ public class ClientAnmeldungFilter {
 		restrictions.add(new ClientActiveFilter(ClientAnmeldung_.active));
 		restrictions.add(new ClientNameFilter(clientName, ClientAnmeldung_.client));
 		restrictions.add(new AfterIdFilter<>(afterId, ClientAnmeldung_.id));
-		restrictions.add(new ClientGueltigkeitFilter());
+		restrictions.add(new ClientGueltigkeitFilter(ClientAnmeldung_.anmeldung, ClientAnmeldung_.client));
 
 		this.limit = limit;
 	}

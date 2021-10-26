@@ -20,7 +20,6 @@ package ch.dvbern.kibon.shared.filter;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
@@ -29,8 +28,6 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import ch.dvbern.kibon.persistence.Restriction;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
 
 /**
  * Utility class for filtering criteria queries to only deliver {@link ClientAnmeldung}en that are active.
