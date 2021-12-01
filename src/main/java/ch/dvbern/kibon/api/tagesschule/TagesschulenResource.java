@@ -285,6 +285,12 @@ public class TagesschulenResource {
 			groups,
 			refnr);
 
+		for (var modulAuswahlDTO : bestaetigungDTO.getModule()) {
+			if (modulAuswahlDTO.getModulId() == null && modulAuswahlDTO.getFremdId() == null) {
+				return Uni.createFrom().item(Response.status(Status.BAD_REQUEST).entity("Either modulId oder fremdId must be set").build());
+			}
+		}
+
 		Optional<String> institutionId = anmeldungService.getLatestAnmeldung(refnr)
 			.map(AbstractInstitutionPeriodeEntity::getInstitutionId);
 
