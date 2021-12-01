@@ -139,7 +139,8 @@ public final class InstitutionTestUtil {
 			List.of(MONDAY, TUESDAY),
 			List.of(Intervall.WOECHENTLICH),
 			true,
-			BigDecimal.valueOf(10.5));
+			BigDecimal.valueOf(10.5),
+			null);
 
 		return List.of(modulDTO);
 	}
