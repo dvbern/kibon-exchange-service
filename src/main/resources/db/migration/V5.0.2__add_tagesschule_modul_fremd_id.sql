@@ -15,4 +15,4 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-ALTER TABLE modul ADD COLUMN fremd_id VARCHAR(255);
+ALTER TABLE modul ADD COLUMN fremdid VARCHAR(255);
