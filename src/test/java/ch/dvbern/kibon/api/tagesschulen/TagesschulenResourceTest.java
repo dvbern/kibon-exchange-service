@@ -177,6 +177,7 @@ public class TagesschulenResourceTest {
 						.where("von", is(jsonText("2020-08-01")))
 						.where("bis", is(jsonText("2021-07-31")))
 						.where("massgebendesEinkommen", jsonNumber(DoubleNode.valueOf(88341.05)))
+						.where("familienGroesse", jsonNumber(DoubleNode.valueOf(2)))
 						.where("tarifPaedagogisch", is(jsonObject()
 							.where("totalKostenProWoche", jsonNumber(DoubleNode.valueOf(9.68)))
 							.where("betreuungsKostenProStunde", jsonNumber(DoubleNode.valueOf(1.84)))

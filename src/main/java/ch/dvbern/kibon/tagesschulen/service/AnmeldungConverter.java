@@ -144,7 +144,8 @@ public class AnmeldungConverter {
 		ObjectNode result = mapper.createObjectNode()
 			.put("von", dto.getVon().toString())
 			.put("bis", dto.getBis().toString())
-			.put("massgebendesEinkommen", dto.getMassgebendesEinkommen());
+			.put("massgebendesEinkommen", dto.getMassgebendesEinkommen())
+			.put("familienGroesse", dto.getFamilienGroesse());
 
 		addTarif(result, "tarifPaedagogisch", dto.getTarifPaedagogisch());
 		addTarif(result, "tarifNichtPaedagogisch", dto.getTarifNichtPaedagogisch());
