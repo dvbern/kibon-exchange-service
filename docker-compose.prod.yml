@@ -84,6 +84,7 @@ services:
 
   service:
     image: docker.dvbern.ch/kibon/exchange-service:${VERSION}
+    restart: "unless-stopped"
     networks:
       - kibon_exchange_backbone
     depends_on:
