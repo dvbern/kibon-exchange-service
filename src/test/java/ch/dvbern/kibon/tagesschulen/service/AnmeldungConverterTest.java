@@ -166,6 +166,7 @@ public class AnmeldungConverterTest {
 			.where("von", is(jsonText(dto.getVon().toString())))
 			.where("bis", is(jsonText(dto.getBis().toString())))
 			.where("massgebendesEinkommen", jsonBigDecimalLike(dto.getMassgebendesEinkommen()))
+			.where("familienGroesse", jsonBigDecimalLike(dto.getFamilienGroesse()))
 			.where("tarifPaedagogisch", matchesTarif(dto.getTarifPaedagogisch()))
 			.where("tarifNichtPaedagogisch", matchesTarif(dto.getTarifNichtPaedagogisch()))
 		);

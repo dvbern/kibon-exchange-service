@@ -229,5 +229,6 @@ public class InstitutionConverter {
 		modul.setVerpflegungsKosten(modulDTO.getVerpflegungsKosten());
 		modul.setZeitVon(TimeConverter.deserialize(modulDTO.getZeitVon()));
 		modul.setZeitBis(TimeConverter.deserialize(modulDTO.getZeitBis()));
+		modul.setFremdId(modulDTO.getFremdId());
 	}
 }

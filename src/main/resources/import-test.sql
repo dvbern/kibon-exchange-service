@@ -321,6 +321,7 @@ VALUES ('{
 					"von": "2020-08-01",
 					"bis": "2021-07-31",
 					"massgebendesEinkommen": 88341.05,
+					"familienGroesse": 2,
 					"tarifPaedagogisch": {
 						"totalKostenProWoche": 9.68,
 						"betreuungsKostenProStunde": 1.84,
