@@ -39,12 +39,12 @@ public class AfterIdFilter<X, Y> implements Restriction<X, Y> {
 	private final Long afterId;
 
 	@Nonnull
-	private final SingularAttribute<? super X, Long> z;
+	private final SingularAttribute<X, Long> z;
 
 	@Nullable
 	private ParameterExpression<Long> param;
 
-	public AfterIdFilter(@Nullable Long afterId, @Nonnull SingularAttribute<? super X, Long> z) {
+	public AfterIdFilter(@Nullable Long afterId, @Nonnull SingularAttribute<X, Long> z) {
 		this.afterId = afterId;
 		this.z = z;
 	}

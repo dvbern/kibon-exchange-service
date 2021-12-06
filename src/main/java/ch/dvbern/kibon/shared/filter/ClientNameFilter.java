@@ -44,12 +44,12 @@ public class ClientNameFilter<X, Y> implements Restriction<X, Y> {
 	private final String clientName;
 
 	@Nonnull
-	private final SingularAttribute<? super X, Client> z;
+	private final SingularAttribute<X, Client> z;
 
 	@Nullable
 	private ParameterExpression<String> clientParam;
 
-	public ClientNameFilter(@Nonnull String clientName, @Nonnull SingularAttribute<? super X, Client> z) {
+	public ClientNameFilter(@Nonnull String clientName, @Nonnull SingularAttribute<X, Client> z) {
 		this.clientName = clientName;
 		this.z = z;
 	}

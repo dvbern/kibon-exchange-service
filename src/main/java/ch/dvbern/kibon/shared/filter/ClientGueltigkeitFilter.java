@@ -34,15 +34,17 @@ import ch.dvbern.kibon.persistence.Restriction;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
 
-public class ClientGueltigkeitFilter<X extends AbstractInstitutionPeriodeEntity, Y> implements Restriction<X, Y> {
+public class ClientGueltigkeitFilter<X, Y> implements Restriction<X, Y> {
 
 	@Nonnull
-	private final SingularAttribute<? super X, X> z;
+	private final SingularAttribute<X, ? extends AbstractInstitutionPeriodeEntity> z;
 
 	@Nonnull
-	private final SingularAttribute<? super X, Client> c;
+	private final SingularAttribute<X, Client> c;
 
-	public ClientGueltigkeitFilter(@Nonnull SingularAttribute<? super X, X> z, @Nonnull SingularAttribute<? super X, Client> c) {
+	public ClientGueltigkeitFilter(
+		@Nonnull SingularAttribute<X, ? extends AbstractInstitutionPeriodeEntity> z,
+		@Nonnull SingularAttribute<X, Client> c) {
 		this.z = z;
 		this.c = c;
 	}

@@ -35,9 +35,9 @@ import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
 public class ClientActiveFilter<X, Y> implements Restriction<X, Y> {
 
 	@Nonnull
-	private final SingularAttribute<? super X, Boolean> z;
+	private final SingularAttribute<X, Boolean> z;
 
-	public ClientActiveFilter(@Nonnull SingularAttribute<? super X, Boolean> z) {
+	public ClientActiveFilter(@Nonnull SingularAttribute<X, Boolean> z) {
 		this.z = z;
 	}
 
