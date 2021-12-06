@@ -39,6 +39,7 @@ import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage_;
 import ch.dvbern.kibon.betreuung.service.filter.ClientBetreuungAnfrageFilter;
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
 
 @ApplicationScoped
 public class BetreuungAnfrageService {
@@ -75,10 +76,10 @@ public class BetreuungAnfrageService {
 		query.select(cb.construct(
 			ClientBetreuungAnfrageDTO.class,
 			root.get(ClientBetreuungAnfrage_.id),
-			betreuungAnfrage.get(BetreuungAnfrage_.refnr),
-			betreuungAnfrage.get(BetreuungAnfrage_.institutionId),
-			betreuungAnfrage.get(BetreuungAnfrage_.periodeVon),
-			betreuungAnfrage.get(BetreuungAnfrage_.periodeBis),
+			betreuungAnfrage.get(AbstractInstitutionPeriodeEntity_.refnr),
+			betreuungAnfrage.get(AbstractInstitutionPeriodeEntity_.institutionId),
+			betreuungAnfrage.get(AbstractInstitutionPeriodeEntity_.periodeVon),
+			betreuungAnfrage.get(AbstractInstitutionPeriodeEntity_.periodeBis),
 			betreuungAnfrage.get(BetreuungAnfrage_.betreuungsArt),
 			betreuungAnfrage.get(BetreuungAnfrage_.kind),
 			betreuungAnfrage.get(BetreuungAnfrage_.gesuchsteller),
