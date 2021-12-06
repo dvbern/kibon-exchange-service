@@ -78,6 +78,8 @@ import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static ch.dvbern.kibon.util.StringUtil.isBlankString;
+
 @Path("/tagesschulen")
 @Tag(name = OpenApiTag.TAGES_SCHULEN)
 @Produces(MediaType.APPLICATION_JSON)
@@ -286,8 +288,8 @@ public class TagesschulenResource {
 			refnr);
 
 		for (var modulAuswahlDTO : bestaetigungDTO.getModule()) {
-			if (modulAuswahlDTO.getModulId() == null && modulAuswahlDTO.getFremdId() == null) {
-				return Uni.createFrom().item(Response.status(Status.BAD_REQUEST).entity("Either modulId oder fremdId must be set").build());
+			if (isBlankString(modulAuswahlDTO.getModulId()) && isBlankString(modulAuswahlDTO.getFremdId())) {
+				return Uni.createFrom().item(Response.status(Status.BAD_REQUEST).build());
 			}
 		}
 
