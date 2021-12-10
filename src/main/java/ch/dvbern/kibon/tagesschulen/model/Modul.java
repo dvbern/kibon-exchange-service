@@ -89,6 +89,9 @@ public class Modul extends BaseEntity {
 	@Nonnull
 	private @NotNull BigDecimal verpflegungsKosten;
 
+	@Nullable
+	private String fremdId;
+
 	@Override
 	public boolean equals(@Nullable Object o) {
 		if (this == o) {
@@ -197,5 +200,14 @@ public class Modul extends BaseEntity {
 
 	public void setVerpflegungsKosten(@Nonnull BigDecimal verpflegungsKosten) {
 		this.verpflegungsKosten = verpflegungsKosten;
+	}
+
+	@Nullable
+	public String getFremdId() {
+		return fremdId;
+	}
+
+	public void setFremdId(@Nullable String fremdId) {
+		this.fremdId = fremdId;
 	}
 }

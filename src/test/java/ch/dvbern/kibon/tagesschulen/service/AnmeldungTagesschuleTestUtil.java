@@ -54,6 +54,7 @@ public final class AnmeldungTagesschuleTestUtil {
 			LocalDate.of(2020, 8, 1),
 			LocalDate.of(2021, 3, 31),
 			BigDecimal.valueOf(88231.05),
+			BigDecimal.valueOf(2),
 			null,
 			null
 		);
@@ -62,6 +63,7 @@ public final class AnmeldungTagesschuleTestUtil {
 			LocalDate.of(2021, 4, 1),
 			LocalDate.of(2021, 7, 31),
 			BigDecimal.valueOf(55645),
+			BigDecimal.valueOf(2),
 			createTarifDTO(),
 			createTarifDTO()
 		);

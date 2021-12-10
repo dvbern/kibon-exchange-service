@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 DV Bern AG, Switzerland
+ * Copyright (C) 2021 DV Bern AG, Switzerland
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,14 +17,15 @@
 
 package ch.dvbern.kibon.util;
 
-@SuppressWarnings("PMD.ClassNamingConventions")
-public final class OpenApiTag {
+import javax.annotation.Nullable;
 
-	public static final String BETREUUNGS_GUTSCHEINE = "Betreuungsgutscheine";
-	public static final String BETREUUNGEN = "Betreuungen";
-	public static final String FAMILIEN_PORTAL = "Familienportal Bern";
-	public static final String TAGES_SCHULEN = "Tagesschulen";
+public final class StringUtil {
 
-	private OpenApiTag() {
+	private StringUtil() {
+
+	}
+
+	public static boolean isBlankString(@Nullable String value) {
+		return value == null || value.isBlank();
 	}
 }
