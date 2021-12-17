@@ -32,7 +32,6 @@ import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.Message;
-import org.eclipse.microprofile.reactive.messaging.Metadata;
 import org.slf4j.Logger;
 
 import static ch.dvbern.kibon.exchange.commons.util.EventUtil.MESSAGE_HEADER_CLIENT_NAME;
@@ -67,7 +66,8 @@ public final class EmitterUtil {
 			CompletableFuture<Void> future = new CompletableFuture<>();
 
 			Message<T> message = KafkaRecord.of(key, payload)
-				.addMetadata(Metadata.of(metadata, metadataDep))
+				.addMetadata(metadata)
+				.addMetadata(metadataDep)
 				.withAck(() -> {
 					logger.info("ACK {} / {}", eventType, key);
 					future.complete(null);
