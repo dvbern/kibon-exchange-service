@@ -28,9 +28,11 @@ import javax.annotation.Nonnull;
 import ch.dvbern.kibon.clients.model.Client;
 import io.smallrye.reactive.messaging.kafka.KafkaRecord;
 import io.smallrye.reactive.messaging.kafka.api.OutgoingKafkaRecordMetadata;
+import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.Message;
+import org.eclipse.microprofile.reactive.messaging.Metadata;
 import org.slf4j.Logger;
 
 import static ch.dvbern.kibon.exchange.commons.util.EventUtil.MESSAGE_HEADER_CLIENT_NAME;
@@ -51,17 +53,21 @@ public final class EmitterUtil {
 
 		return (emitter, logger) -> {
 
-			OutgoingKafkaRecordMetadata<String> metadata = buildMetadata(eventType, key, client);
+			// sometimes metadata is lost! While debugging, I noticed there are 2 different
+			// OutgoingKafkaRecordMetadata classes used. One didn't contain metadata the other one did. Not really
+			// sure if this will help at all, but might be better to have the same metadata in both cases.
+			var headers = createRecordHeaders(eventType, client);
+			var metadata = buildMetadata(key, headers);
+			var metadataDep = buildMetadataDeprecated(key, headers);
 
 			// there are two different send methods: the one that accepts a payload returns a CompletionStage, which
-			// will
-			// be completed when the message for this payload is acknowledged. Unfortunately, the one that accepts a
-			// message does not return anything. We thus provide our our own ack & nack functions, similar as
+			// will be completed when the message for this payload is acknowledged. Unfortunately, the one that
+			// accepts a message does not return anything. We thus provide our our own ack & nack functions, similar as
 			// in the payload-parameter method of EmitterImpl, to block the REST request until an ACK is received.
 			CompletableFuture<Void> future = new CompletableFuture<>();
 
 			Message<T> message = KafkaRecord.of(key, payload)
-				.addMetadata(metadata)
+				.addMetadata(Metadata.of(metadata, metadataDep))
 				.withAck(() -> {
 					logger.info("ACK {} / {}", eventType, key);
 					future.complete(null);
@@ -85,19 +91,36 @@ public final class EmitterUtil {
 	}
 
 	@Nonnull
+	private static Headers createRecordHeaders(@Nonnull String eventType, @Nonnull Client client) {
+		return new RecordHeaders()
+			.add(MESSAGE_HEADER_EVENT_ID, UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
+			.add(MESSAGE_HEADER_EVENT_TYPE, eventType.getBytes(StandardCharsets.UTF_8))
+			.add(MESSAGE_HEADER_CLIENT_NAME, client.getId().getClientName().getBytes(StandardCharsets.UTF_8));
+	}
+
+	@Nonnull
 	private static OutgoingKafkaRecordMetadata<String> buildMetadata(
-		@Nonnull String eventType,
 		@Nonnull String key,
-		@Nonnull Client client) {
+		@Nonnull Headers headers) {
 
 		OutgoingKafkaRecordMetadata<String> metadata = OutgoingKafkaRecordMetadata.<String>builder()
 			.withKey(key)
-			.withHeaders(new RecordHeaders()
-				.add(MESSAGE_HEADER_EVENT_ID, UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
-				.add(MESSAGE_HEADER_EVENT_TYPE, eventType.getBytes(StandardCharsets.UTF_8))
-				.add(MESSAGE_HEADER_CLIENT_NAME, client.getId().getClientName().getBytes(StandardCharsets.UTF_8))
-			)
+			.withHeaders(headers)
 			.build();
+
+		return metadata;
+	}
+
+	@Nonnull
+	private static io.smallrye.reactive.messaging.kafka.OutgoingKafkaRecordMetadata<String> buildMetadataDeprecated(
+		@Nonnull String key,
+		@Nonnull Headers headers) {
+
+		io.smallrye.reactive.messaging.kafka.OutgoingKafkaRecordMetadata<String> metadata =
+			io.smallrye.reactive.messaging.kafka.OutgoingKafkaRecordMetadata.<String>builder()
+				.withKey(key)
+				.withHeaders(headers)
+				.build();
 
 		return metadata;
 	}
