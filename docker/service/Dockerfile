@@ -21,7 +21,7 @@
 # docker run -i --rm -p 8080:8080 -p 5005:5005 -e JAVA_ENABLE_DEBUG="true" docker.dvbern.ch/kibon/exchange-service
 #
 ###
-FROM docker-registry.dvbern.ch/dockerhub/redhat/ubi8-minimal:8.4
+FROM docker-registry.dvbern.ch/dockerhub/redhat/ubi8-minimal:8.5
 
 ARG BUILD_VERSION
 ARG JAVA_PACKAGE=java-11-openjdk-headless
