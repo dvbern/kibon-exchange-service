@@ -224,7 +224,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-authz-client</artifactId>
-            <version>15.0.2</version>
+            <version>16.1.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
