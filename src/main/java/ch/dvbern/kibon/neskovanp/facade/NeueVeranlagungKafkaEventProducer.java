@@ -25,7 +25,6 @@ import javax.inject.Inject;
 
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.exchange.commons.neskovanp.NeueVeranlagungEventDTO;
-import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungEventDTO;
 import ch.dvbern.kibon.kafka.EmitterUtil;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;

@@ -72,7 +72,8 @@ public class VeranlagungResource {
 	NeueVeranlagungKafkaEventProducer veranlagungProducer;
 
 	@POST
-	@Operation(deprecated = true, summary = "Siehe /api/v1/veranlagung")
+	@Operation(summary = "Eine neue Veranlagung an kiBon melden",
+		description = "Diese Schnittstelle meldet an kiBon das eine neue Veranlagung ist zur Verfügung")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
 	@APIResponse(responseCode = "200", content = {})
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
