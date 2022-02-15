@@ -23,7 +23,6 @@ import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.exchange.commons.neskovanp.NeueVeranlagungEventDTO;
 import ch.dvbern.kibon.kafka.EmitterUtil;
 import org.eclipse.microprofile.reactive.messaging.Channel;
@@ -42,18 +41,18 @@ public class NeueVeranlagungKafkaEventProducer {
 	Emitter<NeueVeranlagungEventDTO> neueVeranlagungEvents;
 
 	/**
-	 * Sends a betreuungEventDTO to Kafka.
+	 * Sends a NeueVeranlagungEventDTO to Kafka.
 	 *
-	 * @param betreuungEventDTO the payload
+	 * @param dto the payload
 	 * @return the {@code CompletionStage}, which will be completed when the message for this payload is acknowledged
 	 * by Kafka, or which will completeExceptionally upon NACK, channel cancellation/termination or queue overlflow.
 	 */
 	@Nonnull
-	public CompletionStage<Void> process(@Nonnull NeueVeranlagungEventDTO neueVeranlagungEventDTO, @Nonnull Client client) {
+	public CompletionStage<Void> process(@Nonnull NeueVeranlagungEventDTO dto, @Nonnull String clientName) {
 		String eventType = "NeueVeranlagung";
-		String key = neueVeranlagungEventDTO.getKibonAntragId();
+		String key = dto.getKibonAntragId();
 
-		return EmitterUtil.emitHelper(eventType, key, client, neueVeranlagungEventDTO)
+		return EmitterUtil.emitHelper(eventType, key, clientName, dto)
 			.apply(neueVeranlagungEvents, LOG);
 	}
 }

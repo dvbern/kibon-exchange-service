@@ -32,8 +32,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import ch.dvbern.kibon.clients.model.Client;
-import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.exchange.api.common.neskovanp.NeueVeranlagungDTO;
 import ch.dvbern.kibon.exchange.commons.neskovanp.NeueVeranlagungEventDTO;
 import ch.dvbern.kibon.neskovanp.facade.NeueVeranlagungKafkaEventProducer;
@@ -98,14 +96,10 @@ public class VeranlagungResource {
 			clientName,
 			groups);
 
-		// wir erstellen einen temporären Client um seiner Name in der Event Header zu übermitteln
-		Client clientTemp = new Client();
-		clientTemp.setId(new ClientId(clientName, ""));
-
 		NeueVeranlagungEventDTO neueVeranlagungEventDTO = objectMapper.convertValue(veranlagungDTO, NeueVeranlagungEventDTO.class);
 
 		LOG.debug("generating message");
-		CompletionStage<Response> acked = veranlagungProducer.process(neueVeranlagungEventDTO, clientTemp)
+		CompletionStage<Response> acked = veranlagungProducer.process(neueVeranlagungEventDTO, clientName)
 			.thenApply(Void -> {
 				LOG.debug("received ack");
 				return Response.ok().build();
