@@ -79,7 +79,7 @@
       "attributes" : { }
     }, {
        "id" : "c12cbef7-9bbe-43cf-a382-2ff05f7bca2a",
-       "name" : "nesko",
+       "name" : "neskovanp",
        "description" : "Erlaubt neue Veranlagung zu melden für die Neskovanp Schnittstelle.",
        "composite" : false,
        "clientRole" : false,
@@ -405,7 +405,7 @@
       "credentials" : [ ],
       "disableableCredentialTypes" : [ ],
       "requiredActions" : [ ],
-      "realmRoles" : [ "nesko", "uma_authorization", "offline_access" ],
+      "realmRoles" : [ "neskovanp", "uma_authorization", "offline_access" ],
       "clientRoles" : {
           "account" : [ "manage-account", "view-profile" ]
       },

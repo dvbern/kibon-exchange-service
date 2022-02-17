@@ -47,7 +47,7 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/veranlagung")
+@Path("/neskovanp")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class VeranlagungResource {
@@ -80,7 +80,7 @@ public class VeranlagungResource {
 	@Path("/veranlagung")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@RolesAllowed("nesko")
+	@RolesAllowed("neskovanp")
 	@Timed(name = "veranlagungTimer",
 		description = "A measure of how long it takes to process VeranlagungDTO",
 		unit = MetricUnits.MILLISECONDS)
