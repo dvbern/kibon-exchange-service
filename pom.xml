@@ -13,14 +13,14 @@
     <properties>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>2.6.1.Final</quarkus.platform.version>
+        <quarkus.platform.version>2.7.1.Final</quarkus.platform.version>
         <hamcrest.version>2.2</hamcrest.version>
         <spotify.hamcrest.version>1.2.0</spotify.hamcrest.version>
-        <testcontainers.version>1.16.0</testcontainers.version>
+        <testcontainers.version>1.16.3</testcontainers.version>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
-        <kibon.exchange.api.commons.version>5.1.0</kibon.exchange.api.commons.version>
-        <kibon.exchange.api.version>5.1.0</kibon.exchange.api.version>
+        <kibon.exchange.api.commons.version>5.2.0</kibon.exchange.api.commons.version>
+        <kibon.exchange.api.version>5.2.0</kibon.exchange.api.version>
 
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <maven.compiler.source>11</maven.compiler.source>
@@ -291,7 +291,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.36.1</version>
+                <version>0.39.0</version>
                 <configuration>
                     <imagePullPolicy>always</imagePullPolicy>
                     <skipPush>false</skipPush>
