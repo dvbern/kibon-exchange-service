@@ -71,7 +71,7 @@ public class VeranlagungResource {
 
 	@POST
 	@Operation(summary = "Eine neue Veranlagung an kiBon melden",
-		description = "Diese Schnittstelle meldet an kiBon das eine neue Veranlagung ist zur Verfügung")
+		description = "Diese Schnittstelle meldet kiBon dass eine neue Steuer-Veranlagung verfügbar ist.")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
 	@APIResponse(responseCode = "200", content = {})
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
@@ -84,7 +84,7 @@ public class VeranlagungResource {
 	@Timed(name = "veranlagungTimer",
 		description = "A measure of how long it takes to process VeranlagungDTO",
 		unit = MetricUnits.MILLISECONDS)
-	public Uni<Response> sendPlatzbestaetigungBetreuungToKafka(@Nonnull @NotNull @Valid NeueVeranlagungDTO veranlagungDTO) {
+	public Uni<Response> sendNeueVeranlagungToKafka(@Nonnull @NotNull @Valid NeueVeranlagungDTO veranlagungDTO) {
 
 		String clientName = jsonWebToken.getClaim("clientId");
 		Set<String> groups = identity.getRoles();
