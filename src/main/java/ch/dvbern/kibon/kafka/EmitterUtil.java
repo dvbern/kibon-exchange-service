@@ -50,12 +50,22 @@ public final class EmitterUtil {
 		@Nonnull Client client,
 		@Nonnull T payload) {
 
+		return emitHelper(eventType, key, client.getId().getClientName(), payload);
+	}
+
+	@Nonnull
+	public static <T> BiFunction<Emitter<T>, Logger, CompletionStage<Void>> emitHelper(
+		@Nonnull String eventType,
+		@Nonnull String key,
+		@Nonnull String clientName,
+		@Nonnull T payload) {
+
 		return (emitter, logger) -> {
 
 			// sometimes metadata is lost! While debugging, I noticed there are 2 different
 			// OutgoingKafkaRecordMetadata classes used. One didn't contain metadata the other one did. Not really
 			// sure if this will help at all, but might be better to have the same metadata in both cases.
-			var headers = createRecordHeaders(eventType, client);
+			var headers = createRecordHeaders(eventType, clientName);
 			var metadata = buildMetadata(key, headers);
 			var metadataDep = buildMetadataDeprecated(key, headers);
 
@@ -91,11 +101,11 @@ public final class EmitterUtil {
 	}
 
 	@Nonnull
-	private static Headers createRecordHeaders(@Nonnull String eventType, @Nonnull Client client) {
+	private static Headers createRecordHeaders(@Nonnull String eventType, @Nonnull String clientName) {
 		return new RecordHeaders()
 			.add(MESSAGE_HEADER_EVENT_ID, UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
 			.add(MESSAGE_HEADER_EVENT_TYPE, eventType.getBytes(StandardCharsets.UTF_8))
-			.add(MESSAGE_HEADER_CLIENT_NAME, client.getId().getClientName().getBytes(StandardCharsets.UTF_8));
+			.add(MESSAGE_HEADER_CLIENT_NAME, clientName.getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Nonnull

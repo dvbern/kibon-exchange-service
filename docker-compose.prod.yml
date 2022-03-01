@@ -112,6 +112,7 @@ services:
       - kibon_exchange_backbone
     depends_on:
       - service
+      - keycloak
     ports:
       - "443:443"
     volumes:
