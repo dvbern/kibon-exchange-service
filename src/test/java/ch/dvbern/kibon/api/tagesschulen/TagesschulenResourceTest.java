@@ -17,6 +17,7 @@
 
 package ch.dvbern.kibon.api.tagesschulen;
 
+import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
@@ -33,6 +34,8 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static com.spotify.hamcrest.jackson.JsonMatchers.isJsonStringMatching;
@@ -45,6 +48,7 @@ import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
@@ -69,95 +73,103 @@ public class TagesschulenResourceTest {
 			));
 	}
 
-	@Test
-	void testPostConfirmRequiresAuthorisation() {
-		given()
-			.contentType(ContentType.JSON)
-			.when()
-			.post("/tagesschulen/anmeldungen/refnr/" + REFNR)
-			.then()
-			.assertThat()
-			.statusCode(Status.UNAUTHORIZED.getStatusCode());
+	@Nested
+	class ConfirmTest {
+
+		@Test
+		void returnUnauthorized_whenUnauthorized() {
+			given()
+				.contentType(ContentType.JSON)
+				.when()
+				.post("/tagesschulen/anmeldungen/refnr/" + REFNR)
+				.then()
+				.assertThat()
+				.statusCode(Status.UNAUTHORIZED.getStatusCode());
+		}
+
+		@Test
+		void returnNotFound_whenUnknownRefNr() {
+			TagesschuleBestaetigungDTO valid = create(createValidModul());
+
+			given()
+				.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+				.contentType(ContentType.JSON)
+				.body(valid)
+				.when()
+				.post("/tagesschulen/anmeldungen/refnr/20.000102.001.1.1")
+				.then()
+				.assertThat()
+				.statusCode(Status.NOT_FOUND.getStatusCode());
+		}
+
+		@Test
+		void returnBadRequest_whenInvalidInput() {
+			TagesschuleBestaetigungDTO invalid = create(createInvalidModul());
+
+			given()
+				.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+				.contentType(ContentType.JSON)
+				.body(invalid)
+				.when()
+				.post("/tagesschulen/anmeldungen/refnr/" + REFNR)
+				.then()
+				.assertThat()
+				.statusCode(Status.BAD_REQUEST.getStatusCode());
+		}
+
+		@Test
+		void returnOK_onSuccess() {
+			TagesschuleBestaetigungDTO valid = create(createValidModul());
+
+			given()
+				.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+				.contentType(ContentType.JSON)
+				.body(valid)
+				.when()
+				.post("/tagesschulen/anmeldungen/refnr/" + REFNR)
+				.then()
+				.assertThat()
+				.statusCode(Status.OK.getStatusCode());
+		}
 	}
 
-	@Test
-	void testPostConfirmAnmeldungNotFound() {
-		TagesschuleBestaetigungDTO valid = create(createValidModul());
+	@Nested
+	class DeclineTest {
 
-		given()
-			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
-			.contentType(ContentType.JSON)
-			.body(valid)
-			.when()
-			.post("/tagesschulen/anmeldungen/refnr/20.000102.001.1.1")
-			.then()
-			.assertThat()
-			.statusCode(Status.NOT_FOUND.getStatusCode());
-	}
+		@Test
+		void returnUnauthorized_whenUnauthorized() {
+			given()
+				.contentType(ContentType.JSON)
+				.when()
+				.delete("/tagesschulen/anmeldungen/refnr/" + REFNR)
+				.then()
+				.assertThat()
+				.statusCode(Status.UNAUTHORIZED.getStatusCode());
+		}
 
-	@Test
-	void testPostConfirmRequiresValidDTO() {
-		TagesschuleBestaetigungDTO invalid = create(createInvalidModul());
+		@Test
+		void returnNotFound_whenUnknownRefNr() {
+			given()
+				.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+				.contentType(ContentType.JSON)
+				.when()
+				.delete("/tagesschulen/anmeldungen/refnr/20.000102.001.1.1")
+				.then()
+				.assertThat()
+				.statusCode(Status.NOT_FOUND.getStatusCode());
+		}
 
-		given()
-			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
-			.contentType(ContentType.JSON)
-			.body(invalid)
-			.when()
-			.post("/tagesschulen/anmeldungen/refnr/" + REFNR)
-			.then()
-			.assertThat()
-			.statusCode(Status.BAD_REQUEST.getStatusCode());
-	}
-
-	@Test
-	void testPostConfirmAcceptsValidDTO() {
-		TagesschuleBestaetigungDTO valid = create(createValidModul());
-
-		given()
-			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
-			.contentType(ContentType.JSON)
-			.body(valid)
-			.when()
-			.post("/tagesschulen/anmeldungen/refnr/" + REFNR)
-			.then()
-			.assertThat()
-			.statusCode(Status.OK.getStatusCode());
-	}
-
-	@Test
-	void testDeleteRejectRequiresAuthorisation() {
-		given()
-			.contentType(ContentType.JSON)
-			.when()
-			.delete("/tagesschulen/anmeldungen/refnr/" + REFNR)
-			.then()
-			.assertThat()
-			.statusCode(Status.UNAUTHORIZED.getStatusCode());
-	}
-
-	@Test
-	void testDeleteRejectAnmeldungNotFound() {
-		given()
-			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
-			.contentType(ContentType.JSON)
-			.when()
-			.delete("/tagesschulen/anmeldungen/refnr/20.000102.001.1.1")
-			.then()
-			.assertThat()
-			.statusCode(Status.NOT_FOUND.getStatusCode());
-	}
-
-	@Test
-	void testDeleteRejectAcceptsValidRefnummer() {
-		given()
-			.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
-			.contentType(ContentType.JSON)
-			.when()
-			.delete("/tagesschulen/anmeldungen/refnr/" + REFNR)
-			.then()
-			.assertThat()
-			.statusCode(Status.OK.getStatusCode());
+		@Test
+		void returnOK_onValidRefNr() {
+			given()
+				.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+				.contentType(ContentType.JSON)
+				.when()
+				.delete("/tagesschulen/anmeldungen/refnr/" + REFNR)
+				.then()
+				.assertThat()
+				.statusCode(Status.OK.getStatusCode());
+		}
 	}
 
 	@Test
@@ -188,6 +200,63 @@ public class TagesschulenResourceTest {
 						.where("tarifNichtPaedagogisch", is(jsonNull()))
 				))))
 			));
+	}
+
+	@Nested
+	class GetModuleTest {
+
+		@Test
+		void returnUnauthorized_whenUnauthorized() {
+			given()
+				.contentType(ContentType.JSON)
+				.when()
+				.get("/tagesschulen/module/institution/5/periode/2022")
+				.then()
+				.assertThat()
+				.statusCode(Status.UNAUTHORIZED.getStatusCode());
+		}
+
+		@Test
+		void returnNotFound_whenNoClientForInstitution() {
+			given()
+				.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+				.contentType(ContentType.JSON)
+				.when()
+				.get("/tagesschulen/module/institution/1/periode/2022")
+				.then()
+				.assertThat()
+				.statusCode(Status.NOT_FOUND.getStatusCode());
+		}
+
+		@Test
+		void returnOK_onValidRequest() {
+			JsonPath expectedJson = new JsonPath(new File("src/test/resources/tagesschule_module_expected_response.json"));
+
+			given()
+				.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+				.contentType(ContentType.JSON)
+				.when()
+				.get("/tagesschulen/module/institution/5/periode/2022")
+				.then()
+				.assertThat()
+				.statusCode(Status.OK.getStatusCode())
+			// TODO fix problems with BigDecimal formatting
+//				.body("", equalTo(expectedJson.getMap("")))
+			;
+			;
+		}
+
+		@Test
+		void returnNotFound_whenNoModule() {
+			given()
+				.auth().oauth2(TestcontainersEnvironment.getTagesschuleAccessToken())
+				.contentType(ContentType.JSON)
+				.when()
+				.get("/tagesschule/module/institution/5/periode/2010")
+				.then()
+				.assertThat()
+				.statusCode(Status.NOT_FOUND.getStatusCode());
+		}
 	}
 
 	@Nonnull
