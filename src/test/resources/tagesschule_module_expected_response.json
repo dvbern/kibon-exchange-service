@@ -18,7 +18,7 @@
         "WOECHENTLICH"
       ],
       "wirdPaedagogischBetreut": true,
-      "verpflegungsKosten": 0
+      "verpflegungsKosten": 0.00
     },
     {
       "id": "e9e97fc7-8681-4526-9372-7fd449be87e9",
@@ -35,7 +35,7 @@
         "ALLE_ZWEI_WOCHEN"
       ],
       "wirdPaedagogischBetreut": false,
-      "verpflegungsKosten": 1
+      "verpflegungsKosten": 1.00
     },
     {
       "id": "d000a4c7-052a-45e2-a1b9-9919390e0769",
@@ -55,7 +55,7 @@
         "WOECHENTLICH"
       ],
       "wirdPaedagogischBetreut": true,
-      "verpflegungsKosten": 5
+      "verpflegungsKosten": 5.00
     },
     {
       "id": "d3e9ce16-882a-474c-aa50-579714817096",
@@ -73,7 +73,7 @@
         "ALLE_ZWEI_WOCHEN"
       ],
       "wirdPaedagogischBetreut": false,
-      "verpflegungsKosten": 3
+      "verpflegungsKosten": 3.00
     },
     {
       "id": "ff0efb51-fbdd-4e8c-9e7c-6371567a6b05",
@@ -92,7 +92,7 @@
         "ALLE_ZWEI_WOCHEN"
       ],
       "wirdPaedagogischBetreut": false,
-      "verpflegungsKosten": 1
+      "verpflegungsKosten": 1.00
     },
     {
       "id": "0d22d778-971e-4432-b3d4-4a82b98aee03",
@@ -108,7 +108,7 @@
         "WOECHENTLICH"
       ],
       "wirdPaedagogischBetreut": true,
-      "verpflegungsKosten": 10
+      "verpflegungsKosten": 10.00
     },
     {
       "id": "a85e58c4-ce9d-4db8-9f41-011566df9010",
@@ -124,7 +124,7 @@
         "WOECHENTLICH"
       ],
       "wirdPaedagogischBetreut": true,
-      "verpflegungsKosten": 0
+      "verpflegungsKosten": 0.00
     },
     {
       "id": "45435b75-92fd-4ff5-9f5a-962a4c48ed35",
@@ -141,7 +141,7 @@
         "ALLE_ZWEI_WOCHEN"
       ],
       "wirdPaedagogischBetreut": true,
-      "verpflegungsKosten": 22
+      "verpflegungsKosten": 22.00
     }
   ]
 }

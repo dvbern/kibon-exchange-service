@@ -240,10 +240,7 @@ public class TagesschulenResourceTest {
 				.then()
 				.assertThat()
 				.statusCode(Status.OK.getStatusCode())
-			// TODO fix problems with BigDecimal formatting
-//				.body("", equalTo(expectedJson.getMap("")))
-			;
-			;
+				.body("", equalTo(expectedJson.getMap("")));
 		}
 
 		@Test
