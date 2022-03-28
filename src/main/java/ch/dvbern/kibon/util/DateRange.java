@@ -60,10 +60,10 @@ public class DateRange implements Comparable<DateRange> {
 	@Nonnull
 	public static DateRange of(@Nullable LocalDate gueltigAb, @Nullable LocalDate gueltigBis) {
 		LocalDate ab = Optional.ofNullable(gueltigAb)
-			.orElseGet(() -> AB);
+			.orElse(AB);
 
 		LocalDate bis = Optional.ofNullable(gueltigBis)
-			.orElseGet(() -> BIS);
+			.orElse(BIS);
 
 		return new DateRange(ab, bis);
 	}

@@ -1,0 +1,147 @@
+{
+  "institutionId": "5",
+  "periodeVon": "2022-08-01",
+  "periodeBis": "2023-07-31",
+  "module": [
+    {
+      "id": "df57287d-cb4e-4f73-8e13-afb890252987",
+      "fremdId": "Neu4",
+      "bezeichnungDE": "Neu4",
+      "bezeichnungFR": "Neu4",
+      "zeitVon": "13:10:00",
+      "zeitBis": "13:11:00",
+      "wochentage": [
+        "THURSDAY",
+        "FRIDAY"
+      ],
+      "erlaubteIntervalle": [
+        "WOECHENTLICH"
+      ],
+      "wirdPaedagogischBetreut": true,
+      "verpflegungsKosten": 0.00
+    },
+    {
+      "id": "e9e97fc7-8681-4526-9372-7fd449be87e9",
+      "fremdId": "Neu5b",
+      "bezeichnungDE": "Neu5b",
+      "bezeichnungFR": "Neu5b",
+      "zeitVon": "18:00:00",
+      "zeitBis": "18:05:00",
+      "wochentage": [
+        "MONDAY"
+      ],
+      "erlaubteIntervalle": [
+        "WOECHENTLICH",
+        "ALLE_ZWEI_WOCHEN"
+      ],
+      "wirdPaedagogischBetreut": false,
+      "verpflegungsKosten": 1.00
+    },
+    {
+      "id": "d000a4c7-052a-45e2-a1b9-9919390e0769",
+      "fremdId": "Morgen",
+      "bezeichnungDE": "Morgen",
+      "bezeichnungFR": "Matain",
+      "zeitVon": "07:00:00",
+      "zeitBis": "12:00:00",
+      "wochentage": [
+        "MONDAY",
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY",
+        "FRIDAY"
+      ],
+      "erlaubteIntervalle": [
+        "WOECHENTLICH"
+      ],
+      "wirdPaedagogischBetreut": true,
+      "verpflegungsKosten": 5.00
+    },
+    {
+      "id": "d3e9ce16-882a-474c-aa50-579714817096",
+      "fremdId": "Nachmittag",
+      "bezeichnungDE": "Nachmittag",
+      "bezeichnungFR": "Aprés midi",
+      "zeitVon": "14:00:00",
+      "zeitBis": "17:00:00",
+      "wochentage": [
+        "MONDAY",
+        "TUESDAY"
+      ],
+      "erlaubteIntervalle": [
+        "WOECHENTLICH",
+        "ALLE_ZWEI_WOCHEN"
+      ],
+      "wirdPaedagogischBetreut": false,
+      "verpflegungsKosten": 3.00
+    },
+    {
+      "id": "ff0efb51-fbdd-4e8c-9e7c-6371567a6b05",
+      "fremdId": "Neu3",
+      "bezeichnungDE": "Neu3",
+      "bezeichnungFR": "Neu3",
+      "zeitVon": "13:10:00",
+      "zeitBis": "13:15:00",
+      "wochentage": [
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY"
+      ],
+      "erlaubteIntervalle": [
+        "WOECHENTLICH",
+        "ALLE_ZWEI_WOCHEN"
+      ],
+      "wirdPaedagogischBetreut": false,
+      "verpflegungsKosten": 1.00
+    },
+    {
+      "id": "0d22d778-971e-4432-b3d4-4a82b98aee03",
+      "fremdId": "Neu2",
+      "bezeichnungDE": "Neu2",
+      "bezeichnungFR": "Neu2",
+      "zeitVon": "13:00:00",
+      "zeitBis": "13:05:00",
+      "wochentage": [
+        "MONDAY"
+      ],
+      "erlaubteIntervalle": [
+        "WOECHENTLICH"
+      ],
+      "wirdPaedagogischBetreut": true,
+      "verpflegungsKosten": 10.00
+    },
+    {
+      "id": "a85e58c4-ce9d-4db8-9f41-011566df9010",
+      "fremdId": "Neu5a",
+      "bezeichnungDE": "Neu5a",
+      "bezeichnungFR": "Neu5a",
+      "zeitVon": "15:00:00",
+      "zeitBis": "16:00:00",
+      "wochentage": [
+        "THURSDAY"
+      ],
+      "erlaubteIntervalle": [
+        "WOECHENTLICH"
+      ],
+      "wirdPaedagogischBetreut": true,
+      "verpflegungsKosten": 0.00
+    },
+    {
+      "id": "45435b75-92fd-4ff5-9f5a-962a4c48ed35",
+      "fremdId": "NEU",
+      "bezeichnungDE": "NEU",
+      "bezeichnungFR": "NEU",
+      "zeitVon": "12:00:00",
+      "zeitBis": "12:30:00",
+      "wochentage": [
+        "THURSDAY"
+      ],
+      "erlaubteIntervalle": [
+        "WOECHENTLICH",
+        "ALLE_ZWEI_WOCHEN"
+      ],
+      "wirdPaedagogischBetreut": true,
+      "verpflegungsKosten": 22.00
+    }
+  ]
+}
