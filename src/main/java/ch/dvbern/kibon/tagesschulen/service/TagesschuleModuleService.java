@@ -69,7 +69,7 @@ public class TagesschuleModuleService {
 		Path<String> institutionPath = periodeJoin.get(TagesschuleModule_.institution).get(Institution_.id);
 
 		ParameterExpression<String> idParam = cb.parameter(String.class, Institution_.ID);
-		Predicate idPredicate = cb.equal(institutionPath, idParam);
+		Predicate institutionPredicate = cb.equal(institutionPath, idParam);
 
 		ParameterExpression<LocalDate> periodeVonParam = cb.parameter(LocalDate.class, TagesschuleModule_.PERIODE_VON);
 		Predicate periodeVonPredicate = cb.equal(periodeJoin.get(TagesschuleModule_.periodeVon), periodeVonParam);
@@ -77,7 +77,7 @@ public class TagesschuleModuleService {
 		ParameterExpression<LocalDate> periodeBisParam = cb.parameter(LocalDate.class, TagesschuleModule_.PERIODE_BIS);
 		Predicate periodeBisPredicate = cb.equal(periodeJoin.get(TagesschuleModule_.periodeBis), periodeBisParam);
 
-		query.where(idPredicate, periodeVonPredicate, periodeBisPredicate);
+		query.where(institutionPredicate, periodeVonPredicate, periodeBisPredicate);
 
 		String institutionId = client.getId().getInstitutionId();
 
