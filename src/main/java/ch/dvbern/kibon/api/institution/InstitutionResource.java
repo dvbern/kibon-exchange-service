@@ -170,7 +170,7 @@ public class InstitutionResource {
 			return Response.status(Status.FORBIDDEN).build();
 		}
 
-		Optional<ClientInstitutionDTO> institutionDTO = institutionService.get(client);
+		Optional<ClientInstitutionDTO> institutionDTO = institutionService.find(client);
 
 		return institutionDTO.map(Response::ok)
 			.orElseGet(() -> Response.status(Status.NOT_FOUND))

@@ -36,6 +36,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.persistence.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkiverse.hibernate.types.json.JsonTypes;
 import org.hibernate.annotations.Type;
@@ -48,6 +49,7 @@ public class Modul extends BaseEntity {
 	@Nonnull
 	private @NotEmpty String id = "";
 
+	@JsonIgnore
 	@Nonnull
 	// allowing nullable DB schema, to make hibernate cascading from institution -> parent -> module work,
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)

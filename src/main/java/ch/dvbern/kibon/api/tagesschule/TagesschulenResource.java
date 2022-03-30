@@ -17,6 +17,8 @@
 
 package ch.dvbern.kibon.api.tagesschule;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +50,7 @@ import javax.ws.rs.core.Response.Status;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.clients.service.ClientService;
+import ch.dvbern.kibon.exchange.api.common.tagesschule.TagesschuleModuleDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnmeldungDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnmeldungenDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleBestaetigungDTO;
@@ -59,6 +62,7 @@ import ch.dvbern.kibon.tagesschulen.facade.AnmeldungKafkaEventProducer;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.service.AnmeldungService;
+import ch.dvbern.kibon.tagesschulen.service.TagesschuleModuleService;
 import ch.dvbern.kibon.tagesschulen.service.filter.ClientAnmeldungFilter;
 import ch.dvbern.kibon.util.OpenApiTag;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -101,6 +105,10 @@ public class TagesschulenResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	AnmeldungService anmeldungService;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	TagesschuleModuleService tagesschuleModuleService;
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
@@ -374,6 +382,63 @@ public class TagesschulenResource {
 		}
 
 		return Response.ok(convertToTagesschuleTarifeDTO(anmeldung.get())).build();
+	}
+
+	@GET
+	@Path("/module/institution/{institutionId}/periode/{periodeVon}")
+	@Operation(
+		summary = "Module einer Tagesschule",
+		description = "Gibt die Module der Tagesschule in der Periode an.")
+	@SecurityRequirement(name = "OAuth2", scopes = "tagesschule")
+	@APIResponse(responseCode = "200",
+		content = @Content(schema = @Schema(implementation = TagesschuleModuleDTO.class)))
+	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
+	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
+	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
+	@APIResponse(responseCode = "404", ref = "#/components/responses/NotFound")
+	@Transactional
+	@NoCache
+	@Nonnull
+	@RolesAllowed("tagesschule")
+	public Response getModule(
+		@NotEmpty @PathParam("institutionId") String institutionId,
+		@NotNull @Parameter(description = "Jahr (vierstellig), in welchem das Schuljahr beginnt.")
+		@PathParam("periodeVon") Integer periodeVon) {
+
+		String clientName = jsonWebToken.getClaim(CLIENT_ID);
+		Set<String> groups = identity.getRoles();
+		String userName = identity.getPrincipal().getName();
+
+		LOG.info(
+			"Tagesschule Module accessed by '{}' with clientName '{}', roles '{}'. institutionId '{}'",
+			userName,
+			clientName,
+			groups,
+			institutionId);
+
+		Response response = clientService.find(new ClientId(clientName, institutionId))
+			.map(client -> toClientModuleResponse(client, periodeVon))
+			// Institution not found for given client
+			.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+
+		return response;
+	}
+
+	@Nonnull
+	private Response toClientModuleResponse(@Nonnull Client client, @Nonnull Integer periodeVonJahr) {
+		if (!client.getActive()) {
+			// Client not active (forbidden) for given institution
+			return Response.status(Status.FORBIDDEN).build();
+		}
+
+		LocalDate periodeVon = LocalDate.of(periodeVonJahr, Month.AUGUST, 1);
+		LocalDate periodeBis = periodeVon.plusYears(1).minusDays(1);
+
+		Optional<TagesschuleModuleDTO> tagesschuleModuleDTO = tagesschuleModuleService.find(client, periodeVon, periodeBis);
+
+		return tagesschuleModuleDTO.map(Response::ok)
+			.orElseGet(() -> Response.status(Status.NOT_FOUND))
+			.build();
 	}
 
 	@Nonnull
