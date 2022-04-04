@@ -169,6 +169,8 @@ public class TagesschulenResource {
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit,
+		@Parameter(description = "Liefert nur Resultate mit spezifischer Referenznummer")
+		@QueryParam("refnr") @Nullable String refnr,
 		@Parameter(description = "Erweiterung für zusätzliche Filter - wird momentan nicht verwendet")
 		@QueryParam("$filter") @Nullable String filter) {
 
@@ -184,7 +186,7 @@ public class TagesschulenResource {
 			limit,
 			afterId);
 
-		ClientAnmeldungFilter queryFilter = new ClientAnmeldungFilter(clientName, afterId, limit);
+		ClientAnmeldungFilter queryFilter = new ClientAnmeldungFilter(clientName, afterId, limit, refnr);
 
 		List<ClientAnmeldungDTO> clientAnmeldungen = anmeldungService.getAllForClient(queryFilter);
 
@@ -201,6 +203,43 @@ public class TagesschulenResource {
 	@Nonnull
 	private TagesschuleAnmeldungDTO convert(@Nonnull ClientAnmeldungDTO model) {
 		return objectMapper.convertValue(model, TagesschuleAnmeldungDTO.class);
+	}
+
+	@GET
+	@Path("/anmeldungen/refnr/{refnr}")
+	@Operation(summary = "Returniert die aktuellest Anmeldung zu der Referenznummer")
+	@SecurityRequirement(name = "OAuth2", scopes = "tagesschule")
+	@APIResponse(responseCode = "200",
+		content = @Content(schema = @Schema(implementation = TagesschuleAnmeldungDTO.class)))
+	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
+	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
+	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
+	@APIResponse(responseCode = "404", ref = "#/components/responses/NotFound")
+	@Transactional
+	@NoCache
+	@Nonnull
+	@RolesAllowed("tagesschule")
+	public Response getLatestAnmeldung(@NotEmpty @PathParam("refnr") String refnr) {
+		String clientName = jsonWebToken.getClaim(CLIENT_ID);
+		Set<String> groups = identity.getRoles();
+		String userName = identity.getPrincipal().getName();
+
+		LOG.info(
+			"Tagesschule-Anmeldung accessed by '{}' with clientName '{}', roles '{}'. refNr '{}'",
+			userName,
+			clientName,
+			groups,
+			refnr);
+
+		Optional<ClientAnmeldungDTO> anmeldung = anmeldungService.getLatestClientAnmeldung(clientName, refnr);
+
+		if (anmeldung.isEmpty()) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+
+		TagesschuleAnmeldungDTO tagesschuleAnmeldungDTOS = convert(anmeldung.get());
+
+		return Response.ok(tagesschuleAnmeldungDTOS).build();
 	}
 
 	@DELETE

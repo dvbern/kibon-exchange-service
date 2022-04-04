@@ -47,7 +47,7 @@ public class ClientAnmeldungFilter {
 	 * For filtering by clientName only.
 	 */
 	public ClientAnmeldungFilter(@Nonnull String clientName) {
-		this(clientName, null, null);
+		this(clientName, null, null, null);
 	}
 
 	/**
@@ -58,11 +58,13 @@ public class ClientAnmeldungFilter {
 	public ClientAnmeldungFilter(
 		@Nonnull String clientName,
 		@Nullable Long afterId,
-		@Nullable Integer limit) {
+		@Nullable Integer limit,
+		@Nullable String refnr) {
 
 		restrictions.add(new ClientActiveFilter());
 		restrictions.add(new ClientNameFilter(clientName));
 		restrictions.add(new AfterIdFilter(afterId));
+		restrictions.add(new RefNrFilter(refnr));
 
 		this.limit = limit;
 	}
