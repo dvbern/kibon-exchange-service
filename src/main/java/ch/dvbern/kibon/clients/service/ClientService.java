@@ -67,8 +67,12 @@ public class ClientService {
 		if (existingClient.isPresent()) {
 			reactivateClient(existingClient.get());
 		} else {
-			em.persist(new Client(toClientId(dto), eventTime, dto.getGueltigAb(), dto.getGueltigBis()));
+			persistClient(dto, eventTime);
 		}
+	}
+
+	private void persistClient(@Nonnull InstitutionClientEventDTO dto, @Nonnull LocalDateTime eventTime) {
+		em.persist(new Client(toClientId(dto), eventTime, dto.getGueltigAb(), dto.getGueltigBis()));
 	}
 
 	private void reactivateClient(@Nonnull Client existing) {
@@ -85,11 +89,10 @@ public class ClientService {
 	 * Updates a client's gueltigkeit in response to the clientModified event.
 	 */
 	@Transactional(TxType.MANDATORY)
-	public void onClientModified(@Nonnull InstitutionClientEventDTO dto) {
+	public void onClientModified(@Nonnull InstitutionClientEventDTO dto, @Nonnull LocalDateTime eventTime) {
 		find(toClientId(dto)).ifPresentOrElse(
 			client -> updateClientGueltigkeit(client, dto),
-			() -> LOG.warn("Cannot update unknown client with name '{}' and institutionId '{}'",
-				dto.getClientName(), dto.getInstitutionId()));
+			() -> persistClient(dto, eventTime));
 	}
 
 	private void updateClientGueltigkeit(
