@@ -157,7 +157,7 @@ public class InstitutionService {
 	}
 
 	@Nonnull
-	public Optional<ClientInstitutionDTO> get(@Nonnull Client client) {
+	public Optional<ClientInstitutionDTO> find(@Nonnull Client client) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<ClientInstitutionDTO> query = cb.createQuery(ClientInstitutionDTO.class);
 		Root<Institution> root = query.from(Institution.class);
@@ -176,7 +176,7 @@ public class InstitutionService {
 			adresse.get(KontaktAngaben_.land)
 		));
 
-		ParameterExpression<String> idParam = cb.parameter(String.class, "id");
+		ParameterExpression<String> idParam = cb.parameter(String.class, Institution_.ID);
 		Predicate idPredicate = cb.equal(root.get(Institution_.id), idParam);
 
 		query.where(idPredicate);

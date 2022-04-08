@@ -109,6 +109,7 @@ public class Anmeldung extends AbstractInstitutionPeriodeEntity {
 	private boolean abweichungZweitesSemester;
 
 	@Nullable
+	@Column(columnDefinition = "text")
 	private String bemerkung;
 
 	@Nonnull
