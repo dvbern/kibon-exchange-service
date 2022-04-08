@@ -38,7 +38,6 @@ import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -125,7 +124,7 @@ class VerfuegungServiceQuarkusTest {
 		// change gueltigkeit of client
 		InstitutionClientEventDTO dto =
 			new InstitutionClientEventDTO("1", "kitAdmin", "EXCHANGE_SERVICE_USER", von, bis);
-		tx.newTransaction(() -> clientService.onClientModified(dto));
+		tx.newTransaction(() -> clientService.onClientModified(dto, LocalDateTime.now()));
 
 		// there should be no more results for insitutionId 1
 		List<ClientVerfuegungDTO> allForClient = tx.newTransaction(() -> verfuegungService.getAllForClient
@@ -217,6 +216,6 @@ class VerfuegungServiceQuarkusTest {
 		InstitutionClientEventDTO dto =
 			new InstitutionClientEventDTO(institutionId, clientName, "EXCHANGE_SERVICE_USER", null, null);
 
-		tx.newTransaction(() -> clientService.onClientModified(dto));
+		tx.newTransaction(() -> clientService.onClientModified(dto, LocalDateTime.now()));
 	}
 }
