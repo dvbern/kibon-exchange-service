@@ -46,14 +46,8 @@ public class ClientBetreuungAnfrageFilter {
 	@Nullable
 	private final Integer limit;
 	@Nonnull
-	private final List<Restriction<ClientBetreuungAnfrage, ClientBetreuungAnfrageDTO>> restrictions = new ArrayList<>();
-
-	/**
-	 * For filtering by clientName only.
-	 */
-	public ClientBetreuungAnfrageFilter(@Nonnull String clientName) {
-		this(clientName, null, null);
-	}
+	private final List<Restriction<ClientBetreuungAnfrage, ClientBetreuungAnfrageDTO>> restrictions =
+		new ArrayList<>();
 
 	/**
 	 * @param clientName the clients name
@@ -65,12 +59,10 @@ public class ClientBetreuungAnfrageFilter {
 		@Nullable Long afterId,
 		@Nullable Integer limit) {
 
-		restrictions.add(new ClientActiveFilter<>(ClientBetreuungAnfrage_.active));
-		restrictions.add(new ClientNameFilter<>(clientName, ClientBetreuungAnfrage_.client));
-		restrictions.add(new AfterIdFilter<>(afterId, ClientBetreuungAnfrage_.id));
-		restrictions.add(new ClientGueltigkeitFilter<>(
-			ClientBetreuungAnfrage_.betreuungAnfrage,
-			ClientBetreuungAnfrage_.client));
+		restrictions.add(new ClientActiveFilter<>());
+		restrictions.add(new ClientNameFilter<>(clientName));
+		restrictions.add(new AfterIdFilter<>(afterId));
+		restrictions.add(new ClientGueltigkeitFilter<>(ClientBetreuungAnfrage_.betreuungAnfrage));
 
 		this.limit = limit;
 	}

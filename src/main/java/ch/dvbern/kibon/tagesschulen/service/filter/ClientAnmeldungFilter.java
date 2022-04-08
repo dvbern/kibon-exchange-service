@@ -49,13 +49,6 @@ public class ClientAnmeldungFilter {
 	private final List<Restriction<ClientAnmeldung, ClientAnmeldungDTO>> restrictions = new ArrayList<>();
 
 	/**
-	 * For filtering by clientName only.
-	 */
-	public ClientAnmeldungFilter(@Nonnull String clientName) {
-		this(clientName, null, null, null);
-	}
-
-	/**
 	 * @param clientName the clients name
 	 * @param afterId for pagination, the id after which results are wanted
 	 * @param limit max. amount of results
@@ -66,10 +59,10 @@ public class ClientAnmeldungFilter {
 		@Nullable Integer limit,
 		@Nullable String refnr) {
 
-		restrictions.add(new ClientActiveFilter<>(ClientAnmeldung_.active));
-		restrictions.add(new ClientNameFilter<>(clientName, ClientAnmeldung_.client));
-		restrictions.add(new AfterIdFilter<>(afterId, ClientAnmeldung_.id));
-		restrictions.add(new ClientGueltigkeitFilter<>(ClientAnmeldung_.anmeldung, ClientAnmeldung_.client));
+		restrictions.add(new ClientActiveFilter<>());
+		restrictions.add(new ClientNameFilter<>(clientName));
+		restrictions.add(new AfterIdFilter<>(afterId));
+		restrictions.add(new ClientGueltigkeitFilter<>(ClientAnmeldung_.anmeldung));
 		restrictions.add(new RefNrFilter(refnr));
 
 		this.limit = limit;

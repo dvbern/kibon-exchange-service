@@ -65,10 +65,10 @@ public class ClientVerfuegungFilter {
 		@Nullable Long afterId,
 		@Nullable Integer limit) {
 
-		restrictions.add(new ClientActiveFilter<>(ClientVerfuegung_.active));
-		restrictions.add(new ClientNameFilter<>(clientName, ClientVerfuegung_.client));
-		restrictions.add(new AfterIdFilter<>(afterId, ClientVerfuegung_.id));
-		restrictions.add(new ClientGueltigkeitFilter<>(ClientVerfuegung_.verfuegung, ClientVerfuegung_.client));
+		restrictions.add(new ClientActiveFilter<>());
+		restrictions.add(new ClientNameFilter<>(clientName));
+		restrictions.add(new AfterIdFilter<>(afterId));
+		restrictions.add(new ClientGueltigkeitFilter<>(ClientVerfuegung_.verfuegung));
 
 		this.limit = limit;
 	}

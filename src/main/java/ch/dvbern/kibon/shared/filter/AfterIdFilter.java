@@ -26,27 +26,24 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
 
 import ch.dvbern.kibon.persistence.Restriction;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity_;
 
 /**
  * Utility class for filtering criteria queries to only deliver entries with an ID > the specified one.
  */
-public class AfterIdFilter<X, Y> implements Restriction<X, Y> {
+public class AfterIdFilter<X extends AbstractClientEntity, Y> implements Restriction<X, Y> {
 
 	@Nullable
 	private final Long afterId;
 
-	@Nonnull
-	private final SingularAttribute<X, Long> z;
-
 	@Nullable
 	private ParameterExpression<Long> param;
 
-	public AfterIdFilter(@Nullable Long afterId, @Nonnull SingularAttribute<X, Long> z) {
+	public AfterIdFilter(@Nullable Long afterId) {
 		this.afterId = afterId;
-		this.z = z;
 	}
 
 	@Override
@@ -56,12 +53,10 @@ public class AfterIdFilter<X, Y> implements Restriction<X, Y> {
 			return Optional.empty();
 		}
 
-		param = cb.parameter(Long.class, "id");
+		param = cb.parameter(Long.class, AbstractClientEntity_.ID);
 
-
-		return Optional.of(cb.greaterThan(root.get(z), param));
+		return Optional.of(cb.greaterThan(root.get(AbstractClientEntity_.id), param));
 	}
-
 
 	@Override
 	public void setParameter(@Nonnull TypedQuery<Y> query) {

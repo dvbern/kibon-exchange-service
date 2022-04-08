@@ -31,22 +31,19 @@ import javax.persistence.metamodel.SingularAttribute;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.Client_;
 import ch.dvbern.kibon.persistence.Restriction;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity_;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
 
-public class ClientGueltigkeitFilter<X, Y> implements Restriction<X, Y> {
+public class ClientGueltigkeitFilter<X extends AbstractClientEntity, Y> implements Restriction<X, Y> {
 
 	@Nonnull
 	private final SingularAttribute<X, ? extends AbstractInstitutionPeriodeEntity> z;
 
-	@Nonnull
-	private final SingularAttribute<X, Client> c;
-
 	public ClientGueltigkeitFilter(
-		@Nonnull SingularAttribute<X, ? extends AbstractInstitutionPeriodeEntity> z,
-		@Nonnull SingularAttribute<X, Client> c) {
+		@Nonnull SingularAttribute<X, ? extends AbstractInstitutionPeriodeEntity> z) {
 		this.z = z;
-		this.c = c;
 	}
 
 	@Nonnull
@@ -57,7 +54,7 @@ public class ClientGueltigkeitFilter<X, Y> implements Restriction<X, Y> {
 		Path<LocalDate> entityBis = root.get(z)
 			.get(AbstractInstitutionPeriodeEntity_.periodeBis);
 
-		Path<Client> clientPath = root.get(c);
+		Path<Client> clientPath = root.get(AbstractClientEntity_.client);
 		Path<LocalDate> gueltigAb = clientPath.get(Client_.gueltigAb);
 		Path<LocalDate> gueltigBis = clientPath.get(Client_.gueltigBis);
 

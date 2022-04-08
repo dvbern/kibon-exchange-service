@@ -24,27 +24,20 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
 
 import ch.dvbern.kibon.persistence.Restriction;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity_;
 
 /**
- * Utility class for filtering criteria queries to only deliver {@link ClientAnmeldung}en that are active.
+ * Utility class for filtering criteria queries to only deliver {@link AbstractClientEntity}s that are active.
  */
-public class ClientActiveFilter<X, Y> implements Restriction<X, Y> {
-
-	@Nonnull
-	private final SingularAttribute<X, Boolean> z;
-
-	public ClientActiveFilter(@Nonnull SingularAttribute<X, Boolean> z) {
-		this.z = z;
-	}
+public class ClientActiveFilter<X extends AbstractClientEntity, Y> implements Restriction<X, Y> {
 
 	@Nonnull
 	@Override
 	public Optional<Predicate> getPredicate(@Nonnull Root<X> root, @Nonnull CriteriaBuilder cb) {
-		return Optional.of(cb.isTrue(root.get(z)));
+		return Optional.of(cb.isTrue(root.get(AbstractClientEntity_.active)));
 	}
 
 	@Override

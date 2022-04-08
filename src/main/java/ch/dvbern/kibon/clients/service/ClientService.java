@@ -29,10 +29,13 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.exchange.commons.institutionclient.InstitutionClientEventDTO;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
 import ch.dvbern.kibon.util.DateRange;
+import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,13 +99,13 @@ public class ClientService {
 		DateRange existingGueltigkeit = DateRange.of(existingClient.getGueltigAb(), existingClient.getGueltigBis());
 		DateRange newGueltigkeit = DateRange.of(dto.getGueltigAb(), dto.getGueltigBis());
 		List<DateRange> previsoulyExcludedDates = newGueltigkeit.except(existingGueltigkeit);
-		insertClientVerfuegungen(existingClient, previsoulyExcludedDates);
+		insertClientEntities(existingClient, previsoulyExcludedDates);
 
 		existingClient.setGueltigAb(dto.getGueltigAb());
 		existingClient.setGueltigBis(dto.getGueltigBis());
 	}
 
-	private void insertClientVerfuegungen(@Nonnull Client client, @Nonnull List<DateRange> searchRanges) {
+	private void insertClientEntities(@Nonnull Client client, @Nonnull List<DateRange> searchRanges) {
 		if (searchRanges.isEmpty()) {
 			return;
 		}
@@ -116,8 +119,39 @@ public class ClientService {
 
 		em.createNativeQuery(
 				"INSERT INTO clientverfuegung (id, active, client_clientname, client_institutionid, verfuegung_id, "
-					+ "since) (SELECT nextval('clientverfuegung_id_seq'), :active, :client, :institutionId, missing"
-					+ ".id, now() FROM (SELECT DISTINCT v.id FROM verfuegung v WHERE v.institutionid = :institutionId "
+					+ "since) (SELECT nextval('"
+					+ ClientVerfuegung.ID_SEQUENCE
+					+ "'), :active, :client, :institutionId, missing.id, now() FROM (SELECT DISTINCT v.id FROM "
+					+ "verfuegung v WHERE v.institutionid = :institutionId "
+					+ "AND ("
+					+ gueltigkeiten
+					+ ") ) AS missing );")
+			.setParameter("active", client.getActive())
+			.setParameter("client", client.getId().getClientName())
+			.setParameter("institutionId", client.getId().getInstitutionId())
+			.executeUpdate();
+
+		em.createNativeQuery(
+				"INSERT INTO clientanmeldung (id, active, client_clientname, client_institutionid, anmeldung_id) "
+					+ "(SELECT nextval('"
+					+ ClientAnmeldung.ID_SEQUENCE
+					+ "'), :active, :client, :institutionId, missing.id FROM (SELECT DISTINCT v.id FROM anmeldung v "
+					+ "WHERE v.institutionid = :institutionId "
+					+ "AND ("
+					+ gueltigkeiten
+					+ ") ) AS missing );")
+			.setParameter("active", client.getActive())
+			.setParameter("client", client.getId().getClientName())
+			.setParameter("institutionId", client.getId().getInstitutionId())
+			.executeUpdate();
+
+		em.createNativeQuery(
+				"INSERT INTO clientbetreuunganfrage (id, active, client_clientname, client_institutionid, "
+					+ "betreuunganfrage_id) "
+					+ "(SELECT nextval('"
+					+ ClientBetreuungAnfrage.ID_SEQUENCE
+					+ "'), :active, :client, :institutionId, missing.id FROM (SELECT DISTINCT v.id FROM betreuunganfrage v "
+					+ "WHERE v.institutionid = :institutionId "
 					+ "AND ("
 					+ gueltigkeiten
 					+ ") ) AS missing );")
