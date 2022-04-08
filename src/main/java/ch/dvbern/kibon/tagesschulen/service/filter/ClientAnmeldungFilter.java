@@ -30,8 +30,13 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import ch.dvbern.kibon.persistence.Restriction;
+import ch.dvbern.kibon.shared.filter.AfterIdFilter;
+import ch.dvbern.kibon.shared.filter.ClientActiveFilter;
+import ch.dvbern.kibon.shared.filter.ClientGueltigkeitFilter;
+import ch.dvbern.kibon.shared.filter.ClientNameFilter;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
 
 /**
  * Helper class for filtering {@link ClientAnmeldung}en.
@@ -44,13 +49,6 @@ public class ClientAnmeldungFilter {
 	private final List<Restriction<ClientAnmeldung, ClientAnmeldungDTO>> restrictions = new ArrayList<>();
 
 	/**
-	 * For filtering by clientName only.
-	 */
-	public ClientAnmeldungFilter(@Nonnull String clientName) {
-		this(clientName, null, null);
-	}
-
-	/**
 	 * @param clientName the clients name
 	 * @param afterId for pagination, the id after which results are wanted
 	 * @param limit max. amount of results
@@ -58,11 +56,14 @@ public class ClientAnmeldungFilter {
 	public ClientAnmeldungFilter(
 		@Nonnull String clientName,
 		@Nullable Long afterId,
-		@Nullable Integer limit) {
+		@Nullable Integer limit,
+		@Nullable String refnr) {
 
-		restrictions.add(new ClientActiveFilter());
-		restrictions.add(new ClientNameFilter(clientName));
-		restrictions.add(new AfterIdFilter(afterId));
+		restrictions.add(new ClientActiveFilter<>());
+		restrictions.add(new ClientNameFilter<>(clientName));
+		restrictions.add(new AfterIdFilter<>(afterId));
+		restrictions.add(new ClientGueltigkeitFilter<>(ClientAnmeldung_.anmeldung));
+		restrictions.add(new RefNrFilter(refnr));
 
 		this.limit = limit;
 	}

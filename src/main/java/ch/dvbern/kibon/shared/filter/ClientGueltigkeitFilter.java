@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.verfuegung.service.filter;
+package ch.dvbern.kibon.shared.filter;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -26,26 +26,35 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.Client_;
 import ch.dvbern.kibon.persistence.Restriction;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity_;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
-import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
-import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
-import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 
-public class ClientGueltigkeitFilter implements Restriction<ClientVerfuegung, ClientVerfuegungDTO> {
+public class ClientGueltigkeitFilter<X extends AbstractClientEntity, Y> implements Restriction<X, Y> {
+
+	@Nonnull
+	private final SingularAttribute<X, ? extends AbstractInstitutionPeriodeEntity> z;
+
+	public ClientGueltigkeitFilter(
+		@Nonnull SingularAttribute<X, ? extends AbstractInstitutionPeriodeEntity> z) {
+		this.z = z;
+	}
 
 	@Nonnull
 	@Override
-	public Optional<Predicate> getPredicate(@Nonnull Root<ClientVerfuegung> root, @Nonnull CriteriaBuilder cb) {
-		Path<LocalDate> entityVon = root.get(ClientVerfuegung_.verfuegung)
+	public Optional<Predicate> getPredicate(@Nonnull Root<X> root, @Nonnull CriteriaBuilder cb) {
+		Path<LocalDate> entityVon = root.get(z)
 			.get(AbstractInstitutionPeriodeEntity_.periodeVon);
-		Path<LocalDate> entityBis = root.get(ClientVerfuegung_.verfuegung)
+		Path<LocalDate> entityBis = root.get(z)
 			.get(AbstractInstitutionPeriodeEntity_.periodeBis);
 
-		Path<Client> clientPath = root.get(ClientVerfuegung_.client);
+		Path<Client> clientPath = root.get(AbstractClientEntity_.client);
 		Path<LocalDate> gueltigAb = clientPath.get(Client_.gueltigAb);
 		Path<LocalDate> gueltigBis = clientPath.get(Client_.gueltigBis);
 
@@ -57,7 +66,7 @@ public class ClientGueltigkeitFilter implements Restriction<ClientVerfuegung, Cl
 	}
 
 	@Override
-	public void setParameter(@Nonnull TypedQuery<ClientVerfuegungDTO> query) {
+	public void setParameter(@Nonnull TypedQuery<Y> query) {
 
 	}
 }

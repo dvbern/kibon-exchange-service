@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.tagesschulen.service.filter;
+package ch.dvbern.kibon.shared.filter;
 
 import java.util.Optional;
 
@@ -31,16 +31,14 @@ import javax.persistence.criteria.Root;
 import ch.dvbern.kibon.clients.model.ClientId_;
 import ch.dvbern.kibon.clients.model.Client_;
 import ch.dvbern.kibon.persistence.Restriction;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity_;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
-
-
 
 /**
  * Utility class for filtering criteria queries to only deliver {@link ClientAnmeldung}en with a specific client name.
  */
-public class ClientNameFilter implements Restriction<ClientAnmeldung, ClientAnmeldungDTO> {
+public class ClientNameFilter<X extends AbstractClientEntity, Y> implements Restriction<X, Y> {
 
 	@Nonnull
 	private final String clientName;
@@ -54,15 +52,15 @@ public class ClientNameFilter implements Restriction<ClientAnmeldung, ClientAnme
 
 	@Nonnull
 	@Override
-	public Optional<Predicate> getPredicate(@Nonnull Root<ClientAnmeldung> root, @Nonnull CriteriaBuilder cb) {
-		clientParam = cb.parameter(String.class, "clientName");
-		Path<String> namePath = root.get(ClientAnmeldung_.client).get(Client_.id).get(ClientId_.clientName);
+	public Optional<Predicate> getPredicate(@Nonnull Root<X> root, @Nonnull CriteriaBuilder cb) {
+		clientParam = cb.parameter(String.class, ClientId_.CLIENT_NAME);
+		Path<String> namePath = root.get(AbstractClientEntity_.client).get(Client_.id).get(ClientId_.clientName);
 
 		return Optional.of(cb.equal(namePath, clientParam));
 	}
 
 	@Override
-	public void setParameter(@Nonnull TypedQuery<ClientAnmeldungDTO> query) {
+	public void setParameter(@Nonnull TypedQuery<Y> query) {
 		query.setParameter(clientParam, clientName);
 	}
 }

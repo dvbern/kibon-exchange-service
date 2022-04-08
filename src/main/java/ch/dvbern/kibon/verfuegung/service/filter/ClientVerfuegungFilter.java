@@ -30,8 +30,13 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import ch.dvbern.kibon.persistence.Restriction;
+import ch.dvbern.kibon.shared.filter.AfterIdFilter;
+import ch.dvbern.kibon.shared.filter.ClientActiveFilter;
+import ch.dvbern.kibon.shared.filter.ClientGueltigkeitFilter;
+import ch.dvbern.kibon.shared.filter.ClientNameFilter;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
+import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 
 /**
  * Helper class for filtering {@link ClientVerfuegung}en.
@@ -60,10 +65,10 @@ public class ClientVerfuegungFilter {
 		@Nullable Long afterId,
 		@Nullable Integer limit) {
 
-		restrictions.add(new ClientActiveFilter());
-		restrictions.add(new ClientNameFilter(clientName));
-		restrictions.add(new AfterIdFilter(afterId));
-		restrictions.add(new ClientGueltigkeitFilter());
+		restrictions.add(new ClientActiveFilter<>());
+		restrictions.add(new ClientNameFilter<>(clientName));
+		restrictions.add(new AfterIdFilter<>(afterId));
+		restrictions.add(new ClientGueltigkeitFilter<>(ClientVerfuegung_.verfuegung));
 
 		this.limit = limit;
 	}

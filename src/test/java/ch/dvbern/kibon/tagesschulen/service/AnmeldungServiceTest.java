@@ -153,14 +153,14 @@ public class AnmeldungServiceTest extends EasyMockSupport {
 		Root<Anmeldung> root = mock(Root.class);
 		expect(query.from(Anmeldung.class)).andReturn(root);
 
-		ParameterExpression<String> refNrParam = mock(ParameterExpression.class);
-		expect(cb.parameter(String.class, "refnr")).andReturn(refNrParam);
+		ParameterExpression<String> refnrParam = mock(ParameterExpression.class);
+		expect(cb.parameter(String.class, AbstractInstitutionPeriodeEntity_.REFNR)).andReturn(refnrParam);
 
-		Path<String> refNrPath = mock(Path.class);
-		expect(root.get(AbstractInstitutionPeriodeEntity_.refnr)).andReturn(refNrPath);
+		Path<String> refnrPath = mock(Path.class);
+		expect(root.get(AbstractInstitutionPeriodeEntity_.refnr)).andReturn(refnrPath);
 
 		Predicate refnrPredicate = mock(Predicate.class);
-		expect(cb.equal(refNrPath, refNrParam)).andReturn(refnrPredicate);
+		expect(cb.equal(refnrPath, refnrParam)).andReturn(refnrPredicate);
 
 		expect(query.where(refnrPredicate)).andReturn(query);
 
@@ -173,7 +173,7 @@ public class AnmeldungServiceTest extends EasyMockSupport {
 
 		TypedQuery<Anmeldung> q = mock(TypedQuery.class);
 		expect(em.createQuery(query)).andReturn(q);
-		expect(q.setParameter(refNrParam, refnr)).andReturn(q);
+		expect(q.setParameter(refnrParam, refnr)).andReturn(q);
 		expect(q.setMaxResults(1)).andReturn(q);
 		expect(q.getResultStream()).andReturn(result);
 	}

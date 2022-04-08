@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 DV Bern AG, Switzerland
+ * Copyright (C) 2022 DV Bern AG, Switzerland
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,29 +20,54 @@ package ch.dvbern.kibon.tagesschulen.service.filter;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import ch.dvbern.kibon.persistence.Restriction;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
 
 /**
- * Utility class for filtering criteria queries to only deliver {@link ClientAnmeldung}en that are active.
+ * Utility class for filtering criteria queries to only deliver entries with a specific refnr.
  */
-public class ClientActiveFilter implements Restriction<ClientAnmeldung, ClientAnmeldungDTO> {
+public class RefNrFilter implements Restriction<ClientAnmeldung, ClientAnmeldungDTO> {
+
+	@Nullable
+	private final String refnr;
+
+	@Nullable
+	private ParameterExpression<String> refnrParam;
+
+	public RefNrFilter(@Nullable String refnr) {
+		this.refnr = refnr;
+	}
 
 	@Nonnull
 	@Override
 	public Optional<Predicate> getPredicate(@Nonnull Root<ClientAnmeldung> root, @Nonnull CriteriaBuilder cb) {
-		return Optional.of(cb.isTrue(root.get(ClientAnmeldung_.active)));
+		if (refnr == null) {
+			return Optional.empty();
+		}
+
+		Path<String> refnrPath = root.get(ClientAnmeldung_.anmeldung).get(AbstractInstitutionPeriodeEntity_.refnr);
+		refnrParam = cb.parameter(String.class, AbstractInstitutionPeriodeEntity_.REFNR);
+
+		return Optional.of(cb.equal(refnrPath, refnrParam));
 	}
 
 	@Override
 	public void setParameter(@Nonnull TypedQuery<ClientAnmeldungDTO> query) {
-		// nop
+		if (refnr == null) {
+			return;
+		}
+
+		query.setParameter(refnrParam, refnr);
 	}
 }

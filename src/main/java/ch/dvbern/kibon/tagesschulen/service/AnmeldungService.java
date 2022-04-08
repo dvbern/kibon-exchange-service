@@ -85,18 +85,42 @@ public class AnmeldungService {
 		CriteriaQuery<Anmeldung> query = cb.createQuery(Anmeldung.class);
 		Root<Anmeldung> root = query.from(Anmeldung.class);
 
-		ParameterExpression<String> refNrParam = cb.parameter(String.class, "refnr");
+		ParameterExpression<String> refnrParam = cb.parameter(String.class, AbstractInstitutionPeriodeEntity_.REFNR);
 
-		Predicate refnrPredicate = cb.equal(root.get(AbstractInstitutionPeriodeEntity_.refnr), refNrParam);
+		Predicate refnrPredicate = cb.equal(root.get(AbstractInstitutionPeriodeEntity_.refnr), refnrParam);
 
 		query.where(refnrPredicate)
 			.orderBy(cb.desc(root.get(AbstractInstitutionPeriodeEntity_.id)));
 
 		return em.createQuery(query)
-			.setParameter(refNrParam, refnr)
+			.setParameter(refnrParam, refnr)
 			.setMaxResults(1)
 			.getResultStream()
 			.findFirst();
+	}
+
+	/**
+	 * Delivers latest {@link ClientAnmeldungDTO} for the given refnr.
+	 */
+	@Transactional(TxType.MANDATORY)
+	public Optional<ClientAnmeldungDTO> getLatestClientAnmeldung(@Nonnull String clientName, @Nonnull String refnr) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+
+		CriteriaQuery<ClientAnmeldungDTO> query = cb.createQuery(ClientAnmeldungDTO.class);
+		Root<ClientAnmeldung> root = query.from(ClientAnmeldung.class);
+
+		select(query, root, cb);
+
+		ClientAnmeldungFilter filter = new ClientAnmeldungFilter(clientName, null, 1, refnr);
+		filter.setPredicate(query, root, cb);
+
+		query.orderBy(cb.desc(root.get(ClientAnmeldung_.id)));
+
+		TypedQuery<ClientAnmeldungDTO> q = em.createQuery(query);
+
+		filter.setParameters(q);
+
+		return q.getResultStream().findFirst();
 	}
 
 	/**
@@ -105,10 +129,31 @@ public class AnmeldungService {
 	@Transactional(TxType.MANDATORY)
 	public List<ClientAnmeldungDTO> getAllForClient(@Nonnull ClientAnmeldungFilter filter) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
+
 		CriteriaQuery<ClientAnmeldungDTO> query = cb.createQuery(ClientAnmeldungDTO.class);
 		Root<ClientAnmeldung> root = query.from(ClientAnmeldung.class);
-		Join<ClientAnmeldung, Anmeldung> anmeldungJoin =
-			root.join(ClientAnmeldung_.anmeldung);
+
+		select(query, root, cb);
+
+		filter.setPredicate(query, root, cb);
+
+		query.orderBy(cb.asc(root.get(ClientAnmeldung_.id)));
+
+		TypedQuery<ClientAnmeldungDTO> q = em.createQuery(query);
+
+		filter.setParameters(q);
+
+		List<ClientAnmeldungDTO> resultList = q.getResultList();
+
+		return resultList;
+	}
+
+	private void select(
+		@Nonnull CriteriaQuery<ClientAnmeldungDTO> query,
+		@Nonnull Root<ClientAnmeldung> root,
+		@Nonnull CriteriaBuilder cb) {
+
+		Join<ClientAnmeldung, Anmeldung> anmeldungJoin = root.join(ClientAnmeldung_.anmeldung);
 
 		query.select(cb.construct(
 			ClientAnmeldungDTO.class,
@@ -131,17 +176,5 @@ public class AnmeldungService {
 			anmeldungJoin.get(Anmeldung_.eintrittsdatum),
 			anmeldungJoin.get(Anmeldung_.module)
 		));
-
-		filter.setPredicate(query, root, cb);
-
-		query.orderBy(cb.asc(root.get(ClientAnmeldung_.id)));
-
-		TypedQuery<ClientAnmeldungDTO> q = em.createQuery(query);
-
-		filter.setParameters(q);
-
-		List<ClientAnmeldungDTO> resultList = q.getResultList();
-
-		return resultList;
 	}
 }
