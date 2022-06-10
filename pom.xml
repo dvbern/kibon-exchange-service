@@ -13,12 +13,12 @@
     <properties>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>2.7.5.Final</quarkus.platform.version>
+        <quarkus.platform.version>2.9.2.Final</quarkus.platform.version>
         <hamcrest.version>2.2</hamcrest.version>
         <spotify.hamcrest.version>1.2.0</spotify.hamcrest.version>
-        <testcontainers.version>1.16.3</testcontainers.version>
-        <compiler-plugin.version>3.8.1</compiler-plugin.version>
-        <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
+        <testcontainers.version>1.17.2</testcontainers.version>
+        <compiler-plugin.version>3.10.1</compiler-plugin.version>
+        <surefire-plugin.version>3.0.0-M6</surefire-plugin.version>
         <kibon.exchange.api.commons.version>5.3</kibon.exchange.api.commons.version>
         <kibon.exchange.api.version>5.2.2</kibon.exchange.api.version>
 
@@ -127,6 +127,16 @@
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
             <version>5.5.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.ws.rs</groupId>
+                    <artifactId>jakarta.ws.rs-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-confluent-registry-avro</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.avro</groupId>
@@ -291,7 +301,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.39.0</version>
+                <version>0.39.1</version>
                 <configuration>
                     <imagePullPolicy>always</imagePullPolicy>
                     <skipPush>false</skipPush>
