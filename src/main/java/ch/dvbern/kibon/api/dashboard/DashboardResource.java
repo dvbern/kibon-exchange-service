@@ -17,9 +17,7 @@
 
 package ch.dvbern.kibon.api.dashboard;
 
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
