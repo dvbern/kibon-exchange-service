@@ -85,9 +85,6 @@ public class DashboardResource {
 	@NoCache
 	@Nonnull
 	@RolesAllowed("dashboard")
-	@Timed(name = "requestTimer",
-		description = "A measure of how long it takes to load Gemeinden",
-		unit = MetricUnits.MILLISECONDS)
 	@Valid
 	public GemeindeDTO getAllGemeinden(
 		@Parameter(description = "Erlaubt es, nur die Gemeinde zu laden, nach einem gewissen ID.\\n\\nJede "
@@ -125,9 +122,6 @@ public class DashboardResource {
 	@NoCache
 	@Nonnull
 	@RolesAllowed("dashboard")
-	@Timed(name = "requestTimer",
-		description = "A measure of how long it takes to load GemeindeKennzahlen",
-		unit = MetricUnits.MILLISECONDS)
 	@Valid
 	public GemeindeKennzahlenDTO getAllGemeindeKennzahlen(
 		@Parameter(description = "Erlaubt es, nur die GemeindeKennzahlen zu laden, nach einem gewissen ID.\\n\\nJede "
@@ -165,9 +159,6 @@ public class DashboardResource {
 	@NoCache
 	@Nonnull
 	@RolesAllowed("dashboard")
-	@Timed(name = "requestTimer",
-		description = "A measure of how long it takes to load Institutionen",
-		unit = MetricUnits.MILLISECONDS)
 	@Valid
 	public InstitutionDTO getAllInstitutionen(
 		@Parameter(description = "Erlaubt es, nur die Instutionen zu laden, nach einem gewissen ID.\\n\\nJede "
@@ -205,9 +196,6 @@ public class DashboardResource {
 	@NoCache
 	@Nonnull
 	@RolesAllowed("dashboard")
-	@Timed(name = "requestTimer",
-		description = "A measure of how long it takes to load Lastenausgleich Daten",
-		unit = MetricUnits.MILLISECONDS)
 	@Valid
 	public LastenausgleichDTO getAllLats(
 		@Parameter(description = "Erlaubt es, nach diesem ID Lastenausgleichdaten zu laden, nach einem gewissen ID.\n\nJede Lastenausgleich hat eine "
@@ -245,9 +233,6 @@ public class DashboardResource {
 	@NoCache
 	@Nonnull
 	@RolesAllowed("dashboard")
-	@Timed(name = "requestTimer",
-		description = "A measure of how long it takes to load Verfuegungen",
-		unit = MetricUnits.MILLISECONDS)
 	@Valid
 	public VerfuegungDTO getAllVerfuegungen(
 		@Parameter(description = "Erlaubt es, nach diesem ID Verfuegungen zu laden.\n\nJede Verfuegung hat eine "
