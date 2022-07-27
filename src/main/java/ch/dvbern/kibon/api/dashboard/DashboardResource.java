@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/dashboard")
-@Tag(name = OpenApiTag.TAGES_SCHULEN)
+@Tag(name = OpenApiTag.DASHBOARD)
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class DashboardResource {
