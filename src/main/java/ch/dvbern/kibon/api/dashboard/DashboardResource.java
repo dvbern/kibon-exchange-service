@@ -76,7 +76,7 @@ public class DashboardResource {
 		summary = "Returniert alle Gemeinde.",
 		description =
 			"Ihr koennt alle Gemeinde Daten abholen, entweder von Anfang vor oder ab einen gewissen ID")
-	@SecurityRequirement(name = "OAuth2", scopes = "tagesschule")
+	@SecurityRequirement(name = "OAuth2", scopes = "dashboard")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
@@ -86,7 +86,7 @@ public class DashboardResource {
 	@Nonnull
 	@RolesAllowed("dashboard")
 	@Timed(name = "requestTimer",
-		description = "A measure of how long it takes to load Anmeldungen",
+		description = "A measure of how long it takes to load Gemeinden",
 		unit = MetricUnits.MILLISECONDS)
 	@Valid
 	public GemeindeDTO getAllGemeinden(
@@ -116,7 +116,7 @@ public class DashboardResource {
 		summary = "Returniert alle GemeindeKennzahlen.",
 		description =
 			"Ihr koennt alle GemeindeKennzahlen Daten abholen, entweder von Anfang vor oder ab einen gewissen ID")
-	@SecurityRequirement(name = "OAuth2", scopes = "tagesschule")
+	@SecurityRequirement(name = "OAuth2", scopes = "dashboard")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
@@ -126,7 +126,7 @@ public class DashboardResource {
 	@Nonnull
 	@RolesAllowed("dashboard")
 	@Timed(name = "requestTimer",
-		description = "A measure of how long it takes to load Anmeldungen",
+		description = "A measure of how long it takes to load GemeindeKennzahlen",
 		unit = MetricUnits.MILLISECONDS)
 	@Valid
 	public GemeindeKennzahlenDTO getAllGemeindeKennzahlen(
@@ -156,7 +156,7 @@ public class DashboardResource {
 		summary = "Returniert alle Institutionen.",
 		description =
 			"Ihr koennt alle Institutionen Daten abholen, entweder von Anfang vor oder ab einen gewissen ID")
-	@SecurityRequirement(name = "OAuth2", scopes = "tagesschule")
+	@SecurityRequirement(name = "OAuth2", scopes = "dashboard")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
@@ -166,7 +166,7 @@ public class DashboardResource {
 	@Nonnull
 	@RolesAllowed("dashboard")
 	@Timed(name = "requestTimer",
-		description = "A measure of how long it takes to load Anmeldungen",
+		description = "A measure of how long it takes to load Institutionen",
 		unit = MetricUnits.MILLISECONDS)
 	@Valid
 	public InstitutionDTO getAllInstitutionen(
@@ -196,7 +196,7 @@ public class DashboardResource {
 		summary = "Returniert alle Lastenausgleich.",
 		description =
 			"Ihr koennt alle Lastenausgleich Daten abholen, entweder von Anfang vor oder ab einen gewissen ID")
-	@SecurityRequirement(name = "OAuth2", scopes = "tagesschule")
+	@SecurityRequirement(name = "OAuth2", scopes = "dashboard")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
@@ -206,7 +206,7 @@ public class DashboardResource {
 	@Nonnull
 	@RolesAllowed("dashboard")
 	@Timed(name = "requestTimer",
-		description = "A measure of how long it takes to load Anmeldungen",
+		description = "A measure of how long it takes to load Lastenausgleich Daten",
 		unit = MetricUnits.MILLISECONDS)
 	@Valid
 	public LastenausgleichDTO getAllLats(
@@ -236,7 +236,7 @@ public class DashboardResource {
 		summary = "Returniert alle Verfuegungen.",
 		description =
 			"Ihr koennt alle Verfuegungen Daten abholen, entweder von Anfang vor oder ab einen gewissen ID")
-	@SecurityRequirement(name = "OAuth2", scopes = "tagesschule")
+	@SecurityRequirement(name = "OAuth2", scopes = "dashboard")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
@@ -246,7 +246,7 @@ public class DashboardResource {
 	@Nonnull
 	@RolesAllowed("dashboard")
 	@Timed(name = "requestTimer",
-		description = "A measure of how long it takes to load Anmeldungen",
+		description = "A measure of how long it takes to load Verfuegungen",
 		unit = MetricUnits.MILLISECONDS)
 	@Valid
 	public VerfuegungDTO getAllVerfuegungen(
