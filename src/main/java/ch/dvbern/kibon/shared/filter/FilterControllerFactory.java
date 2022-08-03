@@ -30,6 +30,7 @@ import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 
+@SuppressWarnings("PMD.ClassNamingConventions")
 public final class FilterControllerFactory {
 
 	private FilterControllerFactory() {
