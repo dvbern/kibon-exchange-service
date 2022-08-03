@@ -120,7 +120,7 @@ if (params.performRelease) {
 					]
 		}
 
-		if (branch.startsWith(masterBranchName) || branch.startsWith(developBranchName)) {
+		if ((branch.startsWith(masterBranchName) || branch.startsWith(developBranchName)) && currentBuild.result == "SUCCESS") {
 			stage('Deploy') {
 				def deploymentConfig = branch.startsWith(masterBranchName) ?
 						'kibon-exchange-uat' :
