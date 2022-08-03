@@ -112,6 +112,15 @@ if (params.performRelease) {
 			}
 		}
 
+        stage('Analysis') {
+			recordIssues enabledForFailure: true, qualityGates: [[threshold: 1, type: 'TOTAL', unstable: false]],
+					tools: [
+							checkStyle(),
+							pmdParser(),
+							spotBugs(pattern: '**/target/spotbugs/spotbugsXml.xml', useRankAsPriority: true)
+					]
+		}
+
 		if (branch.startsWith(masterBranchName) || branch.startsWith(developBranchName)) {
 			stage('Deploy') {
 				def deploymentConfig = branch.startsWith(masterBranchName) ?
