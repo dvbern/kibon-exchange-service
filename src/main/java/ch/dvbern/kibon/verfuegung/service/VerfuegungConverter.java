@@ -17,6 +17,7 @@
 
 package ch.dvbern.kibon.verfuegung.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,10 +57,12 @@ public class VerfuegungConverter {
 		verfuegung.setGemeindeBfsNr(dto.getGemeindeBfsNr());
 		verfuegung.setGemeindeName(dto.getGemeindeName());
 
+		verfuegung.setAuszahlungAnEltern(dto.getAuszahlungAnEltern());
+
 		verfuegung.setKind(toKind(dto.getKind()));
 		verfuegung.setGesuchsteller(toGesuchsteller(dto.getGesuchsteller()));
-		verfuegung.setZeitabschnitte(toZeitabschnitte(dto.getZeitabschnitte()));
-		verfuegung.setIgnorierteZeitabschnitte(toZeitabschnitte(dto.getIgnorierteZeitabschnitte()));
+		verfuegung.setZeitabschnitte(toZeitabschnitte(dto.getZeitabschnitte(), dto.getAuszahlungAnEltern()));
+		verfuegung.setIgnorierteZeitabschnitte(toZeitabschnitte(dto.getIgnorierteZeitabschnitte(), dto.getAuszahlungAnEltern()));
 
 		return verfuegung;
 	}
@@ -81,13 +84,13 @@ public class VerfuegungConverter {
 	}
 
 	@Nonnull
-	private ArrayNode toZeitabschnitte(@Nullable List<ZeitabschnittDTO> zeitabschnitte) {
+	private ArrayNode toZeitabschnitte(@Nullable List<ZeitabschnittDTO> zeitabschnitte, @Nonnull Boolean auszahlungAnEltern) {
 		if (zeitabschnitte == null) {
 			return mapper.createArrayNode();
 		}
 
 		List<ObjectNode> mapped = zeitabschnitte.stream()
-			.map(this::toZeitabschnitt)
+			.map(zdto -> toZeitabschnitt(zdto, auszahlungAnEltern))
 			.collect(Collectors.toList());
 
 		return mapper.createArrayNode()
@@ -95,7 +98,7 @@ public class VerfuegungConverter {
 	}
 
 	@Nonnull
-	private ObjectNode toZeitabschnitt(@Nonnull ZeitabschnittDTO zeitabschnitt) {
+	private ObjectNode toZeitabschnitt(@Nonnull ZeitabschnittDTO zeitabschnitt, @Nonnull Boolean auszahlungAnEltern) {
 		return mapper.createObjectNode()
 			.put("von", zeitabschnitt.getVon().toString())
 			.put("bis", zeitabschnitt.getBis().toString())
@@ -104,12 +107,13 @@ public class VerfuegungConverter {
 			.put("anspruchPct", zeitabschnitt.getAnspruchPct())
 			.put("verguenstigtPct", zeitabschnitt.getVerguenstigtPct())
 			.put("vollkosten", zeitabschnitt.getVollkosten())
-			.put("betreuungsgutschein", zeitabschnitt.getBetreuungsgutschein())
+			.put("betreuungsgutschein", auszahlungAnEltern ? BigDecimal.ZERO : zeitabschnitt.getBetreuungsgutschein())
 			.put("minimalerElternbeitrag", zeitabschnitt.getMinimalerElternbeitrag())
 			.put("verguenstigung", zeitabschnitt.getVerguenstigung())
 			.put("verfuegteAnzahlZeiteinheiten", zeitabschnitt.getVerfuegteAnzahlZeiteinheiten())
 			.put("anspruchsberechtigteAnzahlZeiteinheiten", zeitabschnitt.getAnspruchsberechtigteAnzahlZeiteinheiten())
 			.put("zeiteinheit", zeitabschnitt.getZeiteinheit().name())
-			.put("regelwerk", zeitabschnitt.getRegelwerk().name());
+			.put("regelwerk", zeitabschnitt.getRegelwerk().name())
+			.put("anElternUeberwiesenerBetrag", auszahlungAnEltern ? zeitabschnitt.getBetreuungsgutschein() : BigDecimal.ZERO);
 	}
 }
