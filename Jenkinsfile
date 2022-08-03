@@ -108,7 +108,6 @@ if (params.performRelease) {
 			} catch (Exception e) {
 				currentBuild.result = "FAILURE"
 				handleFailures(e)
-				throw e
 			}
 		}
 
