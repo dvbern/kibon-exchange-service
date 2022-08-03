@@ -70,7 +70,7 @@ public class PlatzbestaetigungResource {
 	@Timed(name = "anfrageTimer",
 		description = "A measure of how long it takes to load BetreuungAnfrage",
 		unit = MetricUnits.MILLISECONDS)
-	public BetreuungAnfragenDTO getAll(@BeanParam ClientInstitutionFilterParams filterParams) {
+	public BetreuungAnfragenDTO getAll(@Valid @BeanParam ClientInstitutionFilterParams filterParams) {
 
 		return betreuungResource.getAll(filterParams);
 	}

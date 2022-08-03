@@ -163,7 +163,7 @@ public class TagesschulenResource {
 		description = "A measure of how long it takes to load Anmeldungen",
 		unit = MetricUnits.MILLISECONDS)
 	@Valid
-	public TagesschuleAnmeldungenDTO getAll(@BeanParam ClientInstitutionFilterParams filterParams) {
+	public TagesschuleAnmeldungenDTO getAll(@Valid @BeanParam ClientInstitutionFilterParams filterParams) {
 
 		String clientName = jsonWebToken.getClaim(CLIENT_ID);
 		Set<String> groups = identity.getRoles();

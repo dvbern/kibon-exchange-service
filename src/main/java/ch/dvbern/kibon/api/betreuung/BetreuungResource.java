@@ -136,7 +136,7 @@ public class BetreuungResource {
 	@Timed(name = "anfrageTimer",
 		description = "A measure of how long it takes to load BetreuungAnfrage",
 		unit = MetricUnits.MILLISECONDS)
-	public BetreuungAnfragenDTO getAll(@BeanParam ClientInstitutionFilterParams filterParams) {
+	public BetreuungAnfragenDTO getAll(@Valid @BeanParam ClientInstitutionFilterParams filterParams) {
 
 		String clientName = jsonWebToken.getClaim("clientId");
 		Set<String> groups = identity.getRoles();

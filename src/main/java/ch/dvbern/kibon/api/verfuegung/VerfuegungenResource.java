@@ -29,6 +29,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -113,7 +114,7 @@ public class VerfuegungenResource {
 	@Timed(name = "requestTimer",
 		description = "A measure of how long it takes to load Verfuegungen",
 		unit = MetricUnits.MILLISECONDS)
-	public VerfuegungenDTO getAll(@BeanParam ClientInstitutionFilterParams filterParams) {
+	public VerfuegungenDTO getAll(@Valid @BeanParam ClientInstitutionFilterParams filterParams) {
 
 		String clientName = jsonWebToken.getClaim("clientId");
 		Set<String> groups = identity.getRoles();
