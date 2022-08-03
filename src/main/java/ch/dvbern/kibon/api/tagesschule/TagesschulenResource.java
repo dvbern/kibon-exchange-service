@@ -27,14 +27,13 @@ import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -42,11 +41,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import ch.dvbern.kibon.api.shared.ClientInstitutionFilterParams;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.clients.service.ClientService;
@@ -56,14 +55,16 @@ import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleAnme
 import ch.dvbern.kibon.exchange.api.common.tagesschule.anmeldung.TagesschuleBestaetigungDTO;
 import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TagesschuleTarifeDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleBestaetigungEventDTO;
+import ch.dvbern.kibon.shared.filter.FilterController;
+import ch.dvbern.kibon.shared.filter.FilterControllerFactory;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import ch.dvbern.kibon.tagesschulen.facade.AblehnenAnmeldungKafkaEventProducer;
 import ch.dvbern.kibon.tagesschulen.facade.AnmeldungKafkaEventProducer;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
+import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.service.AnmeldungService;
 import ch.dvbern.kibon.tagesschulen.service.TagesschuleModuleService;
-import ch.dvbern.kibon.tagesschulen.service.filter.ClientAnmeldungFilter;
 import ch.dvbern.kibon.util.OpenApiTag;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
@@ -162,31 +163,21 @@ public class TagesschulenResource {
 		description = "A measure of how long it takes to load Anmeldungen",
 		unit = MetricUnits.MILLISECONDS)
 	@Valid
-	public TagesschuleAnmeldungenDTO getAll(
-		@Parameter(description = "Erlaubt es, nur neue Anmeldung zu laden.\n\nJede Anmeldung hat eine "
-			+ "monoton steigende ID. Ein Client kann deshalb die grösste ID bereits eingelesener Anmeldungen als"
-			+ " `after_id` Parameter setzen, um nur die neu verfügbaren Anmeldung zu erhalten.")
-		@QueryParam("after_id") @Nullable Long afterId,
-		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
-		@Min(0) @QueryParam("limit") @Nullable Integer limit,
-		@Parameter(description = "Liefert nur Resultate mit spezifischer Referenznummer")
-		@QueryParam("refnr") @Nullable String refnr,
-		@Parameter(description = "Erweiterung für zusätzliche Filter - wird momentan nicht verwendet")
-		@QueryParam("$filter") @Nullable String filter) {
+	public TagesschuleAnmeldungenDTO getAll(@BeanParam ClientInstitutionFilterParams filterParams) {
 
 		String clientName = jsonWebToken.getClaim(CLIENT_ID);
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
 
 		LOG.info(
-			"Tagesschule-Anmeldungen accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id '{}'",
+			"Tagesschule-Anmeldungen accessed by '{}' with clientName '{}', roles '{}' and filter '{}'",
 			userName,
 			clientName,
 			groups,
-			limit,
-			afterId);
+			filterParams);
 
-		ClientAnmeldungFilter queryFilter = new ClientAnmeldungFilter(clientName, afterId, limit, refnr);
+		FilterController<ClientAnmeldung, ClientAnmeldungDTO> queryFilter =
+			FilterControllerFactory.anmeldungenFilter(clientName, filterParams);
 
 		List<ClientAnmeldungDTO> clientAnmeldungen = anmeldungService.getAllForClient(queryFilter);
 
