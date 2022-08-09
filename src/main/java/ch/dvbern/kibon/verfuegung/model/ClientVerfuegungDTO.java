@@ -60,6 +60,8 @@ public class ClientVerfuegungDTO {
 	@Nonnull
 	private final String gemeindeName;
 
+	private final boolean auszahlungAnEltern;
+
 	@Nonnull
 	private final JsonNode kind;
 
@@ -84,6 +86,7 @@ public class ClientVerfuegungDTO {
 		@Nonnull BetreuungsangebotTyp betreuungsArt,
 		@Nonnull Long gemeindeBfsNr,
 		@Nonnull String gemeindeName,
+		boolean auszahlungAnEltern,
 		@Nonnull JsonNode kind,
 		@Nonnull JsonNode gesuchsteller,
 		@Nonnull JsonNode zeitabschnitte,
@@ -100,6 +103,7 @@ public class ClientVerfuegungDTO {
 		this.betreuungsArt = betreuungsArt;
 		this.gemeindeBfsNr = gemeindeBfsNr;
 		this.gemeindeName = gemeindeName;
+		this.auszahlungAnEltern = auszahlungAnEltern;
 		this.kind = kind;
 		this.gesuchsteller = gesuchsteller;
 		this.zeitabschnitte = zeitabschnitte;
@@ -159,6 +163,10 @@ public class ClientVerfuegungDTO {
 	@Nonnull
 	public String getGemeindeName() {
 		return gemeindeName;
+	}
+
+	public boolean isAuszahlungAnEltern() {
+		return auszahlungAnEltern;
 	}
 
 	@Nonnull
