@@ -27,18 +27,18 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import javax.validation.constraints.Min;
+import javax.validation.Valid;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import ch.dvbern.kibon.api.shared.ClientInstitutionFilterParams;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.clients.service.ClientService;
@@ -47,17 +47,18 @@ import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungDTO;
 import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungenDTO;
 import ch.dvbern.kibon.exchange.api.common.verfuegung.ZeitabschnittDTO;
 import ch.dvbern.kibon.institution.service.InstitutionService;
+import ch.dvbern.kibon.shared.filter.FilterController;
+import ch.dvbern.kibon.shared.filter.FilterControllerFactory;
 import ch.dvbern.kibon.util.OpenApiTag;
+import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.service.VerfuegungService;
-import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
@@ -114,33 +115,21 @@ public class VerfuegungenResource {
 	@Timed(name = "requestTimer",
 		description = "A measure of how long it takes to load Verfuegungen",
 		unit = MetricUnits.MILLISECONDS)
-	public VerfuegungenDTO getAll(
-		@Parameter(description = "Erlaubt es, nur neue Verfügungen zu laden.\n\nJede Verfügung hat eine "
-			+ "monoton steigende ID. Ein Client kann deshalb die grösste ID bereits eingelesener Verfügung als"
-			+ " `after_id` Parameter setzen, um nur die neu verfügbaren Verfügung zu erhalten.")
-		@QueryParam("after_id") @Nullable Long afterId,
-		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
-		@Min(0) @QueryParam("limit") @Nullable Integer limit,
-		@Parameter(description = "Erweiterung für zusätzliche Filter - wird momentan nicht verwendet")
-		@QueryParam("$filter") @Nullable String filter) {
+	public VerfuegungenDTO getAll(@Valid @BeanParam ClientInstitutionFilterParams filterParams) {
 
 		String clientName = jsonWebToken.getClaim("clientId");
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
 
 		LOG.info(
-			"Verfuegungen accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id '{}'",
+			"Verfuegungen accessed by '{}' with clientName '{}', roles '{}' and filter '{}'",
 			userName,
 			clientName,
 			groups,
-			limit,
-			afterId);
+			filterParams);
 
-		// "filter" parameter is ignored at the moment. Added to API to make adding restrictions easily
-
-		ClientVerfuegungFilter queryFilter = new ClientVerfuegungFilter(clientName, afterId, limit);
-
-		VerfuegungenDTO verfuegungenDTO = new VerfuegungenDTO();
+		FilterController<ClientVerfuegung, ClientVerfuegungDTO> queryFilter =
+			FilterControllerFactory.verfuegungenFilter(clientName, filterParams);
 
 		List<ClientVerfuegungDTO> dtos = verfuegungenService.getAllForClient(queryFilter);
 
@@ -148,6 +137,7 @@ public class VerfuegungenResource {
 			.map(this::convert)
 			.collect(Collectors.toList());
 
+		VerfuegungenDTO verfuegungenDTO = new VerfuegungenDTO();
 		verfuegungenDTO.setVerfuegungen(verfuegungen);
 
 		Set<String> institutionIds = verfuegungen.stream()

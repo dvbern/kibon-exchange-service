@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.tagesschulen.service.filter;
+package ch.dvbern.kibon.shared.filter;
 
 import java.util.Optional;
 
@@ -27,43 +27,49 @@ import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
 import ch.dvbern.kibon.persistence.Restriction;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
 
 /**
  * Utility class for filtering criteria queries to only deliver entries with a specific refnr.
  */
-public class RefNrFilter implements Restriction<ClientAnmeldung, ClientAnmeldungDTO> {
+public class RefNrFilter<X extends AbstractClientEntity, Y> implements Restriction<X, Y> {
 
 	@Nullable
 	private final String refnr;
 
+	@Nonnull
+	private final SingularAttribute<X, ? extends AbstractInstitutionPeriodeEntity> z;
+
 	@Nullable
 	private ParameterExpression<String> refnrParam;
 
-	public RefNrFilter(@Nullable String refnr) {
+	public RefNrFilter(
+		@Nonnull SingularAttribute<X, ? extends AbstractInstitutionPeriodeEntity> z,
+		@Nullable String refnr) {
+		this.z = z;
 		this.refnr = refnr;
 	}
 
 	@Nonnull
 	@Override
-	public Optional<Predicate> getPredicate(@Nonnull Root<ClientAnmeldung> root, @Nonnull CriteriaBuilder cb) {
+	public Optional<Predicate> getPredicate(@Nonnull Root<X> root, @Nonnull CriteriaBuilder cb) {
 		if (refnr == null) {
 			return Optional.empty();
 		}
 
-		Path<String> refnrPath = root.get(ClientAnmeldung_.anmeldung).get(AbstractInstitutionPeriodeEntity_.refnr);
+		Path<String> refnrPath = root.get(z).get(AbstractInstitutionPeriodeEntity_.refnr);
 		refnrParam = cb.parameter(String.class, AbstractInstitutionPeriodeEntity_.REFNR);
 
 		return Optional.of(cb.equal(refnrPath, refnrParam));
 	}
 
 	@Override
-	public void setParameter(@Nonnull TypedQuery<ClientAnmeldungDTO> query) {
+	public void setParameter(@Nonnull TypedQuery<Y> query) {
 		if (refnr == null) {
 			return;
 		}

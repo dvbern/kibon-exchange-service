@@ -120,11 +120,20 @@ if (params.performRelease) {
             }
         }
 
-        if (branch.startsWith(masterBranchName) || branch.startsWith(developBranchName)) {
-            stage('Deploy') {
-                def deploymentConfig = branch.startsWith(masterBranchName) ?
-                    'kibon-exchange-uat' :
-                    'kibon-exchange-dev'
+        stage('Analysis') {
+        			recordIssues enabledForFailure: true, qualityGates: [[threshold: 1, type: 'TOTAL', unstable: false]],
+        					tools: [
+        							checkStyle(),
+        							pmdParser(),
+        							spotBugs(pattern: '**/target/spotbugs/spotbugsXml.xml', useRankAsPriority: true)
+        					]
+        		}
+
+		if ((branch.startsWith(masterBranchName) || branch.startsWith(developBranchName)) && currentBuild.result == "SUCCESS") {
+			stage('Deploy') {
+				def deploymentConfig = branch.startsWith(masterBranchName) ?
+						'kibon-exchange-uat' :
+						'kibon-exchange-dev'
 
                 sshPublisher(publishers: [sshPublisherDesc(
                     configName: deploymentConfig,
