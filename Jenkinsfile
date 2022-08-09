@@ -18,15 +18,15 @@
 @Library('dvbern-ci') _
 
 properties([
-		[$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '10']],
-		parameters([
-				booleanParam(defaultValue: false, description: 'Do you want to perform a Release?', name:
-						'performRelease'),
-				string(defaultValue: '', description: 'This release version', name: 'releaseversion', trim:
-						true),
-				string(defaultValue: '', description: 'The next release version', name: 'nextreleaseversion',
-						trim: true)
-		])
+    [$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '10']],
+    parameters([
+        booleanParam(defaultValue: false, description: 'Do you want to perform a Release?', name:
+            'performRelease'),
+        string(defaultValue: '', description: 'This release version', name: 'releaseversion', trim:
+            true),
+        string(defaultValue: '', description: 'The next release version', name: 'nextreleaseversion',
+            trim: true)
+    ])
 ])
 
 def jdk = "OpenJDK_11.0.4"
@@ -40,104 +40,112 @@ def releaseBranchPrefix = "release"
 def hotfixBranchPrefix = "hotfix"
 
 if (params.performRelease) {
-	// see https://issues.jenkins-ci.org/browse/JENKINS-53512
-	def releaseVersion = params.releaseversion
-	def nextReleaseVersion = params.nextreleaseversion
+    // see https://issues.jenkins-ci.org/browse/JENKINS-53512
+    def releaseVersion = params.releaseversion
+    def nextReleaseVersion = params.nextreleaseversion
 
-	dvbJGitFlowRelease {
-		releaseversion = releaseVersion
-		nextreleaseversion = nextReleaseVersion
-		emailRecipients = recipients
-		jdkVersion = jdk
-		credentialsId = 'jenkins-github-token'
-	}
+    dvbJGitFlowRelease {
+        releaseversion = releaseVersion
+        nextreleaseversion = nextReleaseVersion
+        emailRecipients = recipients
+        jdkVersion = jdk
+        credentialsId = 'jenkins-github-token'
+    }
 } else {
-	node('docker') {
-		stage('Checkout') {
-			checkout([
-					$class           : 'GitSCM',
-					branches         : scm.branches,
-					extensions       : scm.extensions + [[$class: 'LocalBranch', localBranch: '']],
-					userRemoteConfigs: scm.userRemoteConfigs
-			])
-		}
+    node('docker') {
+        stage('Checkout') {
+            checkout([
+                $class           : 'GitSCM',
+                branches         : scm.branches,
+                extensions       : scm.extensions + [[$class: 'LocalBranch', localBranch: '']],
+                userRemoteConfigs: scm.userRemoteConfigs
+            ])
+        }
 
-		String branch = env.BRANCH_NAME.toString()
-		currentBuild.displayName = "${branch}-${dvbMaven.pomVersion()}-${env.BUILD_NUMBER}"
+        String branch = env.BRANCH_NAME.toString()
+        currentBuild.displayName = "${branch}-${dvbMaven.pomVersion()}-${env.BUILD_NUMBER}"
 
-		def handleFailures = {error ->
-			if (branch.startsWith(featureBranchPrefix)) {
-				// feature branche failures should only notify the feature owner
-				step([
-						$class                  : 'Mailer',
-						notifyEveryUnstableBuild: true,
-						recipients              : emailextrecipients([[$class: 'RequesterRecipientProvider']]),
-						sendToIndividuals       : true])
+        def handleFailures = {error ->
+            if (branch.startsWith(featureBranchPrefix)) {
+                // feature branche failures should only notify the feature owner
+                step([
+                    $class                  : 'Mailer',
+                    notifyEveryUnstableBuild: true,
+                    recipients              : emailextrecipients([[$class: 'RequesterRecipientProvider']]),
+                    sendToIndividuals       : true])
 
-			} else {
-				dvbErrorHandling.sendMail(recipients, currentBuild, error)
-			}
-		}
+            } else {
+                dvbErrorHandling.sendMail(recipients, currentBuild, error)
+            }
+        }
 
-		stage('Maven build') {
+        stage('Maven build') {
 
-			// in develop and master branches attempt to deploy the artifacts, otherwise only run to the verify
-			// phase.
-			def branchSpecificGoal = {
-				def developGoal = "deploy docker:build docker:push"
-				if (branch.startsWith(developBranchName)) {
-					return developGoal
-				}
+            // in develop and master branches attempt to deploy the artifacts, otherwise only run to the verify
+            // phase.
+            def branchSpecificGoal = {
+                def developGoal = "-Ddocker.username=$DOCKER_USERNAME -Ddocker.password=$DOCKER_PASSWORD deploy " +
+                    "docker:build docker:push"
+                if (branch.startsWith(developBranchName)) {
+                    return developGoal
+                }
 
-				if (branch.startsWith(masterBranchName)) {
-					return developGoal + " -Ddocker.tag.latest=latest"
-				}
+                if (branch.startsWith(masterBranchName)) {
+                    return developGoal + " -Ddocker.tag.latest=latest"
+                }
 
-				return "verify"
-			}
+                return "verify"
+            }
 
-			try {
-				withMaven(jdk: jdk) {
-					dvbUtil.genericSh(
-							'./mvnw -U -B -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
-					)
-				}
-				if (currentBuild.result == "UNSTABLE") {
-					handleFailures("build is unstable")
-				}
-			} catch (Exception e) {
-				currentBuild.result = "FAILURE"
-				handleFailures(e)
-				throw e
-			}
-		}
+            try {
+                withMaven(jdk: jdk) {
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: 'docker-registry-kibon-rw',
+                            passwordVariable: 'DOCKER_PASSWORD',
+                            usernameVariable: 'DOCKER_USERNAME')
+                    ]) {
+                        dvbUtil.genericSh(
+                            './mvnw -U -B -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
+                        )
+                    }
+                }
+                if (currentBuild.result == "UNSTABLE") {
+                    handleFailures("build is unstable")
+                }
+            } catch (Exception e) {
+                currentBuild.result = "FAILURE"
+                handleFailures(e)
+                throw e
+            }
+        }
 
-		if (branch.startsWith(masterBranchName) || branch.startsWith(developBranchName)) {
-			stage('Deploy') {
-				def deploymentConfig = branch.startsWith(masterBranchName) ?
-						'kibon-exchange-uat' :
-						'kibon-exchange-dev'
+        if (branch.startsWith(masterBranchName) || branch.startsWith(developBranchName)) {
+            stage('Deploy') {
+                def deploymentConfig = branch.startsWith(masterBranchName) ?
+                    'kibon-exchange-uat' :
+                    'kibon-exchange-dev'
 
-				sshPublisher(publishers: [sshPublisherDesc(
-						configName: deploymentConfig,
-						transfers: [sshTransfer(
-								cleanRemote: false,
-								excludes: '',
-								execCommand: '/opt/kibon-exchange-service/restart.sh',
-								execTimeout: 120000,
-								flatten: false,
-								makeEmptyDirs: false,
-								noDefaultExcludes: false,
-								patternSeparator: '[, ]+',
-								remoteDirectory: '',
-								remoteDirectorySDF:
-										false,
-								removePrefix: '',
-								sourceFiles: '')],
-						usePromotionTimestamp: false,
-						useWorkspaceInPromotion: false,
-						verbose: false)])
-			}
-		}
-	}
+                sshPublisher(publishers: [sshPublisherDesc(
+                    configName: deploymentConfig,
+                    transfers: [sshTransfer(
+                        cleanRemote: false,
+                        excludes: '',
+                        execCommand: '/opt/kibon-exchange-service/restart.sh',
+                        execTimeout: 120000,
+                        flatten: false,
+                        makeEmptyDirs: false,
+                        noDefaultExcludes: false,
+                        patternSeparator: '[, ]+',
+                        remoteDirectory: '',
+                        remoteDirectorySDF:
+                            false,
+                        removePrefix: '',
+                        sourceFiles: '')],
+                    usePromotionTimestamp: false,
+                    useWorkspaceInPromotion: false,
+                    verbose: false)])
+            }
+        }
+    }
 }

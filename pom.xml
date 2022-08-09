@@ -308,7 +308,7 @@
                     <verbose>false</verbose>
                     <images>
                         <image>
-                            <name>docker.dvbern.ch/kibon/exchange-service:${project.version}</name>
+                            <name>docker-registry.dvbern.ch/kibon/exchange-service:${project.version}</name>
                             <alias>exchange-service</alias>
                             <build>
                                 <contextDir>${project.basedir}</contextDir>
@@ -323,7 +323,7 @@
                             </build>
                         </image>
                         <image>
-                            <name>docker.dvbern.ch/kibon/exchange-nginx:${project.version}</name>
+                            <name>docker-registry.dvbern.ch/kibon/exchange-nginx:${project.version}</name>
                             <alias>exchange-nginx</alias>
                             <build>
                                 <dockerFile>${project.basedir}/docker/nginx/Dockerfile</dockerFile>

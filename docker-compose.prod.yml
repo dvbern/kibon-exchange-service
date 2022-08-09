@@ -83,7 +83,7 @@ services:
       KIBON_EXCHANGE_SERVICE_SECRET: ${KIBON_EXCHANGE_SERVICE_SECRET}
 
   service:
-    image: docker.dvbern.ch/kibon/exchange-service:${VERSION}
+    image: docker-registry.dvbern.ch/kibon/exchange-service:${VERSION}
     restart: "unless-stopped"
     networks:
       - kibon_exchange_backbone
@@ -107,7 +107,7 @@ services:
       QUARKUS_LOG_SENTRY_ENVIRONMENT: ${QUARKUS_LOG_SENTRY_ENVIRONMENT}
 
   nginx:
-    image: docker.dvbern.ch/kibon/exchange-nginx:${VERSION}
+    image: docker-registry.dvbern.ch/kibon/exchange-nginx:${VERSION}
     networks:
       - kibon_exchange_backbone
     depends_on:
