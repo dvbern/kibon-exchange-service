@@ -156,7 +156,7 @@ public class VerfuegungenResource {
 
 		removeZeitabschnitteOutsideGueltigkeit(clientName, verfuegungenDTO, institutionIds);
 
-		removeAnElternUeberwiesenerBetragIfPresent(verfuegungenDTO);
+		removeForbiddenForInstitutionFields(verfuegungenDTO);
 
 		List<InstitutionDTO> institutionDTOs = institutionService.get(institutionIds);
 
@@ -165,12 +165,17 @@ public class VerfuegungenResource {
 		return verfuegungenDTO;
 	}
 
-	// der an die Eltern überwiesene Betrag sollte den Intitutionen nicht mitgeteilt werden
-	private void removeAnElternUeberwiesenerBetragIfPresent(@Nonnull VerfuegungenDTO verfuegungenDTO) {
+	// 'verguenstigung', 'minimalerElternbeitrag' and 'anElternUeberwiesenerBetrag' sollte den Intitutionen nicht mitgeteilt
+	// werden, wenn 'auszahlungAnEltern' TRUE ist
+	private void removeForbiddenForInstitutionFields(@Nonnull VerfuegungenDTO verfuegungenDTO) {
 		verfuegungenDTO.getVerfuegungen().stream()
 			.flatMap(verfuegungDTO -> verfuegungDTO.getZeitabschnitte().stream())
 			.filter(ZeitabschnittDTO::isAuszahlungAnEltern)
-			.forEach(zeitabschnittDTO -> zeitabschnittDTO.setAnElternUeberwiesenerBetrag(BigDecimal.ZERO));
+			.forEach(zeitabschnittDTO -> {
+				zeitabschnittDTO.setAnElternUeberwiesenerBetrag(BigDecimal.ZERO);
+				zeitabschnittDTO.setVerguenstigung(BigDecimal.ZERO);
+				zeitabschnittDTO.setMinimalerElternbeitrag(BigDecimal.ZERO);
+			});
 	}
 
 	@Nonnull
