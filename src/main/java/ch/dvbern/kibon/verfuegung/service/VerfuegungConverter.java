@@ -17,6 +17,7 @@
 
 package ch.dvbern.kibon.verfuegung.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,6 +56,8 @@ public class VerfuegungConverter {
 		verfuegung.setBetreuungsArt(dto.getBetreuungsArt());
 		verfuegung.setGemeindeBfsNr(dto.getGemeindeBfsNr());
 		verfuegung.setGemeindeName(dto.getGemeindeName());
+
+		verfuegung.setAuszahlungAnEltern(dto.getAuszahlungAnEltern());
 
 		verfuegung.setKind(toKind(dto.getKind()));
 		verfuegung.setGesuchsteller(toGesuchsteller(dto.getGesuchsteller()));
@@ -104,12 +107,14 @@ public class VerfuegungConverter {
 			.put("anspruchPct", zeitabschnitt.getAnspruchPct())
 			.put("verguenstigtPct", zeitabschnitt.getVerguenstigtPct())
 			.put("vollkosten", zeitabschnitt.getVollkosten())
-			.put("betreuungsgutschein", zeitabschnitt.getBetreuungsgutschein())
+			.put("betreuungsgutschein", zeitabschnitt.getAuszahlungAnEltern() ? BigDecimal.ZERO : zeitabschnitt.getBetreuungsgutschein())
 			.put("minimalerElternbeitrag", zeitabschnitt.getMinimalerElternbeitrag())
 			.put("verguenstigung", zeitabschnitt.getVerguenstigung())
 			.put("verfuegteAnzahlZeiteinheiten", zeitabschnitt.getVerfuegteAnzahlZeiteinheiten())
 			.put("anspruchsberechtigteAnzahlZeiteinheiten", zeitabschnitt.getAnspruchsberechtigteAnzahlZeiteinheiten())
 			.put("zeiteinheit", zeitabschnitt.getZeiteinheit().name())
-			.put("regelwerk", zeitabschnitt.getRegelwerk().name());
+			.put("regelwerk", zeitabschnitt.getRegelwerk().name())
+			.put("auszahlungAnEltern", zeitabschnitt.getAuszahlungAnEltern())
+			.put("anElternUeberwiesenerBetrag", zeitabschnitt.getAuszahlungAnEltern() ? zeitabschnitt.getBetreuungsgutschein() : BigDecimal.ZERO);
 	}
 }
