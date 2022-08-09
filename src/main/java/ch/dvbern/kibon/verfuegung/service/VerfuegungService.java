@@ -92,6 +92,7 @@ public class VerfuegungService {
 			verfuegung.get(Verfuegung_.gemeindeName),
 			verfuegung.get(Verfuegung_.kind),
 			verfuegung.get(Verfuegung_.gesuchsteller),
+			verfuegung.get(Verfuegung_.auszahlungAnEltern),
 			verfuegung.get(Verfuegung_.zeitabschnitte),
 			verfuegung.get(Verfuegung_.ignorierteZeitabschnitte)
 		));

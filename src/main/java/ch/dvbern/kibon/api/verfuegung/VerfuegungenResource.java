@@ -17,6 +17,7 @@
 
 package ch.dvbern.kibon.api.verfuegung;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -155,11 +156,21 @@ public class VerfuegungenResource {
 
 		removeZeitabschnitteOutsideGueltigkeit(clientName, verfuegungenDTO, institutionIds);
 
+		removeAnElternUeberwiesenerBetragIfPresent(verfuegungenDTO);
+
 		List<InstitutionDTO> institutionDTOs = institutionService.get(institutionIds);
 
 		verfuegungenDTO.setInstitutionen(institutionDTOs);
 
 		return verfuegungenDTO;
+	}
+
+	// der an die Eltern überwiesene Betrag sollte den Intitutionen nicht mitgeteilt werden
+	private void removeAnElternUeberwiesenerBetragIfPresent(@Nonnull VerfuegungenDTO verfuegungenDTO) {
+		verfuegungenDTO.getVerfuegungen().stream()
+			.flatMap(verfuegungDTO -> verfuegungDTO.getZeitabschnitte().stream())
+			.filter(ZeitabschnittDTO::isAuszahlungAnEltern)
+			.forEach(zeitabschnittDTO -> zeitabschnittDTO.setAnElternUeberwiesenerBetrag(BigDecimal.ZERO));
 	}
 
 	@Nonnull
