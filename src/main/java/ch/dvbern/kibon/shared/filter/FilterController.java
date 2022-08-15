@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 DV Bern AG, Switzerland
+ * Copyright (C) 2022 DV Bern AG, Switzerland
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ch.dvbern.kibon.tagesschulen.service.filter;
+package ch.dvbern.kibon.shared.filter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,52 +28,41 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
+import ch.dvbern.kibon.api.shared.ClientInstitutionFilterParams;
 import ch.dvbern.kibon.persistence.Restriction;
-import ch.dvbern.kibon.shared.filter.AfterIdFilter;
-import ch.dvbern.kibon.shared.filter.ClientActiveFilter;
-import ch.dvbern.kibon.shared.filter.ClientGueltigkeitFilter;
-import ch.dvbern.kibon.shared.filter.ClientNameFilter;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
-import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity;
+import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 
-/**
- * Helper class for filtering {@link ClientAnmeldung}en.
- */
-public class ClientAnmeldungFilter {
+public class FilterController<X extends AbstractClientEntity, Y> {
 
 	@Nullable
 	private final Integer limit;
 	@Nonnull
-	private final List<Restriction<ClientAnmeldung, ClientAnmeldungDTO>> restrictions = new ArrayList<>();
+	private final List<Restriction<X, Y>> restrictions = new ArrayList<>();
 
-	/**
-	 * @param clientName the clients name
-	 * @param afterId for pagination, the id after which results are wanted
-	 * @param limit max. amount of results
-	 */
-	public ClientAnmeldungFilter(
+	FilterController(
+		@Nonnull SingularAttribute<X, ? extends AbstractInstitutionPeriodeEntity> institutionPeriodEntity,
 		@Nonnull String clientName,
-		@Nullable Long afterId,
-		@Nullable Integer limit,
-		@Nullable String refnr) {
+		@Nonnull ClientInstitutionFilterParams filterParams) {
+
+		limit = filterParams.getLimit();
 
 		restrictions.add(new ClientActiveFilter<>());
 		restrictions.add(new ClientNameFilter<>(clientName));
-		restrictions.add(new AfterIdFilter<>(afterId));
-		restrictions.add(new ClientGueltigkeitFilter<>(ClientAnmeldung_.anmeldung));
-		restrictions.add(new RefNrFilter(refnr));
-
-		this.limit = limit;
+		restrictions.add(new AfterIdFilter<>(filterParams.getAfterId()));
+		restrictions.add(new ClientGueltigkeitFilter<>(institutionPeriodEntity));
+		restrictions.add(new RefNrFilter<>(institutionPeriodEntity, filterParams.getRefnr()));
+		restrictions.add(new InstitutionFilter<>(filterParams.getInstitutionId()));
 	}
 
 	/**
 	 * Sets the filter predicates on the given query.
 	 */
 	public void setPredicate(
-		@Nonnull CriteriaQuery<ClientAnmeldungDTO> query,
-		@Nonnull Root<ClientAnmeldung> root,
+		@Nonnull CriteriaQuery<Y> query,
+		@Nonnull Root<X> root,
 		@Nonnull CriteriaBuilder cb) {
 
 		Predicate[] predicates = restrictions.stream()
@@ -88,7 +77,7 @@ public class ClientAnmeldungFilter {
 	/**
 	 * Sets the filter parameters on the given query.
 	 */
-	public void setParameters(@Nonnull TypedQuery<ClientAnmeldungDTO> query) {
+	public void setParameters(@Nonnull TypedQuery<Y> query) {
 		restrictions.forEach(r -> r.setParameter(query));
 
 		if (limit != null) {

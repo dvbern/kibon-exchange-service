@@ -63,6 +63,10 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 	@Column(nullable = false, updatable = false)
 	private @NotNull String gemeindeName = "";
 
+	@Nonnull
+	@Column(nullable = false, updatable = false)
+	private @NotNull Boolean auszahlungAnEltern = false;
+
 	@Nullable
 	@Type(type = JsonTypes.JSON_OBJECT_BIN)
 	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
@@ -101,7 +105,8 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 			&& getVerfuegtAm().equals(that.getVerfuegtAm())
 			&& getBetreuungsArt() == that.getBetreuungsArt()
 			&& getGemeindeBfsNr().equals(that.getGemeindeBfsNr())
-			&& getGemeindeName().equals(that.getGemeindeName());
+			&& getGemeindeName().equals(that.getGemeindeName())
+			&& getAuszahlungAnEltern().equals(that.getAuszahlungAnEltern());
 	}
 
 	@Override
@@ -112,7 +117,8 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 			getVerfuegtAm(),
 			getBetreuungsArt(),
 			getGemeindeBfsNr(),
-			getGemeindeName());
+			getGemeindeName(),
+			getAuszahlungAnEltern());
 	}
 
 	@Nonnull
@@ -194,5 +200,14 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 
 	public void setIgnorierteZeitabschnitte(@Nullable JsonNode ignorierteZeitabschnitte) {
 		this.ignorierteZeitabschnitte = ignorierteZeitabschnitte;
+	}
+
+	@Nonnull
+	public Boolean getAuszahlungAnEltern() {
+		return auszahlungAnEltern;
+	}
+
+	public void setAuszahlungAnEltern(@Nonnull Boolean auszahlungAnEltern) {
+		this.auszahlungAnEltern = auszahlungAnEltern;
 	}
 }

@@ -26,16 +26,19 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
+import ch.dvbern.kibon.api.shared.ClientInstitutionFilterParams;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.clients.model.ClientId;
 import ch.dvbern.kibon.clients.service.ClientService;
 import ch.dvbern.kibon.exchange.commons.institutionclient.InstitutionClientEventDTO;
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
+import ch.dvbern.kibon.shared.filter.FilterController;
+import ch.dvbern.kibon.shared.filter.FilterControllerFactory;
 import ch.dvbern.kibon.testutils.TestcontainersEnvironment;
 import ch.dvbern.kibon.testutils.TransactionHelper;
+import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung;
-import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
@@ -73,7 +76,7 @@ class VerfuegungServiceQuarkusTest {
 	// returns excatly the same result as the first.
 	@Test
 	public void testGetAllForClient_doesNotReturnInactiveClients() throws Exception {
-		ClientVerfuegungFilter kitAdmin = new ClientVerfuegungFilter("kitAdmin");
+		FilterController<ClientVerfuegung, ClientVerfuegungDTO> kitAdmin = createClientFilter("kitAdmin");
 
 		// verify setup: when importing import-test.sql, there should be 400 entries for client kitAdmin with
 		// institution IDs 1 or 2
@@ -98,6 +101,21 @@ class VerfuegungServiceQuarkusTest {
 		tx.newTransaction(() -> clientService.onClientAdded(dto, LocalDateTime.now()));
 	}
 
+	@Nonnull
+	private FilterController<ClientVerfuegung, ClientVerfuegungDTO> createClientFilter(@Nonnull String clientName) {
+		return FilterControllerFactory.verfuegungenFilter(clientName, new ClientInstitutionFilterParams());
+	}
+
+	@Nonnull
+	private FilterController<ClientVerfuegung, ClientVerfuegungDTO> createClientFilter(
+		@Nonnull String clientName,
+		@Nonnull Long afterId) {
+		ClientInstitutionFilterParams filterParams = new ClientInstitutionFilterParams();
+		filterParams.setAfterId(afterId);
+
+		return FilterControllerFactory.verfuegungenFilter(clientName, filterParams);
+	}
+
 	/**
 	 * Test setup (import-test.sql) contains 300 Verfuegungen for institution 1 and 100 Verfuegungen for
 	 * institution 2.
@@ -119,7 +137,7 @@ class VerfuegungServiceQuarkusTest {
 		@Nullable LocalDate bis,
 		int expectedResults) throws Exception {
 
-		ClientVerfuegungFilter kitAdmin = new ClientVerfuegungFilter("kitAdmin");
+		var kitAdmin = createClientFilter("kitAdmin");
 
 		// change gueltigkeit of client
 		InstitutionClientEventDTO dto =
@@ -127,8 +145,7 @@ class VerfuegungServiceQuarkusTest {
 		tx.newTransaction(() -> clientService.onClientModified(dto, LocalDateTime.now()));
 
 		// there should be no more results for insitutionId 1
-		List<ClientVerfuegungDTO> allForClient = tx.newTransaction(() -> verfuegungService.getAllForClient
-			(kitAdmin));
+		List<ClientVerfuegungDTO> allForClient = tx.newTransaction(() -> verfuegungService.getAllForClient(kitAdmin));
 		assertThat(allForClient, hasSize(expectedResults));
 
 		// restore gueltigkeit of client (@TestTransaction and @ParametrizedTest does not seem to work)
@@ -147,7 +164,7 @@ class VerfuegungServiceQuarkusTest {
 	void testGetAllForClient_exportsPreviouslyUnaccessibleVerfuegugenWithNewId() throws Exception {
 		String clientName = "newClient";
 		String institutionId = "2";
-		ClientVerfuegungFilter newClient = new ClientVerfuegungFilter(clientName);
+		var newClient = createClientFilter(clientName);
 
 		addClient(clientName, institutionId);
 		addVerfuegung(institutionId);
@@ -160,7 +177,7 @@ class VerfuegungServiceQuarkusTest {
 			.max()
 			.orElseThrow();
 
-		ClientVerfuegungFilter newClientAfterId = new ClientVerfuegungFilter(clientName, maxId, null);
+		var newClientAfterId = createClientFilter(clientName, maxId);
 		assertThat(tx.newTransaction(() -> verfuegungService.getAllForClient(newClientAfterId)), is(empty()));
 
 		// enable client for old verfuegungen
@@ -171,8 +188,8 @@ class VerfuegungServiceQuarkusTest {
 		// restore database
 		tx.newTransaction(() -> {
 			Verfuegung verfuegung = em.createQuery(
-				"SELECT cv.verfuegung FROM ClientVerfuegung cv WHERE cv.id = :clientVerfuegungId",
-				Verfuegung.class)
+					"SELECT cv.verfuegung FROM ClientVerfuegung cv WHERE cv.id = :clientVerfuegungId",
+					Verfuegung.class)
 				.setParameter("clientVerfuegungId", maxId)
 				.getSingleResult();
 

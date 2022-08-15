@@ -32,13 +32,14 @@ import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
+import ch.dvbern.kibon.shared.filter.FilterController;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity_;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung_;
-import ch.dvbern.kibon.verfuegung.service.filter.ClientVerfuegungFilter;
 
 /**
  * Service responsible for {@link Verfuegung} handling.<br>
@@ -69,17 +70,19 @@ public class VerfuegungService {
 	 * Delivers all {@link ClientVerfuegungDTO} for the given filter.
 	 */
 	@Transactional(TxType.MANDATORY)
-	public List<ClientVerfuegungDTO> getAllForClient(@Nonnull ClientVerfuegungFilter filter) {
+	public List<ClientVerfuegungDTO> getAllForClient(
+		@Nonnull FilterController<ClientVerfuegung, ClientVerfuegungDTO> filter) {
+
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<ClientVerfuegungDTO> query = cb.createQuery(ClientVerfuegungDTO.class);
 		Root<ClientVerfuegung> root = query.from(ClientVerfuegung.class);
 		Join<ClientVerfuegung, Verfuegung> verfuegung = root.join(ClientVerfuegung_.verfuegung);
 		// is used by ClientGueltigkeitFilter (included in ClientVerfuegungFilter)
-		root.join(ClientVerfuegung_.client);
+		root.join(AbstractClientEntity_.client);
 
 		query.select(cb.construct(
 			ClientVerfuegungDTO.class,
-			root.get(ClientVerfuegung_.id),
+			root.get(AbstractClientEntity_.id),
 			root.get(ClientVerfuegung_.since),
 			verfuegung.get(AbstractInstitutionPeriodeEntity_.refnr),
 			verfuegung.get(AbstractInstitutionPeriodeEntity_.institutionId),
@@ -90,6 +93,7 @@ public class VerfuegungService {
 			verfuegung.get(Verfuegung_.betreuungsArt),
 			verfuegung.get(Verfuegung_.gemeindeBfsNr),
 			verfuegung.get(Verfuegung_.gemeindeName),
+			verfuegung.get(Verfuegung_.auszahlungAnEltern),
 			verfuegung.get(Verfuegung_.kind),
 			verfuegung.get(Verfuegung_.gesuchsteller),
 			verfuegung.get(Verfuegung_.zeitabschnitte),
@@ -98,7 +102,7 @@ public class VerfuegungService {
 
 		filter.setPredicate(query, root, cb);
 
-		query.orderBy(cb.asc(root.get(ClientVerfuegung_.since)), cb.asc(root.get(ClientVerfuegung_.id)));
+		query.orderBy(cb.asc(root.get(ClientVerfuegung_.since)), cb.asc(root.get(AbstractClientEntity_.id)));
 
 		TypedQuery<ClientVerfuegungDTO> q = em.createQuery(query);
 

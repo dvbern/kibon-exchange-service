@@ -35,14 +35,17 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import ch.dvbern.kibon.api.shared.ClientInstitutionFilterParams;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleAnmeldungEventDTO;
+import ch.dvbern.kibon.shared.filter.FilterController;
+import ch.dvbern.kibon.shared.filter.FilterControllerFactory;
+import ch.dvbern.kibon.shared.model.AbstractClientEntity_;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
 import ch.dvbern.kibon.tagesschulen.model.Anmeldung_;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung_;
-import ch.dvbern.kibon.tagesschulen.service.filter.ClientAnmeldungFilter;
 
 @ApplicationScoped
 public class AnmeldungService {
@@ -111,10 +114,16 @@ public class AnmeldungService {
 
 		select(query, root, cb);
 
-		ClientAnmeldungFilter filter = new ClientAnmeldungFilter(clientName, null, 1, refnr);
+		ClientInstitutionFilterParams filterParams = new ClientInstitutionFilterParams();
+		filterParams.setLimit(1);
+		filterParams.setRefnr(refnr);
+
+		FilterController<ClientAnmeldung, ClientAnmeldungDTO> filter =
+			FilterControllerFactory.anmeldungenFilter(clientName, filterParams);
+
 		filter.setPredicate(query, root, cb);
 
-		query.orderBy(cb.desc(root.get(ClientAnmeldung_.id)));
+		query.orderBy(cb.desc(root.get(AbstractClientEntity_.id)));
 
 		TypedQuery<ClientAnmeldungDTO> q = em.createQuery(query);
 
@@ -127,7 +136,9 @@ public class AnmeldungService {
 	 * Delivers all {@link ClientAnmeldungDTO} for the given filter.
 	 */
 	@Transactional(TxType.MANDATORY)
-	public List<ClientAnmeldungDTO> getAllForClient(@Nonnull ClientAnmeldungFilter filter) {
+	public List<ClientAnmeldungDTO> getAllForClient(
+		@Nonnull FilterController<ClientAnmeldung, ClientAnmeldungDTO> filter) {
+
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 
 		CriteriaQuery<ClientAnmeldungDTO> query = cb.createQuery(ClientAnmeldungDTO.class);
@@ -137,7 +148,7 @@ public class AnmeldungService {
 
 		filter.setPredicate(query, root, cb);
 
-		query.orderBy(cb.asc(root.get(ClientAnmeldung_.id)));
+		query.orderBy(cb.asc(root.get(AbstractClientEntity_.id)));
 
 		TypedQuery<ClientAnmeldungDTO> q = em.createQuery(query);
 
@@ -157,7 +168,7 @@ public class AnmeldungService {
 
 		query.select(cb.construct(
 			ClientAnmeldungDTO.class,
-			root.get(ClientAnmeldung_.id),
+			root.get(AbstractClientEntity_.id),
 			anmeldungJoin.get(AbstractInstitutionPeriodeEntity_.institutionId),
 			anmeldungJoin.get(AbstractInstitutionPeriodeEntity_.refnr),
 			anmeldungJoin.get(Anmeldung_.version),

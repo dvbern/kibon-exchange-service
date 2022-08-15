@@ -18,23 +18,22 @@
 package ch.dvbern.kibon.api.platzbestaetigung;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import ch.dvbern.kibon.api.betreuung.BetreuungResource;
+import ch.dvbern.kibon.api.shared.ClientInstitutionFilterParams;
 import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungAnfragenDTO;
 import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungDTO;
 import ch.dvbern.kibon.util.OpenApiTag;
@@ -42,7 +41,6 @@ import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
@@ -72,18 +70,9 @@ public class PlatzbestaetigungResource {
 	@Timed(name = "anfrageTimer",
 		description = "A measure of how long it takes to load BetreuungAnfrage",
 		unit = MetricUnits.MILLISECONDS)
-	public BetreuungAnfragenDTO getAll(
-		@Parameter(description = "Erlaubt es, nur neue BetreuungAnfragen zu laden.\n\n"
-			+ "Jede BetreuungAnfragen hat eine monoton steigende ID. Ein Client kann deshalb die grösste ID bereits "
-			+ "eingelesener BetreuungAnfragen als `after_id` Parameter setzen, um nur die neu verfügbaren "
-			+ "BetreuungAnfragen zu erhalten.")
-		@QueryParam("after_id") @Nullable Long afterId,
-		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
-		@Min(0) @QueryParam("limit") @Nullable Integer limit,
-		@Parameter(description = "Erweiterung für zusätzliche Filter - wird momentan nicht verwendet")
-		@QueryParam("$filter") @Nullable String filter) {
+	public BetreuungAnfragenDTO getAll(@Valid @BeanParam ClientInstitutionFilterParams filterParams) {
 
-		return betreuungResource.getAll(afterId, limit, filter);
+		return betreuungResource.getAll(filterParams);
 	}
 
 	@POST

@@ -37,8 +37,8 @@ import ch.dvbern.kibon.betreuung.model.BetreuungAnfrage_;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrage_;
-import ch.dvbern.kibon.betreuung.service.filter.ClientBetreuungAnfrageFilter;
 import ch.dvbern.kibon.exchange.commons.platzbestaetigung.BetreuungAnfrageEventDTO;
+import ch.dvbern.kibon.shared.filter.FilterController;
 import ch.dvbern.kibon.shared.model.AbstractClientEntity_;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
 
@@ -67,7 +67,9 @@ public class BetreuungAnfrageService {
 	 * Delivers all {@link ClientBetreuungAnfrageDTO} for the given filter.
 	 */
 	@Transactional(TxType.MANDATORY)
-	public List<ClientBetreuungAnfrageDTO> getAllForClient(@Nonnull ClientBetreuungAnfrageFilter filter) {
+	public List<ClientBetreuungAnfrageDTO> getAllForClient(
+		@Nonnull FilterController<ClientBetreuungAnfrage, ClientBetreuungAnfrageDTO> filter) {
+
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<ClientBetreuungAnfrageDTO> query = cb.createQuery(ClientBetreuungAnfrageDTO.class);
 		Root<ClientBetreuungAnfrage> root = query.from(ClientBetreuungAnfrage.class);
@@ -90,7 +92,7 @@ public class BetreuungAnfrageService {
 
 		filter.setPredicate(query, root, cb);
 
-		query.orderBy(cb.asc(root.get(ClientBetreuungAnfrage_.id)));
+		query.orderBy(cb.asc(root.get(AbstractClientEntity_.id)));
 
 		TypedQuery<ClientBetreuungAnfrageDTO> q = em.createQuery(query);
 
