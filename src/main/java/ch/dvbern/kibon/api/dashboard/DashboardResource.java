@@ -17,6 +17,7 @@
 
 package ch.dvbern.kibon.api.dashboard;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -34,10 +35,12 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeinde.GemeindeDTO;
-import ch.dvbern.kibon.exchange.api.common.dashboard.gemeindekennzahlen.GemeindeKennzahlenDTO;
-import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionDTO;
-import ch.dvbern.kibon.exchange.api.common.dashboard.lastenausgleich.LastenausgleichDTO;
-import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungDTO;
+import ch.dvbern.kibon.exchange.api.common.dashboard.gemeinde.GemeindenDTO;
+import ch.dvbern.kibon.exchange.api.common.dashboard.gemeindekennzahlen.GemeindenKennzahlenDTO;
+import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionenDTO;
+import ch.dvbern.kibon.exchange.api.common.dashboard.lastenausgleich.LastenausgleicheDTO;
+import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungenDTO;
+import ch.dvbern.kibon.gemeinde.service.GemeindeService;
 import ch.dvbern.kibon.util.OpenApiTag;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -60,6 +63,10 @@ public class DashboardResource {
 
 	private static final String CLIENT_ID = "clientId";
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	GemeindeService gemeindeService;
+
 	@SuppressWarnings({ "checkstyle:VisibilityModifier", "CdiInjectionPointsInspection" })
 	@Inject
 	JsonWebToken jsonWebToken;
@@ -69,7 +76,7 @@ public class DashboardResource {
 	SecurityIdentity identity;
 
 	@GET
-	@Path("/gemeinde")
+	@Path("/gemeinden")
 	@Operation(
 		summary = "Returniert alle Gemeinde.",
 		description =
@@ -84,7 +91,7 @@ public class DashboardResource {
 	@Nonnull
 	@RolesAllowed("dashboard")
 	@Valid
-	public GemeindeDTO getAllGemeinden(
+	public GemeindenDTO getAllGemeinden(
 		@Parameter(description = "Erlaubt es, nur die Gemeinde zu laden, nach einem gewissen ID.\\n\\nJede "
 			+ "Gemeinde hat eine monoton steigende ID.")
 		@QueryParam("after_id") @Nullable Long afterId,
@@ -102,11 +109,17 @@ public class DashboardResource {
 			groups,
 			limit,
 			afterId);
-		return new GemeindeDTO();
+
+		List<GemeindeDTO> gemeindeDTOs = gemeindeService.getAllForClient(afterId, limit);
+
+		GemeindenDTO result = new GemeindenDTO();
+		result.setGemeinden(gemeindeDTOs);
+
+		return result;
 	}
 
 	@GET
-	@Path("/gemeindeKennzahlen")
+	@Path("/gemeindenKennzahlen")
 	@Operation(
 		summary = "Returniert alle GemeindeKennzahlen.",
 		description =
@@ -121,7 +134,7 @@ public class DashboardResource {
 	@Nonnull
 	@RolesAllowed("dashboard")
 	@Valid
-	public GemeindeKennzahlenDTO getAllGemeindeKennzahlen(
+	public GemeindenKennzahlenDTO getAllGemeindeKennzahlen(
 		@Parameter(description = "Erlaubt es, nur die GemeindeKennzahlen zu laden, nach einem gewissen ID.\\n\\nJede "
 			+ "GemeindeKennzahlen hat eine monoton steigende ID.")
 		@QueryParam("after_id") @Nullable Long afterId,
@@ -139,11 +152,11 @@ public class DashboardResource {
 			groups,
 			limit,
 			afterId);
-		return new GemeindeKennzahlenDTO();
+		return new GemeindenKennzahlenDTO();
 	}
 
 	@GET
-	@Path("/institution")
+	@Path("/institutionen")
 	@Operation(
 		summary = "Returniert alle Institutionen.",
 		description =
@@ -158,7 +171,7 @@ public class DashboardResource {
 	@Nonnull
 	@RolesAllowed("dashboard")
 	@Valid
-	public InstitutionDTO getAllInstitutionen(
+	public InstitutionenDTO getAllInstitutionen(
 		@Parameter(description = "Erlaubt es, nur die Instutionen zu laden, nach einem gewissen ID.\\n\\nJede "
 			+ "Institution hat eine monoton steigende ID.")
 		@QueryParam("after_id") @Nullable Long afterId,
@@ -176,11 +189,11 @@ public class DashboardResource {
 			groups,
 			limit,
 			afterId);
-		return new InstitutionDTO();
+		return new InstitutionenDTO();
 	}
 
 	@GET
-	@Path("/lastenausgleich")
+	@Path("/lastenausgleiche")
 	@Operation(
 		summary = "Returniert alle Lastenausgleich.",
 		description =
@@ -195,7 +208,7 @@ public class DashboardResource {
 	@Nonnull
 	@RolesAllowed("dashboard")
 	@Valid
-	public LastenausgleichDTO getAllLats(
+	public LastenausgleicheDTO getAllLats(
 		@Parameter(description = "Erlaubt es, nach diesem ID Lastenausgleichdaten zu laden, nach einem gewissen ID.\n\nJede Lastenausgleich hat eine "
 			+ "monoton steigende ID.")
 		@QueryParam("after_id") @Nullable Long afterId,
@@ -213,11 +226,11 @@ public class DashboardResource {
 			groups,
 			limit,
 			afterId);
-		return new LastenausgleichDTO();
+		return new LastenausgleicheDTO();
 	}
 
 	@GET
-	@Path("/verfuegung")
+	@Path("/verfuegungen")
 	@Operation(
 		summary = "Returniert alle Verfuegungen.",
 		description =
@@ -232,7 +245,7 @@ public class DashboardResource {
 	@Nonnull
 	@RolesAllowed("dashboard")
 	@Valid
-	public VerfuegungDTO getAllVerfuegungen(
+	public VerfuegungenDTO getAllVerfuegungen(
 		@Parameter(description = "Erlaubt es, nach diesem ID Verfuegungen zu laden.\n\nJede Verfuegung hat eine "
 			+ "monoton steigende ID.")
 		@QueryParam("after_id") @Nullable Long afterId,
@@ -250,6 +263,6 @@ public class DashboardResource {
 			groups,
 			limit,
 			afterId);
-		return new VerfuegungDTO();
+		return new VerfuegungenDTO();
 	}
 }
