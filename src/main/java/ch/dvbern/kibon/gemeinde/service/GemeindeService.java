@@ -59,7 +59,7 @@ public class GemeindeService {
 
 		Optional<Gemeinde> gemeindeOptional = getGemeindeByBFS(dto.getBfsNummer());
 
-		if (!gemeindeOptional.isPresent()) {
+		if (gemeindeOptional.isEmpty()) {
 			Gemeinde newGemeinde = converter.create(dto);
 			em.persist(newGemeinde);
 		} else {
@@ -73,7 +73,7 @@ public class GemeindeService {
 	 * Delivers all {@link ClientBetreuungAnfrageDTO} for the given filter.
 	 */
 	@Transactional(TxType.MANDATORY)
-	public List<GemeindeDTO> getAllForClient(@Nullable Long afterId, @Nullable Integer limit) {
+	public List<GemeindeDTO> getAll(@Nullable Long afterId, @Nullable Integer limit) {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<GemeindeDTO> query = cb.createQuery(GemeindeDTO.class);

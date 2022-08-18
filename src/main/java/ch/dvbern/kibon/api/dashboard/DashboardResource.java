@@ -110,7 +110,7 @@ public class DashboardResource {
 			limit,
 			afterId);
 
-		List<GemeindeDTO> gemeindeDTOs = gemeindeService.getAllForClient(afterId, limit);
+		List<GemeindeDTO> gemeindeDTOs = gemeindeService.getAll(afterId, limit);
 
 		GemeindenDTO result = new GemeindenDTO();
 		result.setGemeinden(gemeindeDTOs);
@@ -119,7 +119,7 @@ public class DashboardResource {
 	}
 
 	@GET
-	@Path("/gemeindenKennzahlen")
+	@Path("/gemeinden-kennzahlen")
 	@Operation(
 		summary = "Returniert alle GemeindeKennzahlen.",
 		description =

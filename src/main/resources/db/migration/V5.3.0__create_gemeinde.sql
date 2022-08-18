@@ -16,11 +16,11 @@
  */
 
 CREATE TABLE gemeinde (
-	id                             BIGSERIAL    NOT NULL
-		CONSTRAINT gemeinde_pkey
-			PRIMARY KEY,
-	name                           VARCHAR(255) NOT NULL,
-	bfsNummer                      BIGINT       NOT NULL,
-	betreuungsgutscheineAnbietenAb DATE         NOT NULL,
-	gueltigBis                     DATE         NOT NULL
+    id                             BIGSERIAL    NOT NULL
+        CONSTRAINT gemeinde_pkey
+            PRIMARY KEY,
+    name                           VARCHAR(255) NOT NULL,
+    bfsnummer                      BIGINT       NOT NULL,
+    betreuungsgutscheineanbietenab DATE         NOT NULL,
+    gueltigbis                     DATE         NOT NULL
 );
