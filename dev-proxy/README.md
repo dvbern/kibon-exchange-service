@@ -28,3 +28,7 @@ server 192.168.10.96:8180;
 }
 
 Then build the image `build.cmd` and launch it with `start-proxy.cmd`.
+
+# Windows with WSL2
+For windows with Container started in WSL2, we recommand the use of a windows nginx proxy with this configuration.
+You just need to think that keycloak will be started in the WSL2 environment, while Quarkus in windows, the ip adresses will then be different for each server.
