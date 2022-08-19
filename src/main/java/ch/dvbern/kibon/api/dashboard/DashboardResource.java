@@ -36,11 +36,13 @@ import javax.ws.rs.core.MediaType;
 
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeinde.GemeindeDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeinde.GemeindenDTO;
+import ch.dvbern.kibon.exchange.api.common.dashboard.gemeindekennzahlen.GemeindeKennzahlenDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeindekennzahlen.GemeindenKennzahlenDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionenDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.lastenausgleich.LastenausgleicheDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungenDTO;
 import ch.dvbern.kibon.gemeinde.service.GemeindeService;
+import ch.dvbern.kibon.gemeindekennzahlen.service.GemeindeKennzahlenService;
 import ch.dvbern.kibon.util.OpenApiTag;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -66,6 +68,10 @@ public class DashboardResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	GemeindeService gemeindeService;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	GemeindeKennzahlenService gemeindeKennzahlenService;
 
 	@SuppressWarnings({ "checkstyle:VisibilityModifier", "CdiInjectionPointsInspection" })
 	@Inject
@@ -152,7 +158,13 @@ public class DashboardResource {
 			groups,
 			limit,
 			afterId);
-		return new GemeindenKennzahlenDTO();
+
+		List<GemeindeKennzahlenDTO> gemeindeKennzahlenDTOs = gemeindeKennzahlenService.getAll(afterId, limit);
+
+		GemeindenKennzahlenDTO result = new GemeindenKennzahlenDTO();
+		result.setGemeindenKennzahlen(gemeindeKennzahlenDTOs);
+
+		return result;
 	}
 
 	@GET
