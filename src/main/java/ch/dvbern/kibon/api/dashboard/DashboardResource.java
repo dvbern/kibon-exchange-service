@@ -19,6 +19,7 @@ package ch.dvbern.kibon.api.dashboard;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,8 +43,10 @@ import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionenDT
 import ch.dvbern.kibon.exchange.api.common.dashboard.lastenausgleich.LastenausgleicheDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungenDTO;
 import ch.dvbern.kibon.gemeinde.service.GemeindeService;
+import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen;
 import ch.dvbern.kibon.gemeindekennzahlen.service.GemeindeKennzahlenService;
 import ch.dvbern.kibon.util.OpenApiTag;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -80,6 +83,10 @@ public class DashboardResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	SecurityIdentity identity;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	ObjectMapper objectMapper;
 
 	@GET
 	@Path("/gemeinden")
@@ -159,8 +166,10 @@ public class DashboardResource {
 			limit,
 			afterId);
 
-		List<GemeindeKennzahlenDTO> gemeindeKennzahlenDTOs = gemeindeKennzahlenService.getAll(afterId, limit);
-
+		List<GemeindeKennzahlen> gemeindeKennzahlen = gemeindeKennzahlenService.getAll(afterId, limit);
+		List<GemeindeKennzahlenDTO> gemeindeKennzahlenDTOs = gemeindeKennzahlen.stream()
+			.map(this::convertGemeindeKennzahlen)
+			.collect(Collectors.toList());
 		GemeindenKennzahlenDTO result = new GemeindenKennzahlenDTO();
 		result.setGemeindenKennzahlen(gemeindeKennzahlenDTOs);
 
@@ -276,5 +285,10 @@ public class DashboardResource {
 			limit,
 			afterId);
 		return new VerfuegungenDTO();
+	}
+
+	@Nonnull
+	private GemeindeKennzahlenDTO convertGemeindeKennzahlen(@Nonnull GemeindeKennzahlen model) {
+		return objectMapper.convertValue(model, GemeindeKennzahlenDTO.class);
 	}
 }

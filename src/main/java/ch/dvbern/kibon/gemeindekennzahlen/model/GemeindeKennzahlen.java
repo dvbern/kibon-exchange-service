@@ -25,6 +25,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,6 +35,7 @@ import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.types.EinschulungTyp;
 import ch.dvbern.kibon.persistence.BaseEntity;
+import ch.dvbern.kibon.util.ConstantsUtil;
 
 @Table
 @Entity
@@ -77,11 +80,13 @@ public class GemeindeKennzahlen extends BaseEntity {
 	private BigDecimal erwerbspensumZuschlag = null;
 
 	@Nullable
-	@Column(nullable = true, updatable = true)
+	@Enumerated(EnumType.STRING)
+	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
 	private EinschulungTyp limitierungTfo;
 
 	@Nullable
-	@Column(nullable = true, updatable = true)
+	@Enumerated(EnumType.STRING)
+	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
 	private EinschulungTyp limitierungKita;
 
 	@Override

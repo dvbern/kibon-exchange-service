@@ -36,7 +36,6 @@ import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
-import ch.dvbern.kibon.exchange.api.common.dashboard.gemeindekennzahlen.GemeindeKennzahlenDTO;
 import ch.dvbern.kibon.exchange.commons.gemeindekennzahlen.GemeindeKennzahlenEventDTO;
 import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen;
 import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen_;
@@ -85,26 +84,11 @@ public class GemeindeKennzahlenService {
 	 * Delivers all {@link ClientBetreuungAnfrageDTO} for the given filter.
 	 */
 	@Transactional(TxType.MANDATORY)
-	public List<GemeindeKennzahlenDTO> getAll(@Nullable Long afterId, @Nullable Integer limit) {
+	public List<GemeindeKennzahlen> getAll(@Nullable Long afterId, @Nullable Integer limit) {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<GemeindeKennzahlenDTO> query = cb.createQuery(GemeindeKennzahlenDTO.class);
+		CriteriaQuery<GemeindeKennzahlen> query = cb.createQuery(GemeindeKennzahlen.class);
 		Root<GemeindeKennzahlen> root = query.from(GemeindeKennzahlen.class);
-
-		query.select(cb.construct(
-			GemeindeKennzahlenDTO.class,
-			root.get(GemeindeKennzahlen_.id),
-			root.get(GemeindeKennzahlen_.bfsNummer),
-			root.get(GemeindeKennzahlen_.gesuchsperiodeStart),
-			root.get(GemeindeKennzahlen_.gesuchsperiodeStop),
-			root.get(GemeindeKennzahlen_.kontingentierung),
-			root.get(GemeindeKennzahlen_.kontingentierungAusgeschoepft),
-			root.get(GemeindeKennzahlen_.anzahlKinderWarteliste),
-			root.get(GemeindeKennzahlen_.dauerWarteliste),
-			root.get(GemeindeKennzahlen_.limitierungTfo),
-			root.get(GemeindeKennzahlen_.limitierungKita),
-			root.get(GemeindeKennzahlen_.erwerbspensumZuschlag)
-		));
 
 		query.orderBy(cb.asc(root.get(GemeindeKennzahlen_.id)));
 
@@ -112,13 +96,13 @@ public class GemeindeKennzahlenService {
 			query.where(cb.greaterThan(root.get(GemeindeKennzahlen_.id), afterId));
 		}
 
-		TypedQuery<GemeindeKennzahlenDTO> q = em.createQuery(query);
+		TypedQuery<GemeindeKennzahlen> q = em.createQuery(query);
 
 		if (limit != null) {
 			q.setMaxResults(limit);
 		}
 
-		List<GemeindeKennzahlenDTO> resultList = q.getResultList();
+		List<GemeindeKennzahlen> resultList = q.getResultList();
 
 		return resultList;
 	}

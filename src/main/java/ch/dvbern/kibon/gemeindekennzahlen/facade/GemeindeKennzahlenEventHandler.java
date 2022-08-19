@@ -23,7 +23,7 @@ import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import ch.dvbern.kibon.exchange.commons.Gemeindekennzahlen.GemeindeKennzahlenEventDTO;
+import ch.dvbern.kibon.exchange.commons.gemeindekennzahlen.GemeindeKennzahlenEventDTO;
 import ch.dvbern.kibon.gemeindekennzahlen.service.GemeindeKennzahlenService;
 import ch.dvbern.kibon.kafka.BaseEventHandler;
 import ch.dvbern.kibon.kafka.EventType;

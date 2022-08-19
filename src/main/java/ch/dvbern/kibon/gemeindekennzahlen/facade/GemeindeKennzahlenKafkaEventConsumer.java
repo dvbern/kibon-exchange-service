@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import ch.dvbern.kibon.exchange.commons.Gemeindekennzahlen.GemeindeKennzahlenEventDTO;
+import ch.dvbern.kibon.exchange.commons.gemeindekennzahlen.GemeindeKennzahlenEventDTO;
 import ch.dvbern.kibon.kafka.IncomingEvent;
 import ch.dvbern.kibon.kafka.MessageProcessor;
 import io.smallrye.reactive.messaging.annotations.Blocking;
