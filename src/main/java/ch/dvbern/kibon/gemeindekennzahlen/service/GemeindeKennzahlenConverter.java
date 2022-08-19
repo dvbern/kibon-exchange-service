@@ -20,7 +20,7 @@ package ch.dvbern.kibon.gemeindekennzahlen.service;
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 
-import ch.dvbern.kibon.exchange.commons.Gemeindekennzahlen.GemeindeKennzahlenEventDTO;
+import ch.dvbern.kibon.exchange.commons.gemeindekennzahlen.GemeindeKennzahlenEventDTO;
 import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen;
 
 @ApplicationScoped

@@ -37,7 +37,7 @@ import javax.transaction.Transactional.TxType;
 
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeindekennzahlen.GemeindeKennzahlenDTO;
-import ch.dvbern.kibon.exchange.commons.Gemeindekennzahlen.GemeindeKennzahlenEventDTO;
+import ch.dvbern.kibon.exchange.commons.gemeindekennzahlen.GemeindeKennzahlenEventDTO;
 import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen;
 import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen_;
 
