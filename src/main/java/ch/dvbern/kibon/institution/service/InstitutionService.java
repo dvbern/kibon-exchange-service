@@ -17,6 +17,7 @@
 
 package ch.dvbern.kibon.institution.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -50,6 +52,7 @@ import ch.dvbern.kibon.institution.model.KontaktAngaben_;
 
 /**
  * Service responsible for {@link Institution} handling.
+ *
  */
 @ApplicationScoped
 public class InstitutionService {
@@ -193,4 +196,44 @@ public class InstitutionService {
 
 		return result;
 	}
+
+	@Nonnull
+	public List<Institution> getAllForDashboard(@Nullable Long afterId, @Nullable Integer limit) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
+		Root<Institution> root = query.from(Institution.class);
+
+		//noinspection rawtypes
+		ParameterExpression<Set> betreuungsArtParam = cb.parameter(Set.class, "betreuungsArtParam");
+		Predicate betreuungArtPredicate = root.get(Institution_.betreuungsArt).in(betreuungsArtParam);
+
+		ParameterExpression<InstitutionStatus> statusParam = cb.parameter(InstitutionStatus.class, "statusParam");
+		Predicate statusPredicate = cb.equal(root.get(Institution_.status), statusParam);
+
+		List<Predicate> predicates = new ArrayList<>();
+		predicates.add(betreuungArtPredicate);
+		predicates.add(statusPredicate);
+
+		Predicate afterIdPredicate = null;
+		if (afterId != null) {
+			afterIdPredicate = cb.greaterThan(root.get(Institution_.id), afterId);
+		}
+
+		query.where(betreuungArtPredicate, statusPredicate, afterIdPredicate);
+
+		Set<BetreuungsangebotTyp> familyPortalSet =
+			EnumSet.of(BetreuungsangebotTyp.KITA, BetreuungsangebotTyp.TAGESFAMILIEN);
+
+		TypedQuery<Institution> q = em.createQuery(query);
+
+		if (limit != null) {
+			q.setMaxResults(limit);
+		}
+
+		return q.setParameter(betreuungsArtParam, familyPortalSet)
+			.setParameter(statusParam, InstitutionStatus.AKTIV)
+			.getResultList();
+
+	}
+
 }

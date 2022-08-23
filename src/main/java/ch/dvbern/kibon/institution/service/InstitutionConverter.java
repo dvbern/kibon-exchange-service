@@ -52,7 +52,7 @@ public class InstitutionConverter {
 	@Nonnull
 	public Institution create(@Nonnull InstitutionEventDTO dto) {
 		Institution institution = new Institution();
-		institution.setId(dto.getId());
+		institution.setInstitutionId(dto.getId());
 		update(institution, dto);
 
 		return institution;

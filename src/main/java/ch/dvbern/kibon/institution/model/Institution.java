@@ -33,6 +33,8 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
@@ -51,13 +53,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkiverse.hibernate.types.json.JsonTypes;
 import org.hibernate.annotations.Type;
 
-@Table(indexes = @Index(name = "institution_idx1", columnList = "betreuungsArt, status"))
+@Table(indexes = {
+	@Index(name = "institution_idx1", columnList = "betreuungsArt, status"),
+	@Index(name = "institution_idx2", columnList = "institutionId") })
 @Entity
 public class Institution extends BaseEntity {
 
-	@Id
 	@Nonnull
-	private @NotEmpty String id = "";
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(updatable = false, nullable = false)
+	private @NotEmpty Long id = -1L;
+
+	@Nonnull
+	private @NotEmpty String institutionId = "";
 
 	@Nonnull
 	private @NotEmpty String name = "";
@@ -154,8 +163,7 @@ public class Institution extends BaseEntity {
 
 		Institution that = (Institution) o;
 
-		return !getId().isEmpty() &&
-			getId().equals(that.getId()) &&
+		return getId().equals(that.getId()) &&
 			getName().equals(that.getName()) &&
 			Objects.equals(getTraegerschaft(), that.getTraegerschaft()) &&
 			getKontaktAdresse().equals(that.getKontaktAdresse());
@@ -167,11 +175,11 @@ public class Institution extends BaseEntity {
 	}
 
 	@Nonnull
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(@Nonnull String id) {
+	public void setId(@Nonnull Long id) {
 		this.id = id;
 	}
 
@@ -334,5 +342,14 @@ public class Institution extends BaseEntity {
 
 	public void setTagesschuleModule(@Nonnull Set<TagesschuleModule> tagesschuleModule) {
 		this.tagesschuleModule = tagesschuleModule;
+	}
+
+	@Nonnull
+	public String getInstitutionId() {
+		return institutionId;
+	}
+
+	public void setInstitutionId(@Nonnull String institutionId) {
+		this.institutionId = institutionId;
 	}
 }

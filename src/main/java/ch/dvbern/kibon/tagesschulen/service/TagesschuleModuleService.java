@@ -66,7 +66,7 @@ public class TagesschuleModuleService {
 		Root<Modul> root = query.from(Modul.class);
 
 		Join<Modul, TagesschuleModule> periodeJoin = root.join(Modul_.parent);
-		Path<String> institutionPath = periodeJoin.get(TagesschuleModule_.institution).get(Institution_.id);
+		Path<String> institutionPath = periodeJoin.get(TagesschuleModule_.institution).get(Institution_.institutionId);
 
 		ParameterExpression<String> idParam = cb.parameter(String.class, Institution_.ID);
 		Predicate institutionPredicate = cb.equal(institutionPath, idParam);

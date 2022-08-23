@@ -33,6 +33,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungsAngebot;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 public class FamilyPortalInstitutionDTO implements Serializable {
@@ -42,6 +44,7 @@ public class FamilyPortalInstitutionDTO implements Serializable {
 	@Nonnull
 	@Size(min = 1)
 	@NotNull
+	@JsonProperty(value= "institutionId", access= Access.WRITE_ONLY)
 	private String id = "";
 
 	@Nonnull
