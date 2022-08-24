@@ -52,7 +52,7 @@ public class InstitutionConverter {
 	@Nonnull
 	public Institution create(@Nonnull InstitutionEventDTO dto) {
 		Institution institution = new Institution();
-		institution.setInstitutionId(dto.getId());
+		institution.setId(dto.getId());
 		update(institution, dto);
 
 		return institution;
@@ -82,6 +82,8 @@ public class InstitutionConverter {
 		institution.setSubventioniertePlaetze(dto.getSubventioniertePlaetze());
 		institution.setAnzahlPlaetze(dto.getAnzahlPlaetze());
 		institution.setAnzahlPlaetzeFirmen(dto.getAnzahlPlaetzeFirmen());
+		institution.setAuslastungPct(dto.getAuslastungPct());
+		institution.setMandant(dto.getMandant());
 		if (dto.getTimestampMutiert() != null) {
 			institution.setTimestampMutiert(TimestampConverter.toLocalDateTime(dto.getTimestampMutiert()));
 		}

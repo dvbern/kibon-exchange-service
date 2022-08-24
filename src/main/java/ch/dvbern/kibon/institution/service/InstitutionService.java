@@ -216,10 +216,14 @@ public class InstitutionService {
 
 		Predicate afterIdPredicate = null;
 		if (afterId != null) {
-			afterIdPredicate = cb.greaterThan(root.get(Institution_.id), afterId);
+			afterIdPredicate = cb.greaterThan(root.get(Institution_.zusatzId), afterId);
 		}
 
-		query.where(betreuungArtPredicate, statusPredicate, afterIdPredicate);
+		query.orderBy(cb.asc(root.get(Institution_.zusatzId)));
+
+		Predicate mandantPredicate = cb.equal(root.get(Institution_.mandant), "BE");
+
+		query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, afterIdPredicate);
 
 		Set<BetreuungsangebotTyp> familyPortalSet =
 			EnumSet.of(BetreuungsangebotTyp.KITA, BetreuungsangebotTyp.TAGESFAMILIEN);
@@ -235,5 +239,4 @@ public class InstitutionService {
 			.getResultList();
 
 	}
-
 }

@@ -14,23 +14,35 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-ALTER TABLE institution
-	ADD COLUMN institutionid VARCHAR(255);
 
-UPDATE institution set institutionid = id;
+CREATE SEQUENCE institution_zusatzid_seq;
 
 ALTER TABLE institution
-	ALTER COLUMN institutionid VARCHAR(255) NOT NULL;
+    ADD COLUMN zusatzid BIGSERIAL NOT NULL;
 
 ALTER TABLE institution
-	DROP PRIMARY KEY;
+	ALTER COLUMN zusatzid SET DEFAULT nextval('institution_zusatzid_seq');
+
+CREATE INDEX institution_zusatzid_idx
+	ON institution(zusatzid);
 
 ALTER TABLE institution
-    ADD COLUMN id BIGSERIAL NOT NULL
-        CONSTRAINT institution_pkey
-            PRIMARY KEY;
+    ADD UNIQUE (zusatzid);
 
 ALTER TABLE institution
 	ADD COLUMN auslastungpct NUMERIC(19, 2);
 
-CREATE INDEX institution_idx2 ON institution(institutionid);
+ALTER TABLE institution
+	ADD COLUMN mandant VARCHAR(10) NOT NULL DEFAULT 'BERN';
+
+UPDATE institution set mandant = 'LUZERN' where bfsnummer = 1061;
+
+UPDATE institution set mandant = 'SOLOTHURN' where bfsnummer >= 2401 and bfsnummer <= 2622;
+
+ALTER TABLE gemeinde
+	ADD COLUMN mandant VARCHAR(10) NOT NULL DEFAULT 'BERN';
+
+ALTER TABLE gemeindekennzahlen
+	ADD COLUMN mandant VARCHAR(10) NOT NULL DEFAULT 'BERN';
+
+

@@ -34,6 +34,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.types.EinschulungTyp;
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.persistence.BaseEntity;
 import ch.dvbern.kibon.util.ConstantsUtil;
 
@@ -88,6 +89,10 @@ public class GemeindeKennzahlen extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
 	private EinschulungTyp limitierungKita;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private Mandant mandant = Mandant.BERN;
 
 	@Override
 	public boolean equals(@Nullable Object o) {
@@ -209,5 +214,13 @@ public class GemeindeKennzahlen extends BaseEntity {
 
 	public void setLimitierungKita(@Nullable EinschulungTyp limitierungKita) {
 		this.limitierungKita = limitierungKita;
+	}
+
+	public Mandant getMandant() {
+		return mandant;
+	}
+
+	public void setMandant(Mandant mandant) {
+		this.mandant = mandant;
 	}
 }

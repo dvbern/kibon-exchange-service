@@ -30,6 +30,7 @@ public class GemeindeConverter {
 	public Gemeinde create(@Nonnull GemeindeEventDTO dto) {
 		Gemeinde gemeinde = new Gemeinde();
 		gemeinde.setBfsNummer(dto.getBfsNummer());
+		gemeinde.setMandant(dto.getMandant());
 		update(gemeinde, dto);
 
 		return gemeinde;

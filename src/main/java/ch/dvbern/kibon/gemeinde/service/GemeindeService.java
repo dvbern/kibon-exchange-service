@@ -90,9 +90,13 @@ public class GemeindeService {
 
 		query.orderBy(cb.asc(root.get(Gemeinde_.id)));
 
+		Predicate afterIdPredicate = null;
 		if (afterId != null) {
-			query.where(cb.greaterThan(root.get(Gemeinde_.id), afterId));
+			afterIdPredicate = cb.greaterThan(root.get(Gemeinde_.id), afterId);
 		}
+		Predicate mandantPredicate = cb.equal(root.get(Gemeinde_.mandant), "BE");
+
+		query.where(mandantPredicate, afterIdPredicate);
 
 		TypedQuery<GemeindeDTO> q = em.createQuery(query);
 

@@ -33,8 +33,6 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
@@ -45,28 +43,26 @@ import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.persistence.BaseEntity;
 import ch.dvbern.kibon.tagesschulen.model.TagesschuleModule;
 import ch.dvbern.kibon.util.ConstantsUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkiverse.hibernate.types.json.JsonTypes;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 import org.hibernate.annotations.Type;
 
 @Table(indexes = {
 	@Index(name = "institution_idx1", columnList = "betreuungsArt, status"),
-	@Index(name = "institution_idx2", columnList = "institutionId") })
+	@Index(name = "institution_zusatzid_idx", columnList = "zusatzid") })
 @Entity
 public class Institution extends BaseEntity {
 
-	@Nonnull
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(updatable = false, nullable = false)
-	private @NotEmpty Long id = -1L;
-
 	@Nonnull
-	private @NotEmpty String institutionId = "";
+	private @NotEmpty String id = "";
 
 	@Nonnull
 	private @NotEmpty String name = "";
@@ -144,6 +140,18 @@ public class Institution extends BaseEntity {
 	@Nullable
 	private BigDecimal anzahlPlaetzeFirmen = null;
 
+	@Nullable
+	private BigDecimal auslastungPct = null;
+
+	@Nonnull
+	@Generated(GenerationTime.INSERT)
+	@Column(nullable = false, insertable = false)
+	private Long zusatzId;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private Mandant mandant = Mandant.BERN;
+
 	@Nonnull
 	private @NotNull LocalDateTime timestampMutiert = LocalDateTime.now();
 
@@ -163,7 +171,8 @@ public class Institution extends BaseEntity {
 
 		Institution that = (Institution) o;
 
-		return getId().equals(that.getId()) &&
+		return !getId().isEmpty() &&
+			getId().equals(that.getId()) &&
 			getName().equals(that.getName()) &&
 			Objects.equals(getTraegerschaft(), that.getTraegerschaft()) &&
 			getKontaktAdresse().equals(that.getKontaktAdresse());
@@ -172,15 +181,6 @@ public class Institution extends BaseEntity {
 	@Override
 	public int hashCode() {
 		return Objects.hash(getName(), getTraegerschaft(), getKontaktAdresse());
-	}
-
-	@Nonnull
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(@Nonnull Long id) {
-		this.id = id;
 	}
 
 	@Nonnull
@@ -345,11 +345,37 @@ public class Institution extends BaseEntity {
 	}
 
 	@Nonnull
-	public String getInstitutionId() {
-		return institutionId;
+	public String getId() {
+		return id;
 	}
 
-	public void setInstitutionId(@Nonnull String institutionId) {
-		this.institutionId = institutionId;
+	public void setId(@Nonnull String id) {
+		this.id = id;
+	}
+
+	@Nullable
+	public BigDecimal getAuslastungPct() {
+		return auslastungPct;
+	}
+
+	public void setAuslastungPct(@Nullable BigDecimal auslastungPct) {
+		this.auslastungPct = auslastungPct;
+	}
+
+	@Nonnull
+	public Long getZusatzId() {
+		return zusatzId;
+	}
+
+	public void setZusatzId(@Nonnull Long zusatzId) {
+		this.zusatzId = zusatzId;
+	}
+
+	public Mandant getMandant() {
+		return mandant;
+	}
+
+	public void setMandant(Mandant mandant) {
+		this.mandant = mandant;
 	}
 }
