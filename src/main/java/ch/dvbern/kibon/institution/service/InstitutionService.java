@@ -17,7 +17,6 @@
 
 package ch.dvbern.kibon.institution.service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -45,6 +44,7 @@ import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.Institution_;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
@@ -210,20 +210,17 @@ public class InstitutionService {
 		ParameterExpression<InstitutionStatus> statusParam = cb.parameter(InstitutionStatus.class, "statusParam");
 		Predicate statusPredicate = cb.equal(root.get(Institution_.status), statusParam);
 
-		List<Predicate> predicates = new ArrayList<>();
-		predicates.add(betreuungArtPredicate);
-		predicates.add(statusPredicate);
-
-		Predicate afterIdPredicate = null;
-		if (afterId != null) {
-			afterIdPredicate = cb.greaterThan(root.get(Institution_.zusatzId), afterId);
-		}
-
 		query.orderBy(cb.asc(root.get(Institution_.zusatzId)));
 
-		Predicate mandantPredicate = cb.equal(root.get(Institution_.mandant), "BE");
+		Predicate mandantPredicate = cb.equal(root.get(Institution_.mandant), Mandant.BERN);
 
-		query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, afterIdPredicate);
+		if (afterId != null) {
+			Predicate afterIdPredicate = cb.greaterThan(root.get(Institution_.zusatzId), afterId);
+			query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, afterIdPredicate);
+		}
+		else {
+			query.where(betreuungArtPredicate, statusPredicate, mandantPredicate);
+		}
 
 		Set<BetreuungsangebotTyp> familyPortalSet =
 			EnumSet.of(BetreuungsangebotTyp.KITA, BetreuungsangebotTyp.TAGESFAMILIEN);

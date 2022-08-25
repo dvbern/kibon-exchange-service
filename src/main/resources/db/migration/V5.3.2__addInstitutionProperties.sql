@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-CREATE SEQUENCE institution_zusatzid_seq;
-
 ALTER TABLE institution
     ADD COLUMN zusatzid BIGSERIAL NOT NULL;
 

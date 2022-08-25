@@ -92,8 +92,14 @@ public class GemeindeKennzahlenService {
 
 		query.orderBy(cb.asc(root.get(GemeindeKennzahlen_.id)));
 
+		Predicate mandantPredicate = cb.equal(root.get(GemeindeKennzahlen_.mandant), "BERN");
+
 		if (afterId != null) {
-			query.where(cb.greaterThan(root.get(GemeindeKennzahlen_.id), afterId));
+			Predicate afterIdPredicate = cb.greaterThan(root.get(GemeindeKennzahlen_.id), afterId);
+			query.where(mandantPredicate, afterIdPredicate);
+		}
+		else {
+			query.where(mandantPredicate);
 		}
 
 		TypedQuery<GemeindeKennzahlen> q = em.createQuery(query);
