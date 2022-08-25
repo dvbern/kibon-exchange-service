@@ -311,6 +311,17 @@ public class DashboardResource {
 
 	@Nonnull
 	private InstitutionDTO convertInstitution(@Nonnull Institution model) {
-		return objectMapper.convertValue(model, InstitutionDTO.class);
+		InstitutionDTO institutionDTO = objectMapper.convertValue(model, InstitutionDTO.class);
+		if (model.getKontaktAdresse().getGemeinde() != null) {
+			institutionDTO.getAdresse()
+				.setStandortGemeinde(model.getKontaktAdresse().getGemeinde().getName() != null ?
+					model.getKontaktAdresse().getGemeinde().getName() :
+					"");
+			institutionDTO.getAdresse()
+				.setStandortGemeindeBFSNummer(model.getKontaktAdresse().getGemeinde().getBfsNummer() != null ?
+					model.getKontaktAdresse().getGemeinde().getBfsNummer().toString() :
+					"");
+		}
+		return institutionDTO;
 	}
 }
