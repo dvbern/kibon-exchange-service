@@ -37,6 +37,7 @@ import javax.transaction.Transactional.TxType;
 
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.exchange.commons.gemeindekennzahlen.GemeindeKennzahlenEventDTO;
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen;
 import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen_;
 
@@ -92,7 +93,7 @@ public class GemeindeKennzahlenService {
 
 		query.orderBy(cb.asc(root.get(GemeindeKennzahlen_.id)));
 
-		Predicate mandantPredicate = cb.equal(root.get(GemeindeKennzahlen_.mandant), "BERN");
+		Predicate mandantPredicate = cb.equal(root.get(GemeindeKennzahlen_.mandant), Mandant.BERN);
 
 		if (afterId != null) {
 			Predicate afterIdPredicate = cb.greaterThan(root.get(GemeindeKennzahlen_.id), afterId);

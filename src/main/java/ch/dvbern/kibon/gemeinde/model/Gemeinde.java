@@ -62,9 +62,9 @@ public class Gemeinde extends BaseEntity {
 	@Column(nullable = false, updatable = true)
 	private LocalDate gueltigBis;
 
-	@NotNull
+	@Nonnull
 	@Enumerated(EnumType.STRING)
-	private Mandant mandant = Mandant.BERN;
+	private Mandant mandant;
 
 	@Override
 	public boolean equals(@Nullable Object o) {

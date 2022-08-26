@@ -49,6 +49,7 @@ import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.Institution_;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
 import ch.dvbern.kibon.institution.model.KontaktAngaben_;
+import ch.dvbern.kibon.util.ConstantsUtil;
 
 /**
  * Service responsible for {@link Institution} handling.
@@ -95,8 +96,11 @@ public class InstitutionService {
 
 		ParameterExpression<InstitutionStatus> statusParam = cb.parameter(InstitutionStatus.class, "statusParam");
 		Predicate statusPredicate = cb.equal(root.get(Institution_.status), statusParam);
-
-		query.where(betreuungArtPredicate, statusPredicate);
+		Predicate mandantPredicate = cb.equal(root.get(Institution_.mandant), Mandant.BERN);
+		Predicate unbekannteInsti = root.get(Institution_.id)
+			.in(ConstantsUtil.ALL_UNKNOWN_BE_INSTITUTION_IDS)
+			.not();
+		query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, unbekannteInsti);
 
 		Set<BetreuungsangebotTyp> familyPortalSet =
 			EnumSet.of(BetreuungsangebotTyp.KITA, BetreuungsangebotTyp.TAGESFAMILIEN);
@@ -214,12 +218,16 @@ public class InstitutionService {
 
 		Predicate mandantPredicate = cb.equal(root.get(Institution_.mandant), Mandant.BERN);
 
+		Predicate unbekannteInsti = root.get(Institution_.id)
+			.in(ConstantsUtil.ALL_UNKNOWN_BE_INSTITUTION_IDS)
+			.not();
+
 		if (afterId != null) {
 			Predicate afterIdPredicate = cb.greaterThan(root.get(Institution_.zusatzId), afterId);
-			query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, afterIdPredicate);
+			query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, unbekannteInsti, afterIdPredicate);
 		}
 		else {
-			query.where(betreuungArtPredicate, statusPredicate, mandantPredicate);
+			query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, unbekannteInsti);
 		}
 
 		Set<BetreuungsangebotTyp> familyPortalSet =
