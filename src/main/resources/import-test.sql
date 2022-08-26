@@ -160,22 +160,22 @@ INSERT INTO institution(id, name, traegerschaft, anschrift, strasse, hausnummer,
 						betreuungsart, bfsnummer, gemeinde_name, email, telefon, webseite, betreuungsadressen,
 						oeffnungstage, offenvon, offenbis, oeffnungsabweichungen, alterskategorien,
 						subventionierteplaetze, anzahlplaetze, anzahlplaetzefirmen, timestampmutiert,
-						status, betreuungsgutscheineab, betreuungsgutscheinebis, auslastungpct, mandant)
+						status, betreuungsgutscheineab, betreuungsgutscheinebis, zusatzid, auslastungpct, mandant)
 VALUES ('1', 'DV Kids', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3006', 'Bern', 'CH',
 		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now(),
-		'AKTIV', NULL, NULL, NULL, 'BERN'),
+		'AKTIV', NULL, NULL, 1, NULL, 'BERN'),
 	   ('2', 'DV Juniors', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
 		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now(),
-		'AKTIV', NULL, NULL, NULL, 'BERN'),
+		'AKTIV', NULL, NULL, 2, NULL, 'BERN'),
 	   ('3', 'DV Teens', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
 		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now(),
-		'DELETED', NULL, NULL, NULL, 'BERN'),
+		'DELETED', NULL, NULL, 3, NULL, 'BERN'),
 	   ('4', 'DV Tweens', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
 		'TAGESSCHULE', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL,
-		now(), 'AKTIV', NULL, NULL, NULL, 'BERN'),
+		now(), 'AKTIV', NULL, NULL, 4, NULL, 'BERN'),
 		('5', 'TS Test', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
  		'TAGESSCHULE', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL,
- 		now(), 'AKTIV', NULL, NULL, NULL, 'BERN');
+ 		now(), 'AKTIV', NULL, NULL, 5, NULL, 'BERN');
 
 INSERT INTO verfuegung (betreuungsart, periodebis, gesuchsteller, ignoriertezeitabschnitte, institutionid,
 						gemeindebfsnr, gemeindename, auszahlunganeltern, kind, refnr, verfuegtam, version, periodevon, zeitabschnitte)
