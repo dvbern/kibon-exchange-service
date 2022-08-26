@@ -27,8 +27,8 @@ import org.junit.jupiter.api.Test;
 
 import static com.spotify.hamcrest.jackson.JsonMatchers.isJsonStringMatching;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
+import static com.spotify.hamcrest.jackson.JsonMatchers.jsonInt;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
-import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.everyItem;
@@ -64,7 +64,7 @@ public class DashboardResourceTest {
 			.body(isJsonStringMatching(jsonObject()
 				.where("gemeinden", is(jsonArray(
 					everyItem(jsonObject()
-						.where("id", jsonText("1"))
+						.where("id", is(jsonInt(1)))
 					)
 				)))
 			));
@@ -95,7 +95,7 @@ public class DashboardResourceTest {
 			.body(isJsonStringMatching(jsonObject()
 				.where("gemeindenKennzahlen", is(jsonArray(
 					everyItem(jsonObject()
-						.where("id", jsonText("1"))
+						.where("id", is(jsonInt(1)))
 					)
 				)))
 			));
