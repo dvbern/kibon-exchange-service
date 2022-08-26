@@ -124,7 +124,7 @@ public class DashboardResourceTest {
 			.assertThat()
 			.statusCode(Status.OK.getStatusCode())
 			.body(isJsonStringMatching(jsonObject()
-				.where("gemeindenKennzahlen", is(jsonArray(is(not(empty())))
+				.where("institutionen", is(jsonArray(is(not(empty())))
 				))
 			));
 	}
