@@ -402,10 +402,6 @@
     },
     "notBefore" : 0,
     "groups" : [ ]
-  } ],
-  "scopeMappings" : [ {
-    "clientScope" : "offline_access",
-    "roles" : [ "offline_access" ]
   }, {
       "id" : "033c7d56-a3bt-4745-9858-de31fb70f9c3",
       "createdTimestamp" : 1594397812824,
@@ -442,6 +438,10 @@
       },
       "notBefore" : 0,
       "groups" : [ ]
+  } ],
+  "scopeMappings" : [ {
+    "clientScope" : "offline_access",
+    "roles" : [ "offline_access" ]
   } ],
   "clients" : [ {
     "id" : "dd081400-c4d1-4fee-83b7-c7d4ded1ff3e",
