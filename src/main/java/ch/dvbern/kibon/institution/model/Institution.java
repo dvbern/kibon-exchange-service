@@ -43,15 +43,20 @@ import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.persistence.BaseEntity;
 import ch.dvbern.kibon.tagesschulen.model.TagesschuleModule;
 import ch.dvbern.kibon.util.ConstantsUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkiverse.hibernate.types.json.JsonTypes;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 import org.hibernate.annotations.Type;
 
-@Table(indexes = @Index(name = "institution_idx1", columnList = "betreuungsArt, status"))
+@Table(indexes = {
+	@Index(name = "institution_idx1", columnList = "betreuungsArt, status"),
+	@Index(name = "institution_zusatzid_idx", columnList = "zusatzid") })
 @Entity
 public class Institution extends BaseEntity {
 
@@ -135,6 +140,18 @@ public class Institution extends BaseEntity {
 	@Nullable
 	private BigDecimal anzahlPlaetzeFirmen = null;
 
+	@Nullable
+	private BigDecimal auslastungPct = null;
+
+	@Nonnull
+	@Generated(GenerationTime.INSERT)
+	@Column(nullable = false, insertable = false)
+	private Long zusatzId;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private Mandant mandant = Mandant.BERN;
+
 	@Nonnull
 	private @NotNull LocalDateTime timestampMutiert = LocalDateTime.now();
 
@@ -164,15 +181,6 @@ public class Institution extends BaseEntity {
 	@Override
 	public int hashCode() {
 		return Objects.hash(getName(), getTraegerschaft(), getKontaktAdresse());
-	}
-
-	@Nonnull
-	public String getId() {
-		return id;
-	}
-
-	public void setId(@Nonnull String id) {
-		this.id = id;
 	}
 
 	@Nonnull
@@ -334,5 +342,40 @@ public class Institution extends BaseEntity {
 
 	public void setTagesschuleModule(@Nonnull Set<TagesschuleModule> tagesschuleModule) {
 		this.tagesschuleModule = tagesschuleModule;
+	}
+
+	@Nonnull
+	public String getId() {
+		return id;
+	}
+
+	public void setId(@Nonnull String id) {
+		this.id = id;
+	}
+
+	@Nullable
+	public BigDecimal getAuslastungPct() {
+		return auslastungPct;
+	}
+
+	public void setAuslastungPct(@Nullable BigDecimal auslastungPct) {
+		this.auslastungPct = auslastungPct;
+	}
+
+	@Nonnull
+	public Long getZusatzId() {
+		return zusatzId;
+	}
+
+	public void setZusatzId(@Nonnull Long zusatzId) {
+		this.zusatzId = zusatzId;
+	}
+
+	public Mandant getMandant() {
+		return mandant;
+	}
+
+	public void setMandant(Mandant mandant) {
+		this.mandant = mandant;
 	}
 }

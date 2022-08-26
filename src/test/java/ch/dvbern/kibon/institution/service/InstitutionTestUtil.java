@@ -37,6 +37,7 @@ import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleModuleDTO;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
 import ch.dvbern.kibon.exchange.commons.types.Intervall;
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
@@ -104,7 +105,9 @@ public final class InstitutionTestUtil {
 			BigDecimal.valueOf(13.23),
 			BigDecimal.valueOf(7.13),
 			TimestampConverter.fromLocalDateTime(LocalDateTime.now()),
-			null
+			null,
+			null,
+			Mandant.BERN
 		);
 	}
 

@@ -19,6 +19,7 @@ package ch.dvbern.kibon.api.dashboard;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -36,12 +37,19 @@ import javax.ws.rs.core.MediaType;
 
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeinde.GemeindeDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeinde.GemeindenDTO;
+import ch.dvbern.kibon.exchange.api.common.dashboard.gemeindekennzahlen.GemeindeKennzahlenDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeindekennzahlen.GemeindenKennzahlenDTO;
+import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionenDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.lastenausgleich.LastenausgleicheDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungenDTO;
 import ch.dvbern.kibon.gemeinde.service.GemeindeService;
+import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen;
+import ch.dvbern.kibon.gemeindekennzahlen.service.GemeindeKennzahlenService;
+import ch.dvbern.kibon.institution.model.Institution;
+import ch.dvbern.kibon.institution.service.InstitutionService;
 import ch.dvbern.kibon.util.OpenApiTag;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -67,6 +75,14 @@ public class DashboardResource {
 	@Inject
 	GemeindeService gemeindeService;
 
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	GemeindeKennzahlenService gemeindeKennzahlenService;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	InstitutionService institutionService;
+
 	@SuppressWarnings({ "checkstyle:VisibilityModifier", "CdiInjectionPointsInspection" })
 	@Inject
 	JsonWebToken jsonWebToken;
@@ -74,6 +90,10 @@ public class DashboardResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	SecurityIdentity identity;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	ObjectMapper objectMapper;
 
 	@GET
 	@Path("/gemeinden")
@@ -152,7 +172,15 @@ public class DashboardResource {
 			groups,
 			limit,
 			afterId);
-		return new GemeindenKennzahlenDTO();
+
+		List<GemeindeKennzahlen> gemeindeKennzahlen = gemeindeKennzahlenService.getAll(afterId, limit);
+		List<GemeindeKennzahlenDTO> gemeindeKennzahlenDTOs = gemeindeKennzahlen.stream()
+			.map(this::convertGemeindeKennzahlen)
+			.collect(Collectors.toList());
+		GemeindenKennzahlenDTO result = new GemeindenKennzahlenDTO();
+		result.setGemeindenKennzahlen(gemeindeKennzahlenDTOs);
+
+		return result;
 	}
 
 	@GET
@@ -189,7 +217,17 @@ public class DashboardResource {
 			groups,
 			limit,
 			afterId);
-		return new InstitutionenDTO();
+
+		List<Institution> institutionen = institutionService.getAllForDashboard(afterId, limit);
+
+		List<InstitutionDTO> institutionDTOS = institutionen.stream()
+			.map(this::convertInstitution)
+			.collect(Collectors.toList());
+
+		InstitutionenDTO result = new InstitutionenDTO();
+		result.setInstitutionen(institutionDTOS);
+
+		return result;
 	}
 
 	@GET
@@ -264,5 +302,26 @@ public class DashboardResource {
 			limit,
 			afterId);
 		return new VerfuegungenDTO();
+	}
+
+	@Nonnull
+	private GemeindeKennzahlenDTO convertGemeindeKennzahlen(@Nonnull GemeindeKennzahlen model) {
+		return objectMapper.convertValue(model, GemeindeKennzahlenDTO.class);
+	}
+
+	@Nonnull
+	private InstitutionDTO convertInstitution(@Nonnull Institution model) {
+		InstitutionDTO institutionDTO = objectMapper.convertValue(model, InstitutionDTO.class);
+		if (model.getKontaktAdresse().getGemeinde() != null) {
+			institutionDTO.getAdresse()
+				.setStandortGemeinde(model.getKontaktAdresse().getGemeinde().getName() != null ?
+					model.getKontaktAdresse().getGemeinde().getName() :
+					"");
+			institutionDTO.getAdresse()
+				.setStandortGemeindeBFSNummer(model.getKontaktAdresse().getGemeinde().getBfsNummer() != null ?
+					model.getKontaktAdresse().getGemeinde().getBfsNummer().toString() :
+					"");
+		}
+		return institutionDTO;
 	}
 }

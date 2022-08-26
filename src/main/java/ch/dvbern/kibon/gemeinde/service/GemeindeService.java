@@ -37,6 +37,7 @@ import javax.transaction.Transactional.TxType;
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeinde.GemeindeDTO;
 import ch.dvbern.kibon.exchange.commons.gemeinde.GemeindeEventDTO;
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.gemeinde.model.Gemeinde;
 import ch.dvbern.kibon.gemeinde.model.Gemeinde_;
 
@@ -89,9 +90,14 @@ public class GemeindeService {
 		));
 
 		query.orderBy(cb.asc(root.get(Gemeinde_.id)));
+		Predicate mandantPredicate = cb.equal(root.get(Gemeinde_.mandant), Mandant.BERN);
 
 		if (afterId != null) {
-			query.where(cb.greaterThan(root.get(Gemeinde_.id), afterId));
+			Predicate afterIdPredicate = cb.greaterThan(root.get(Gemeinde_.id), afterId);
+			query.where(mandantPredicate, afterIdPredicate);
+		}
+		else {
+			query.where(mandantPredicate);
 		}
 
 		TypedQuery<GemeindeDTO> q = em.createQuery(query);

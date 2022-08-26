@@ -82,6 +82,8 @@ public class InstitutionConverter {
 		institution.setSubventioniertePlaetze(dto.getSubventioniertePlaetze());
 		institution.setAnzahlPlaetze(dto.getAnzahlPlaetze());
 		institution.setAnzahlPlaetzeFirmen(dto.getAnzahlPlaetzeFirmen());
+		institution.setAuslastungPct(dto.getAuslastungPct());
+		institution.setMandant(dto.getMandant());
 		if (dto.getTimestampMutiert() != null) {
 			institution.setTimestampMutiert(TimestampConverter.toLocalDateTime(dto.getTimestampMutiert()));
 		}

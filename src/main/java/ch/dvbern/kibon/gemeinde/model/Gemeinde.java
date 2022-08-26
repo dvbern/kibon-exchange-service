@@ -24,6 +24,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,6 +33,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.persistence.BaseEntity;
 
 @Table
@@ -58,6 +61,10 @@ public class Gemeinde extends BaseEntity {
 	@Nonnull
 	@Column(nullable = false, updatable = true)
 	private LocalDate gueltigBis;
+
+	@Nonnull
+	@Enumerated(EnumType.STRING)
+	private Mandant mandant;
 
 	@Override
 	public boolean equals(@Nullable Object o) {
@@ -126,5 +133,13 @@ public class Gemeinde extends BaseEntity {
 
 	public void setGueltigBis(@Nonnull LocalDate gueltigBis) {
 		this.gueltigBis = gueltigBis;
+	}
+
+	public Mandant getMandant() {
+		return mandant;
+	}
+
+	public void setMandant(Mandant mandant) {
+		this.mandant = mandant;
 	}
 }
