@@ -68,6 +68,7 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 	private static AuthzClient authzClient = null;
 	private static AuthzClient authzClientFambe = null;
 	private static AuthzClient authzClientTagesschule = null;
+	private static AuthzClient authzClientDashboard = null;
 
 	@Container
 	private final KafkaContainer kafka =
@@ -100,6 +101,12 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 	public static String getTagesschuleAccessToken() {
 		return authzClientTagesschule.obtainAccessToken().getToken();
 	}
+
+	@Nonnull
+	public static String getDashboardAccessToken() {
+		return authzClientDashboard.obtainAccessToken().getToken();
+	}
+
 
 	@Override
 	public Map<String, String> start() {
@@ -150,6 +157,7 @@ public class TestcontainersEnvironment implements QuarkusTestResourceLifecycleMa
 		authzClient = createKeycloakClientConfiguration(keycloakURL, "kitAdmin", dummyPassword);
 		authzClientFambe = createKeycloakClientConfiguration(keycloakURL, "fambe", dummyPassword);
 		authzClientTagesschule = createKeycloakClientConfiguration(keycloakURL, "tagesschuleTest", dummyPassword);
+		authzClientDashboard = createKeycloakClientConfiguration(keycloakURL,"dashboard", dummyPassword);
 
 		return systemProps;
 	}

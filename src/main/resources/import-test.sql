@@ -160,22 +160,22 @@ INSERT INTO institution(id, name, traegerschaft, anschrift, strasse, hausnummer,
 						betreuungsart, bfsnummer, gemeinde_name, email, telefon, webseite, betreuungsadressen,
 						oeffnungstage, offenvon, offenbis, oeffnungsabweichungen, alterskategorien,
 						subventionierteplaetze, anzahlplaetze, anzahlplaetzefirmen, timestampmutiert,
-						status, betreuungsgutscheineab, betreuungsgutscheinebis)
+						status, betreuungsgutscheineab, betreuungsgutscheinebis, auslastungpct, mandant)
 VALUES ('1', 'DV Kids', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3006', 'Bern', 'CH',
 		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now(),
-		'AKTIV', NULL, NULL),
+		'AKTIV', NULL, NULL, NULL, 'BERN'),
 	   ('2', 'DV Juniors', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
 		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now(),
-		'AKTIV', NULL, NULL),
+		'AKTIV', NULL, NULL, NULL, 'BERN'),
 	   ('3', 'DV Teens', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
 		'KITA', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL, now(),
-		'DELETED', NULL, NULL),
+		'DELETED', NULL, NULL, NULL, 'BERN'),
 	   ('4', 'DV Tweens', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
 		'TAGESSCHULE', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL,
-		now(), 'AKTIV', NULL, NULL),
+		now(), 'AKTIV', NULL, NULL, NULL, 'BERN'),
 		('5', 'TS Test', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3022', 'Bern', 'CH',
  		'TAGESSCHULE', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL,
- 		now(), 'AKTIV', NULL, NULL);
+ 		now(), 'AKTIV', NULL, NULL, NULL, 'BERN');
 
 INSERT INTO verfuegung (betreuungsart, periodebis, gesuchsteller, ignoriertezeitabschnitte, institutionid,
 						gemeindebfsnr, gemeindename, auszahlunganeltern, kind, refnr, verfuegtam, version, periodevon, zeitabschnitte)
@@ -716,4 +716,11 @@ VALUES (2, '5', '21.000142.064.1.1', '2021-08-01', '2022-07-31',
            ],
            "tarifeDefinitivAkzeptiert": true
        }');
+
+INSERT INTO gemeinde (id, name, bfsnummer, betreuungsgutscheineanbietenab, gueltigbis, mandant)
+VALUES (1, 'Paris', 99998, '2016-01-01', '9999-12-31', 'BERN');
+
+INSERT INTO public.gemeindekennzahlen (id, bfsnummer, gesuchsperiodestart, gesuchsperiodestop, kontingentierung, kontingentierungausgeschoepft, anzahlkinderwarteliste, dauerwarteliste, erwerbspensumzuschlag, limitierungtfo, limitierungkita, mandant)
+VALUES (1, 99998, '2021-08-01', '2022-07-31', null, null, null, null, 20.00, 'VORSCHULALTER', 'KINDERGARTEN2', 'BERN');
+
 -- endregion
