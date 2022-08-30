@@ -150,6 +150,7 @@ public class Institution extends BaseEntity {
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
+	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
 	private Mandant mandant = Mandant.BERN;
 
 	@Nonnull

@@ -58,7 +58,8 @@ public class GemeindeKennzahlenService {
 	@Transactional(TxType.MANDATORY)
 	public void onGemeindeKennzahlenChanged(@Nonnull GemeindeKennzahlenEventDTO dto) {
 
-		Optional<GemeindeKennzahlen> gemeindeKennzahlenOptional = getGemeindeKennzahlen(dto.getBfsNummer(), dto.getGesuchsperiodeStart());
+		Optional<GemeindeKennzahlen> gemeindeKennzahlenOptional =
+			getGemeindeKennzahlen(dto.getBfsNummer(), dto.getGesuchsperiodeStart());
 
 		if (gemeindeKennzahlenOptional.isEmpty()) {
 			GemeindeKennzahlen newGemeindeKennzahlen = converter.create(dto);
@@ -74,18 +75,16 @@ public class GemeindeKennzahlenService {
 	 * Deletes an gemeinde kennzahlen, in response to an gemeindeKennzahlenRemoved event.
 	 */
 	@Transactional(TxType.MANDATORY)
-	public void onGemeindeKennzahlenRemoved(GemeindeKennzahlenEventDTO dto) {
-		Optional<GemeindeKennzahlen> gemeindeKennzahlenOptional = getGemeindeKennzahlen(dto.getBfsNummer(), dto.getGesuchsperiodeStart());
-		if (!gemeindeKennzahlenOptional.isEmpty()) {
-			em.remove(gemeindeKennzahlenOptional.get());
-		}
+	public void onGemeindeKennzahlenRemoved(@Nonnull GemeindeKennzahlenEventDTO dto) {
+		getGemeindeKennzahlen(dto.getBfsNummer(), dto.getGesuchsperiodeStart())
+			.ifPresent(gemeindeKennzahlen -> em.remove(gemeindeKennzahlen));
 	}
 
 	/**
 	 * Delivers all {@link ClientBetreuungAnfrageDTO} for the given filter.
 	 */
 	@Transactional(TxType.MANDATORY)
-	public List<GemeindeKennzahlen> getAll(@Nullable Long afterId, @Nullable Integer limit) {
+	public List<GemeindeKennzahlen> getAll(@Nullable Long afterId, @Nullable Integer limit, @Nonnull Mandant mandant) {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<GemeindeKennzahlen> query = cb.createQuery(GemeindeKennzahlen.class);
@@ -93,13 +92,12 @@ public class GemeindeKennzahlenService {
 
 		query.orderBy(cb.asc(root.get(GemeindeKennzahlen_.id)));
 
-		Predicate mandantPredicate = cb.equal(root.get(GemeindeKennzahlen_.mandant), Mandant.BERN);
+		Predicate mandantPredicate = cb.equal(root.get(GemeindeKennzahlen_.mandant), mandant);
 
 		if (afterId != null) {
 			Predicate afterIdPredicate = cb.greaterThan(root.get(GemeindeKennzahlen_.id), afterId);
 			query.where(mandantPredicate, afterIdPredicate);
-		}
-		else {
+		} else {
 			query.where(mandantPredicate);
 		}
 
@@ -114,18 +112,23 @@ public class GemeindeKennzahlenService {
 		return resultList;
 	}
 
-	public Optional<GemeindeKennzahlen> getGemeindeKennzahlen(@Nonnull Long bfsNummer, @Nonnull LocalDate gesuchsperiodeStart) {
+	// TODO bfsNummer und gesuchsperiodeStart ist nicht zwingend eindeutisch in Mandanten-fähigem System. Auch nach Mandant oder einer globalen ID filtern.
+	@Nonnull
+	public Optional<GemeindeKennzahlen> getGemeindeKennzahlen(
+		@Nonnull Long bfsNummer,
+		@Nonnull LocalDate gesuchsperiodeStart) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<GemeindeKennzahlen> query = cb.createQuery(GemeindeKennzahlen.class);
 		Root<GemeindeKennzahlen> root = query.from(GemeindeKennzahlen.class);
 
-		ParameterExpression<Long> bfsParam = cb.parameter(Long.class,GemeindeKennzahlen_.BFS_NUMMER);
+		ParameterExpression<Long> bfsParam = cb.parameter(Long.class, GemeindeKennzahlen_.BFS_NUMMER);
 
 		Predicate bfsPredicate = cb.equal(root.get(GemeindeKennzahlen_.bfsNummer), bfsParam);
 
-		ParameterExpression<LocalDate> gesuchsperiodeStartParam = cb.parameter(LocalDate.class, GemeindeKennzahlen_.GESUCHSPERIODE_START);
-		Predicate gesuchsperiodeStartPredicate = cb.equal(root.get(GemeindeKennzahlen_.gesuchsperiodeStart), gesuchsperiodeStartParam);
-
+		ParameterExpression<LocalDate> gesuchsperiodeStartParam =
+			cb.parameter(LocalDate.class, GemeindeKennzahlen_.GESUCHSPERIODE_START);
+		Predicate gesuchsperiodeStartPredicate =
+			cb.equal(root.get(GemeindeKennzahlen_.gesuchsperiodeStart), gesuchsperiodeStartParam);
 
 		query.where(bfsPredicate, gesuchsperiodeStartPredicate);
 

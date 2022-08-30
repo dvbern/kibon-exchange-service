@@ -53,7 +53,6 @@ import ch.dvbern.kibon.util.ConstantsUtil;
 
 /**
  * Service responsible for {@link Institution} handling.
- *
  */
 @ApplicationScoped
 public class InstitutionService {
@@ -202,7 +201,11 @@ public class InstitutionService {
 	}
 
 	@Nonnull
-	public List<Institution> getAllForDashboard(@Nullable Long afterId, @Nullable Integer limit) {
+	public List<Institution> getAllForDashboard(
+		@Nullable Long afterId,
+		@Nullable Integer limit,
+		@Nonnull Mandant mandant) {
+
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
 		Root<Institution> root = query.from(Institution.class);
@@ -214,9 +217,7 @@ public class InstitutionService {
 		ParameterExpression<InstitutionStatus> statusParam = cb.parameter(InstitutionStatus.class, "statusParam");
 		Predicate statusPredicate = cb.equal(root.get(Institution_.status), statusParam);
 
-		query.orderBy(cb.asc(root.get(Institution_.zusatzId)));
-
-		Predicate mandantPredicate = cb.equal(root.get(Institution_.mandant), Mandant.BERN);
+		Predicate mandantPredicate = cb.equal(root.get(Institution_.mandant), mandant);
 
 		Predicate unbekannteInsti = root.get(Institution_.id)
 			.in(ConstantsUtil.ALL_UNKNOWN_BE_INSTITUTION_IDS)
@@ -225,12 +226,13 @@ public class InstitutionService {
 		if (afterId != null) {
 			Predicate afterIdPredicate = cb.greaterThan(root.get(Institution_.zusatzId), afterId);
 			query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, unbekannteInsti, afterIdPredicate);
-		}
-		else {
+		} else {
 			query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, unbekannteInsti);
 		}
 
-		Set<BetreuungsangebotTyp> familyPortalSet =
+		query.orderBy(cb.asc(root.get(Institution_.zusatzId)));
+
+		Set<BetreuungsangebotTyp> dashboardSet =
 			EnumSet.of(BetreuungsangebotTyp.KITA, BetreuungsangebotTyp.TAGESFAMILIEN);
 
 		TypedQuery<Institution> q = em.createQuery(query);
@@ -239,7 +241,7 @@ public class InstitutionService {
 			q.setMaxResults(limit);
 		}
 
-		return q.setParameter(betreuungsArtParam, familyPortalSet)
+		return q.setParameter(betreuungsArtParam, dashboardSet)
 			.setParameter(statusParam, InstitutionStatus.AKTIV)
 			.getResultList();
 

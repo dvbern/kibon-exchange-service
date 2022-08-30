@@ -70,11 +70,8 @@ public class GemeindeService {
 		}
 	}
 
-	/**
-	 * Delivers all {@link ClientBetreuungAnfrageDTO} for the given filter.
-	 */
 	@Transactional(TxType.MANDATORY)
-	public List<GemeindeDTO> getAll(@Nullable Long afterId, @Nullable Integer limit) {
+	public List<GemeindeDTO> getAll(@Nullable Long afterId, @Nullable Integer limit, @Nonnull Mandant mandant) {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<GemeindeDTO> query = cb.createQuery(GemeindeDTO.class);
@@ -90,7 +87,7 @@ public class GemeindeService {
 		));
 
 		query.orderBy(cb.asc(root.get(Gemeinde_.id)));
-		Predicate mandantPredicate = cb.equal(root.get(Gemeinde_.mandant), Mandant.BERN);
+		Predicate mandantPredicate = cb.equal(root.get(Gemeinde_.mandant), mandant);
 
 		if (afterId != null) {
 			Predicate afterIdPredicate = cb.greaterThan(root.get(Gemeinde_.id), afterId);
@@ -111,6 +108,7 @@ public class GemeindeService {
 		return resultList;
 	}
 
+	@Nonnull
 	public Optional<Gemeinde> getGemeindeByBFS(@Nonnull Long bfsNummer) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Gemeinde> query = cb.createQuery(Gemeinde.class);

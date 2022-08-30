@@ -31,16 +31,14 @@ ALTER TABLE institution
 	ADD COLUMN auslastungpct NUMERIC(19, 2);
 
 ALTER TABLE institution
-	ADD COLUMN mandant VARCHAR(10) NOT NULL DEFAULT 'BERN';
+	ADD COLUMN mandant VARCHAR(100) NOT NULL DEFAULT 'BERN';
 
 UPDATE institution set mandant = 'LUZERN' where bfsnummer = 1061;
 
 UPDATE institution set mandant = 'SOLOTHURN' where bfsnummer >= 2401 and bfsnummer <= 2622;
 
 ALTER TABLE gemeinde
-	ADD COLUMN mandant VARCHAR(10) NOT NULL DEFAULT 'BERN';
+	ADD COLUMN mandant VARCHAR(100) NOT NULL DEFAULT 'BERN';
 
 ALTER TABLE gemeindekennzahlen
-	ADD COLUMN mandant VARCHAR(10) NOT NULL DEFAULT 'BERN';
-
-
+	ADD COLUMN mandant VARCHAR(100) NOT NULL DEFAULT 'BERN';
