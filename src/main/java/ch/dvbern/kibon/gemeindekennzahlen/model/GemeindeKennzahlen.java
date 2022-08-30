@@ -57,6 +57,7 @@ public class GemeindeKennzahlen extends BaseEntity {
 	@Column(nullable = false, updatable = false)
 	private @NotEmpty String gemeindeUUID = "";
 
+	// TODO noch die kiBon-spezifische Gemeinde ID mitgeben, da bfsNummer nicht zwingend stabil ist?
 	@Nonnull
 	@Column(nullable = false, updatable = true)
 	private Long bfsNummer;
@@ -101,6 +102,7 @@ public class GemeindeKennzahlen extends BaseEntity {
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
+	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
 	private Mandant mandant = Mandant.BERN;
 
 	@Override

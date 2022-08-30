@@ -39,13 +39,16 @@ import ch.dvbern.kibon.exchange.api.common.dashboard.gemeinde.GemeindeDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeinde.GemeindenDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeindekennzahlen.GemeindeKennzahlenDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeindekennzahlen.GemeindenKennzahlenDTO;
+import ch.dvbern.kibon.exchange.api.common.dashboard.institution.AdresseInstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionenDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.lastenausgleich.LastenausgleicheDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungenDTO;
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.gemeinde.service.GemeindeService;
 import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen;
 import ch.dvbern.kibon.gemeindekennzahlen.service.GemeindeKennzahlenService;
+import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.service.InstitutionService;
 import ch.dvbern.kibon.util.OpenApiTag;
@@ -97,10 +100,7 @@ public class DashboardResource {
 
 	@GET
 	@Path("/gemeinden")
-	@Operation(
-		summary = "Returniert alle Gemeinde.",
-		description =
-			"Ihr koennt alle Gemeinde Daten abholen, entweder von Anfang vor oder ab einen gewissen ID")
+	@Operation(summary = "Returniert alle Gemeinden.")
 	@SecurityRequirement(name = "OAuth2", scopes = "dashboard")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
@@ -112,8 +112,8 @@ public class DashboardResource {
 	@RolesAllowed("dashboard")
 	@Valid
 	public GemeindenDTO getAllGemeinden(
-		@Parameter(description = "Erlaubt es, nur die Gemeinde zu laden, nach einem gewissen ID.\\n\\nJede "
-			+ "Gemeinde hat eine monoton steigende ID.")
+		@Parameter(description = "Erlaubt es, nur Gemeinden zu laden, mit einer grösseren sequenceId.\n\nJede "
+			+ "Gemeinde hat eine monoton steigende sequenceId.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit) {
@@ -122,15 +122,18 @@ public class DashboardResource {
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
 
+		Mandant mandant = Mandant.BERN;
+
 		LOG.info(
-			"Gemeinde Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id '{}'",
+			"Gemeinde Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id "
+				+ "'{}'",
 			userName,
 			clientName,
 			groups,
 			limit,
 			afterId);
 
-		List<GemeindeDTO> gemeindeDTOs = gemeindeService.getAll(afterId, limit);
+		List<GemeindeDTO> gemeindeDTOs = gemeindeService.getAll(afterId, limit, mandant);
 
 		GemeindenDTO result = new GemeindenDTO();
 		result.setGemeinden(gemeindeDTOs);
@@ -140,10 +143,7 @@ public class DashboardResource {
 
 	@GET
 	@Path("/gemeinden-kennzahlen")
-	@Operation(
-		summary = "Returniert alle GemeindeKennzahlen.",
-		description =
-			"Ihr koennt alle GemeindeKennzahlen Daten abholen, entweder von Anfang vor oder ab einen gewissen ID")
+	@Operation(summary = "Returniert alle GemeindeKennzahlen.")
 	@SecurityRequirement(name = "OAuth2", scopes = "dashboard")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
@@ -155,8 +155,8 @@ public class DashboardResource {
 	@RolesAllowed("dashboard")
 	@Valid
 	public GemeindenKennzahlenDTO getAllGemeindeKennzahlen(
-		@Parameter(description = "Erlaubt es, nur die GemeindeKennzahlen zu laden, nach einem gewissen ID.\\n\\nJede "
-			+ "GemeindeKennzahlen hat eine monoton steigende ID.")
+		@Parameter(description = "Erlaubt es, nur GemeindeKennzahlen zu laden, mit einer grösseren sequenceId.\n\nJede "
+			+ "GemeindeKennzahlen hat eine monoton steigende sequenceId.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit) {
@@ -166,14 +166,17 @@ public class DashboardResource {
 		String userName = identity.getPrincipal().getName();
 
 		LOG.info(
-			"Gemeindekennzahlen Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id '{}'",
+			"Gemeindekennzahlen Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and "
+				+ "after_id '{}'",
 			userName,
 			clientName,
 			groups,
 			limit,
 			afterId);
 
-		List<GemeindeKennzahlen> gemeindeKennzahlen = gemeindeKennzahlenService.getAll(afterId, limit);
+		Mandant mandant = Mandant.BERN;
+
+		List<GemeindeKennzahlen> gemeindeKennzahlen = gemeindeKennzahlenService.getAll(afterId, limit, mandant);
 		List<GemeindeKennzahlenDTO> gemeindeKennzahlenDTOs = gemeindeKennzahlen.stream()
 			.map(this::convertGemeindeKennzahlen)
 			.collect(Collectors.toList());
@@ -185,10 +188,7 @@ public class DashboardResource {
 
 	@GET
 	@Path("/institutionen")
-	@Operation(
-		summary = "Returniert alle Institutionen.",
-		description =
-			"Ihr koennt alle Institutionen Daten abholen, entweder von Anfang vor oder ab einen gewissen ID")
+	@Operation(summary = "Returniert alle Institutionen.")
 	@SecurityRequirement(name = "OAuth2", scopes = "dashboard")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
@@ -200,8 +200,8 @@ public class DashboardResource {
 	@RolesAllowed("dashboard")
 	@Valid
 	public InstitutionenDTO getAllInstitutionen(
-		@Parameter(description = "Erlaubt es, nur die Instutionen zu laden, nach einem gewissen ID.\\n\\nJede "
-			+ "Institution hat eine monoton steigende ID.")
+		@Parameter(description = "Erlaubt es, nur Instutionen zu laden, mit einer grösseren sequenceId.\n\nJede "
+			+ "Institution hat eine monoton steigende sequenceId.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit) {
@@ -210,15 +210,18 @@ public class DashboardResource {
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
 
+		Mandant mandant = Mandant.BERN;
+
 		LOG.info(
-			"Institution Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id '{}'",
+			"Institution Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id"
+				+ " '{}'",
 			userName,
 			clientName,
 			groups,
 			limit,
 			afterId);
 
-		List<Institution> institutionen = institutionService.getAllForDashboard(afterId, limit);
+		List<Institution> institutionen = institutionService.getAllForDashboard(afterId, limit, mandant);
 
 		List<InstitutionDTO> institutionDTOS = institutionen.stream()
 			.map(this::convertInstitution)
@@ -232,10 +235,7 @@ public class DashboardResource {
 
 	@GET
 	@Path("/lastenausgleiche")
-	@Operation(
-		summary = "Returniert alle Lastenausgleich.",
-		description =
-			"Ihr koennt alle Lastenausgleich Daten abholen, entweder von Anfang vor oder ab einen gewissen ID")
+	@Operation(summary = "Returniert alle Lastenausgleiche.")
 	@SecurityRequirement(name = "OAuth2", scopes = "dashboard")
 	@APIResponse(responseCode = "200")
 	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
@@ -247,8 +247,8 @@ public class DashboardResource {
 	@RolesAllowed("dashboard")
 	@Valid
 	public LastenausgleicheDTO getAllLats(
-		@Parameter(description = "Erlaubt es, nach diesem ID Lastenausgleichdaten zu laden, nach einem gewissen ID.\n\nJede Lastenausgleich hat eine "
-			+ "monoton steigende ID.")
+		@Parameter(description = "Erlaubt es, nur Lastenausgleichdaten zu laden, mit einer grösseren sequenceId.\n\nJede "
+			+ "Lastenausgleiche hat eine monoton steigende sequenceId.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit) {
@@ -258,7 +258,8 @@ public class DashboardResource {
 		String userName = identity.getPrincipal().getName();
 
 		LOG.info(
-			"Lastenausgleich Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id '{}'",
+			"Lastenausgleich Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and "
+				+ "after_id '{}'",
 			userName,
 			clientName,
 			groups,
@@ -295,7 +296,8 @@ public class DashboardResource {
 		String userName = identity.getPrincipal().getName();
 
 		LOG.info(
-			"Verfuegung Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id '{}'",
+			"Verfuegung Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id "
+				+ "'{}'",
 			userName,
 			clientName,
 			groups,
@@ -312,16 +314,15 @@ public class DashboardResource {
 	@Nonnull
 	private InstitutionDTO convertInstitution(@Nonnull Institution model) {
 		InstitutionDTO institutionDTO = objectMapper.convertValue(model, InstitutionDTO.class);
-		if (model.getKontaktAdresse().getGemeinde() != null) {
-			institutionDTO.getAdresse()
-				.setStandortGemeinde(model.getKontaktAdresse().getGemeinde().getName() != null ?
-					model.getKontaktAdresse().getGemeinde().getName() :
-					"");
-			institutionDTO.getAdresse()
-				.setStandortGemeindeBFSNummer(model.getKontaktAdresse().getGemeinde().getBfsNummer() != null ?
-					model.getKontaktAdresse().getGemeinde().getBfsNummer().toString() :
-					"");
+		AdresseInstitutionDTO adresse = institutionDTO.getAdresse();
+		Gemeinde gemeinde = model.getKontaktAdresse().getGemeinde();
+
+		if (gemeinde != null) {
+			adresse.setStandortGemeinde(gemeinde.getName() != null ? gemeinde.getName() : "");
+			String bfsNummer = gemeinde.getBfsNummer() != null ? String.valueOf(gemeinde.getBfsNummer()) : "";
+			adresse.setStandortGemeindeBFSNummer(bfsNummer);
 		}
+
 		return institutionDTO;
 	}
 }

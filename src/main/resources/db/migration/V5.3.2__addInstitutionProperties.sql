@@ -31,19 +31,17 @@ ALTER TABLE institution
 	ADD COLUMN auslastungpct NUMERIC(19, 2);
 
 ALTER TABLE institution
-	ADD COLUMN mandant VARCHAR(10) NOT NULL DEFAULT 'BERN';
+	ADD COLUMN mandant VARCHAR(100) NOT NULL DEFAULT 'BERN';
 
 UPDATE institution set mandant = 'LUZERN' where bfsnummer = 1061;
 
 UPDATE institution set mandant = 'SOLOTHURN' where bfsnummer >= 2401 and bfsnummer <= 2622;
 
 ALTER TABLE gemeinde
-	ADD COLUMN mandant VARCHAR(10) NOT NULL DEFAULT 'BERN';
+	ADD COLUMN mandant VARCHAR(100) NOT NULL DEFAULT 'BERN';
 
 ALTER TABLE gemeindekennzahlen
-	ADD COLUMN mandant VARCHAR(10) NOT NULL DEFAULT 'BERN';
-
-DELETE FROM institution where id='f2491e9c-bd95-44df-b22f-f36a42f8592f';
+	ADD COLUMN mandant VARCHAR(100) NOT NULL DEFAULT 'BERN';DELETE FROM institution where id='f2491e9c-bd95-44df-b22f-f36a42f8592f';
 
 CREATE INDEX gemeinde_mandant_idx
 	ON gemeinde(mandant);
@@ -53,5 +51,4 @@ CREATE INDEX gemeindekennzahlen_mandant_idx
 
 CREATE INDEX institution_mandant_idx
 	ON institution(mandant);
-
 

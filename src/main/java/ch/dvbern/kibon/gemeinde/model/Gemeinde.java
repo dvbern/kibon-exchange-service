@@ -36,6 +36,7 @@ import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.persistence.BaseEntity;
+import ch.dvbern.kibon.util.ConstantsUtil;
 
 @Table(indexes = {
 	@Index(name = "gemeinde_gemeindeuuid_idx", columnList = "gemeindeUUID"),
@@ -72,6 +73,7 @@ public class Gemeinde extends BaseEntity {
 
 	@Nonnull
 	@Enumerated(EnumType.STRING)
+	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE, updatable = false)
 	private Mandant mandant;
 
 	@Override
@@ -90,6 +92,7 @@ public class Gemeinde extends BaseEntity {
 			getGemeindeUUID().equals(that.gemeindeUUID) &&
 			getName().equals(that.getName()) &&
 			getBfsNummer().equals(that.getBfsNummer()) &&
+			getMandant() == that.getMandant() &&
 			getBetreuungsgutscheineAnbietenAb().equals(that.getBetreuungsgutscheineAnbietenAb()) &&
 			getGueltigBis().equals(that.getGueltigBis());
 	}
@@ -100,7 +103,7 @@ public class Gemeinde extends BaseEntity {
 			getGemeindeUUID(),
 			getName(),
 			getBfsNummer(),
-			getBetreuungsgutscheineAnbietenAb(),
+			getMandant(),getBetreuungsgutscheineAnbietenAb(),
 			getGueltigBis());
 	}
 
@@ -149,11 +152,12 @@ public class Gemeinde extends BaseEntity {
 		this.gueltigBis = gueltigBis;
 	}
 
+	@Nonnull
 	public Mandant getMandant() {
 		return mandant;
 	}
 
-	public void setMandant(Mandant mandant) {
+	public void setMandant(@Nonnull Mandant mandant) {
 		this.mandant = mandant;
 	}
 
