@@ -16,16 +16,16 @@
  */
 
 ALTER TABLE institution
-    ADD COLUMN zusatzid BIGSERIAL NOT NULL;
+    ADD COLUMN sequenceid BIGSERIAL NOT NULL;
 
 ALTER TABLE institution
-	ALTER COLUMN zusatzid SET DEFAULT nextval('institution_zusatzid_seq');
+	ALTER COLUMN sequenceid SET DEFAULT nextval('institution_sequenceid_seq');
 
-CREATE INDEX institution_zusatzid_idx
-	ON institution(zusatzid);
+CREATE INDEX institution_sequenceid_idx
+	ON institution(sequenceid);
 
 ALTER TABLE institution
-    ADD UNIQUE (zusatzid);
+    ADD UNIQUE (sequenceid);
 
 ALTER TABLE institution
 	ADD COLUMN auslastungpct NUMERIC(19, 2);
@@ -42,5 +42,16 @@ ALTER TABLE gemeinde
 
 ALTER TABLE gemeindekennzahlen
 	ADD COLUMN mandant VARCHAR(10) NOT NULL DEFAULT 'BERN';
+
+DELETE FROM institution where id='f2491e9c-bd95-44df-b22f-f36a42f8592f';
+
+CREATE INDEX gemeinde_mandant_idx
+	ON gemeinde(mandant);
+
+CREATE INDEX gemeindekennzahlen_mandant_idx
+	ON gemeindekennzahlen(mandant);
+
+CREATE INDEX institution_mandant_idx
+	ON institution(mandant);
 
 

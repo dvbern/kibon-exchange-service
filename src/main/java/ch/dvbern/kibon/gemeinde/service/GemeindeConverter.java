@@ -29,7 +29,7 @@ public class GemeindeConverter {
 	@Nonnull
 	public Gemeinde create(@Nonnull GemeindeEventDTO dto) {
 		Gemeinde gemeinde = new Gemeinde();
-		gemeinde.setBfsNummer(dto.getBfsNummer());
+		gemeinde.setGemeindeUUID(dto.getGemeindeUUID());
 		gemeinde.setMandant(dto.getMandant());
 		update(gemeinde, dto);
 
@@ -38,6 +38,7 @@ public class GemeindeConverter {
 
 	public void update(@Nonnull Gemeinde gemeinde, @Nonnull GemeindeEventDTO dto) {
 		gemeinde.setName(dto.getName());
+		gemeinde.setBfsNummer(dto.getBfsNummer());
 		gemeinde.setBetreuungsgutscheineAnbietenAb(dto.getBetreuungsgutscheineAnbietenAb());
 		gemeinde.setGueltigBis(dto.getGueltigBis());
 	}

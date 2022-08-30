@@ -56,7 +56,8 @@ import org.hibernate.annotations.Type;
 
 @Table(indexes = {
 	@Index(name = "institution_idx1", columnList = "betreuungsArt, status"),
-	@Index(name = "institution_zusatzid_idx", columnList = "zusatzid") })
+	@Index(name = "institution_sequenceid_idx", columnList = "sequenceid"),
+	@Index(name = "institution_mandant_idx", columnList = "mandant") })
 @Entity
 public class Institution extends BaseEntity {
 
@@ -146,7 +147,7 @@ public class Institution extends BaseEntity {
 	@Nonnull
 	@Generated(GenerationTime.INSERT)
 	@Column(nullable = false, insertable = false)
-	private Long zusatzId;
+	private Long sequenceId;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -363,12 +364,12 @@ public class Institution extends BaseEntity {
 	}
 
 	@Nonnull
-	public Long getZusatzId() {
-		return zusatzId;
+	public Long getSequenceId() {
+		return sequenceId;
 	}
 
-	public void setZusatzId(@Nonnull Long zusatzId) {
-		this.zusatzId = zusatzId;
+	public void setSequenceId(@Nonnull Long sequenceId) {
+		this.sequenceId = sequenceId;
 	}
 
 	public Mandant getMandant() {

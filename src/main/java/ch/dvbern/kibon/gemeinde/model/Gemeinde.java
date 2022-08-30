@@ -29,6 +29,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -36,7 +37,10 @@ import javax.validation.constraints.NotNull;
 import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.persistence.BaseEntity;
 
-@Table
+@Table(indexes = {
+	@Index(name = "gemeinde_gemeindeuuid_idx", columnList = "gemeindeUUID"),
+	@Index(name = "gemeinde_mandant_idx", columnList = "mandant")
+})
 @Entity
 public class Gemeinde extends BaseEntity {
 
@@ -44,7 +48,11 @@ public class Gemeinde extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(updatable = false, nullable = false)
-	private @NotNull Long id = -1L;
+	private @NotNull Long sequenceId = -1L;
+
+	@Nonnull
+	@Column(nullable = false, updatable = false)
+	private @NotEmpty String gemeindeUUID = "";
 
 	@Nonnull
 	@Column(nullable = false, updatable = true)
@@ -78,7 +86,8 @@ public class Gemeinde extends BaseEntity {
 
 		Gemeinde that = (Gemeinde) o;
 
-		return	getId().equals(that.getId()) &&
+		return getSequenceId().equals(that.getSequenceId()) &&
+			getGemeindeUUID().equals(that.gemeindeUUID) &&
 			getName().equals(that.getName()) &&
 			getBfsNummer().equals(that.getBfsNummer()) &&
 			getBetreuungsgutscheineAnbietenAb().equals(that.getBetreuungsgutscheineAnbietenAb()) &&
@@ -87,16 +96,21 @@ public class Gemeinde extends BaseEntity {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getName(), getBfsNummer(), getBetreuungsgutscheineAnbietenAb(), getGueltigBis());
+		return Objects.hash(
+			getGemeindeUUID(),
+			getName(),
+			getBfsNummer(),
+			getBetreuungsgutscheineAnbietenAb(),
+			getGueltigBis());
 	}
 
 	@Nonnull
-	public Long getId() {
-		return id;
+	public Long getSequenceId() {
+		return sequenceId;
 	}
 
-	public void setId(@Nonnull Long id) {
-		this.id = id;
+	public void setSequenceId(@Nonnull Long sequenceId) {
+		this.sequenceId = sequenceId;
 	}
 
 	@Nonnull
@@ -141,5 +155,14 @@ public class Gemeinde extends BaseEntity {
 
 	public void setMandant(Mandant mandant) {
 		this.mandant = mandant;
+	}
+
+	@Nonnull
+	public String getGemeindeUUID() {
+		return gemeindeUUID;
+	}
+
+	public void setGemeindeUUID(@Nonnull String gemeindeUUID) {
+		this.gemeindeUUID = gemeindeUUID;
 	}
 }

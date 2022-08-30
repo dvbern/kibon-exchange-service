@@ -58,7 +58,7 @@ public class GemeindeService {
 	@Transactional(TxType.MANDATORY)
 	public void onGemeindeChanged(@Nonnull GemeindeEventDTO dto) {
 
-		Optional<Gemeinde> gemeindeOptional = getGemeindeByBFS(dto.getBfsNummer());
+		Optional<Gemeinde> gemeindeOptional = getGemeindeByGemeindeUUID(dto.getGemeindeUUID());
 
 		if (gemeindeOptional.isEmpty()) {
 			Gemeinde newGemeinde = converter.create(dto);
@@ -82,18 +82,18 @@ public class GemeindeService {
 
 		query.select(cb.construct(
 			GemeindeDTO.class,
-			root.get(Gemeinde_.id),
+			root.get(Gemeinde_.sequenceId),
 			root.get(Gemeinde_.name),
 			root.get(Gemeinde_.betreuungsgutscheineAnbietenAb),
 			root.get(Gemeinde_.gueltigBis),
 			root.get(Gemeinde_.bfsNummer)
 		));
 
-		query.orderBy(cb.asc(root.get(Gemeinde_.id)));
+		query.orderBy(cb.asc(root.get(Gemeinde_.sequenceId)));
 		Predicate mandantPredicate = cb.equal(root.get(Gemeinde_.mandant), Mandant.BERN);
 
 		if (afterId != null) {
-			Predicate afterIdPredicate = cb.greaterThan(root.get(Gemeinde_.id), afterId);
+			Predicate afterIdPredicate = cb.greaterThan(root.get(Gemeinde_.sequenceId), afterId);
 			query.where(mandantPredicate, afterIdPredicate);
 		}
 		else {
@@ -111,19 +111,19 @@ public class GemeindeService {
 		return resultList;
 	}
 
-	public Optional<Gemeinde> getGemeindeByBFS(@Nonnull Long bfsNummer) {
+	public Optional<Gemeinde> getGemeindeByGemeindeUUID(@Nonnull String gemeindeUUID) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Gemeinde> query = cb.createQuery(Gemeinde.class);
 		Root<Gemeinde> root = query.from(Gemeinde.class);
 
-		ParameterExpression<Long> bfsParam = cb.parameter(Long.class,Gemeinde_.BFS_NUMMER);
+		ParameterExpression<String> gemeindeUUIDParam = cb.parameter(String.class,Gemeinde_.GEMEINDE_UU_ID);
 
-		Predicate bfsPredicate = cb.equal(root.get(Gemeinde_.bfsNummer), bfsParam);
+		Predicate gemeindeUUIDPredicate = cb.equal(root.get(Gemeinde_.gemeindeUUID), gemeindeUUIDParam);
 
-		query.where(bfsPredicate);
+		query.where(gemeindeUUIDPredicate);
 
 		return em.createQuery(query)
-			.setParameter(bfsParam, bfsNummer)
+			.setParameter(gemeindeUUIDParam, gemeindeUUID)
 			.setMaxResults(1)
 			.getResultStream()
 			.findFirst();

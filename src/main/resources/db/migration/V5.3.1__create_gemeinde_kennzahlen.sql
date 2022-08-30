@@ -16,8 +16,9 @@
  */
 
 CREATE TABLE gemeindekennzahlen (
-	id                            BIGSERIAL NOT NULL
+	sequenceid                            BIGSERIAL NOT NULL
 		CONSTRAINT gemeindekennzahlen_pkey PRIMARY KEY,
+	gemeindeuuid                  VARCHAR(255)       NOT NULL,
 	bfsnummer                     BIGINT    NOT NULL,
 	gesuchsperiodestart           DATE      NOT NULL,
 	gesuchsperiodestop            DATE      NOT NULL,
@@ -29,3 +30,9 @@ CREATE TABLE gemeindekennzahlen (
 	limitierungtfo                VARCHAR(255),
 	limitierungkita               VARCHAR(255)
 );
+
+CREATE INDEX gemeindekennzahlen_gemeindeuuid_idx
+	ON gemeindekennzahlen(gemeindeuuid);
+
+CREATE INDEX gemeindekennzahlen_gesuchsperiodestart_idx
+	ON gemeindekennzahlen(gesuchsperiodestart);

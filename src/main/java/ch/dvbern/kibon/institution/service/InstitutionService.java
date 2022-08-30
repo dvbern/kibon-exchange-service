@@ -214,7 +214,7 @@ public class InstitutionService {
 		ParameterExpression<InstitutionStatus> statusParam = cb.parameter(InstitutionStatus.class, "statusParam");
 		Predicate statusPredicate = cb.equal(root.get(Institution_.status), statusParam);
 
-		query.orderBy(cb.asc(root.get(Institution_.zusatzId)));
+		query.orderBy(cb.asc(root.get(Institution_.sequenceId)));
 
 		Predicate mandantPredicate = cb.equal(root.get(Institution_.mandant), Mandant.BERN);
 
@@ -223,7 +223,7 @@ public class InstitutionService {
 			.not();
 
 		if (afterId != null) {
-			Predicate afterIdPredicate = cb.greaterThan(root.get(Institution_.zusatzId), afterId);
+			Predicate afterIdPredicate = cb.greaterThan(root.get(Institution_.sequenceId), afterId);
 			query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, unbekannteInsti, afterIdPredicate);
 		}
 		else {

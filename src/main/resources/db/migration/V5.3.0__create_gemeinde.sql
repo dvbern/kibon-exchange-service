@@ -16,11 +16,15 @@
  */
 
 CREATE TABLE gemeinde (
-    id                             BIGSERIAL    NOT NULL
+    sequenceid                             BIGSERIAL    NOT NULL
         CONSTRAINT gemeinde_pkey
             PRIMARY KEY,
+	gemeindeuuid                   VARCHAR(255)       NOT NULL,
     name                           VARCHAR(255) NOT NULL,
     bfsnummer                      BIGINT       NOT NULL,
     betreuungsgutscheineanbietenab DATE         NOT NULL,
     gueltigbis                     DATE         NOT NULL
 );
+
+CREATE INDEX gemeinde_gemeindeuuid_idx
+	ON gemeinde(gemeindeuuid);

@@ -29,7 +29,7 @@ public class GemeindeKennzahlenConverter {
 	@Nonnull
 	public GemeindeKennzahlen create(@Nonnull GemeindeKennzahlenEventDTO dto) {
 		GemeindeKennzahlen gemeindeKennzahlen = new GemeindeKennzahlen();
-		gemeindeKennzahlen.setBfsNummer(dto.getBfsNummer());
+		gemeindeKennzahlen.setGemeindeUUID(dto.getGemeindeUUID());
 		gemeindeKennzahlen.setGesuchsperiodeStart(dto.getGesuchsperiodeStart());
 		gemeindeKennzahlen.setGesuchsperiodeStop(dto.getGesuchsperiodeStop());
 		update(gemeindeKennzahlen, dto);
@@ -45,5 +45,6 @@ public class GemeindeKennzahlenConverter {
 		gemeindeKennzahlen.setLimitierungTfo(dto.getLimitierungTfo());
 		gemeindeKennzahlen.setLimitierungKita(dto.getLimitierungKita());
 		gemeindeKennzahlen.setErwerbspensumZuschlag(dto.getErwerbspensumZuschlag());
+		gemeindeKennzahlen.setBfsNummer(dto.getBfsNummer());
 	}
 }

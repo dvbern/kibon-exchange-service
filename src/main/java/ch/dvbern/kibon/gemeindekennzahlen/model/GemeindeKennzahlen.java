@@ -30,7 +30,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.types.EinschulungTyp;
@@ -38,7 +40,10 @@ import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.persistence.BaseEntity;
 import ch.dvbern.kibon.util.ConstantsUtil;
 
-@Table
+@Table(indexes = {
+	@Index(name = "gemeindekennzahlen_gemeindeuuid_idx", columnList = "gemeindeUUID"),
+	@Index(name = "gemeindekennzahlen_gesuchsperiodestart_idx", columnList = "gesuchsperiodeStart"),
+	@Index(name = "gemeindekennzahlen_mandant_idx", columnList = "mandant") })
 @Entity
 public class GemeindeKennzahlen extends BaseEntity {
 
@@ -46,7 +51,11 @@ public class GemeindeKennzahlen extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(updatable = false, nullable = false)
-	private @NotNull Long id = -1L;
+	private @NotNull Long sequenceId = -1L;
+
+	@Nonnull
+	@Column(nullable = false, updatable = false)
+	private @NotEmpty String gemeindeUUID = "";
 
 	@Nonnull
 	@Column(nullable = false, updatable = true)
@@ -106,7 +115,8 @@ public class GemeindeKennzahlen extends BaseEntity {
 
 		GemeindeKennzahlen that = (GemeindeKennzahlen) o;
 
-		return getId().equals(that.getId()) &&
+		return getSequenceId().equals(that.getSequenceId()) &&
+			getGemeindeUUID().equals(that.gemeindeUUID) &&
 			getBfsNummer().equals(that.getBfsNummer()) &&
 			getGesuchsperiodeStart().equals(that.getGesuchsperiodeStart()) &&
 			getGesuchsperiodeStop().equals(that.getGesuchsperiodeStop());
@@ -114,16 +124,16 @@ public class GemeindeKennzahlen extends BaseEntity {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getId(), getBfsNummer(), getGesuchsperiodeStart(), getGesuchsperiodeStop());
+		return Objects.hash(getGemeindeUUID(), getBfsNummer(), getGesuchsperiodeStart(), getGesuchsperiodeStop());
 	}
 
 	@Nonnull
-	public Long getId() {
-		return id;
+	public Long getSequenceId() {
+		return sequenceId;
 	}
 
-	public void setId(@Nonnull Long id) {
-		this.id = id;
+	public void setSequenceId(@Nonnull Long sequenceId) {
+		this.sequenceId = sequenceId;
 	}
 
 	@Nonnull
@@ -222,5 +232,14 @@ public class GemeindeKennzahlen extends BaseEntity {
 
 	public void setMandant(Mandant mandant) {
 		this.mandant = mandant;
+	}
+
+	@Nonnull
+	public String getGemeindeUUID() {
+		return gemeindeUUID;
+	}
+
+	public void setGemeindeUUID(@Nonnull String gemeindeUUID) {
+		this.gemeindeUUID = gemeindeUUID;
 	}
 }
