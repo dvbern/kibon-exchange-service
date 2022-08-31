@@ -17,11 +17,25 @@
 
 package ch.dvbern.kibon.util;
 
+import java.util.Arrays;
+import java.util.List;
+
 public final class ConstantsUtil {
 
 	public static final int TEXT_AREA_SIZE = 4000;
 	public static final int SHORT_COLUMN_SIZE = 100;
+	public static final String ID_UNKNOWN_INSTITUTION_STAMMDATEN_KITA_BE = "00000000-0000-0000-0000-000000000000";
+	public static final String ID_UNKNOWN_INSTITUTION_STAMMDATEN_TAGESFAMILIE_BE =
+		"00000000-0000-0000-0000-000000000001";
+	public static final String ID_UNKNOWN_INSTITUTION_STAMMDATEN_TAGESSCHULE_BE =
+		"00000000-0000-0000-0000-000000000002";
 
 	private ConstantsUtil() {
 	}
+
+	public static final List<String> ALL_UNKNOWN_BE_INSTITUTION_IDS = Arrays.asList(
+		ConstantsUtil.ID_UNKNOWN_INSTITUTION_STAMMDATEN_KITA_BE,
+		ConstantsUtil.ID_UNKNOWN_INSTITUTION_STAMMDATEN_TAGESFAMILIE_BE,
+		ConstantsUtil.ID_UNKNOWN_INSTITUTION_STAMMDATEN_TAGESSCHULE_BE
+	);
 }

@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -43,10 +44,12 @@ import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.Institution_;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
 import ch.dvbern.kibon.institution.model.KontaktAngaben_;
+import ch.dvbern.kibon.util.ConstantsUtil;
 
 /**
  * Service responsible for {@link Institution} handling.
@@ -92,8 +95,11 @@ public class InstitutionService {
 
 		ParameterExpression<InstitutionStatus> statusParam = cb.parameter(InstitutionStatus.class, "statusParam");
 		Predicate statusPredicate = cb.equal(root.get(Institution_.status), statusParam);
-
-		query.where(betreuungArtPredicate, statusPredicate);
+		Predicate mandantPredicate = cb.equal(root.get(Institution_.mandant), Mandant.BERN);
+		Predicate unbekannteInsti = root.get(Institution_.id)
+			.in(ConstantsUtil.ALL_UNKNOWN_BE_INSTITUTION_IDS)
+			.not();
+		query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, unbekannteInsti);
 
 		Set<BetreuungsangebotTyp> familyPortalSet =
 			EnumSet.of(BetreuungsangebotTyp.KITA, BetreuungsangebotTyp.TAGESFAMILIEN);
@@ -192,5 +198,52 @@ public class InstitutionService {
 		});
 
 		return result;
+	}
+
+	@Nonnull
+	public List<Institution> getAllForDashboard(
+		@Nullable Long afterId,
+		@Nullable Integer limit,
+		@Nonnull Mandant mandant) {
+
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
+		Root<Institution> root = query.from(Institution.class);
+
+		//noinspection rawtypes
+		ParameterExpression<Set> betreuungsArtParam = cb.parameter(Set.class, "betreuungsArtParam");
+		Predicate betreuungArtPredicate = root.get(Institution_.betreuungsArt).in(betreuungsArtParam);
+
+		ParameterExpression<InstitutionStatus> statusParam = cb.parameter(InstitutionStatus.class, "statusParam");
+		Predicate statusPredicate = cb.equal(root.get(Institution_.status), statusParam);
+
+		Predicate mandantPredicate = cb.equal(root.get(Institution_.mandant), mandant);
+
+		Predicate unbekannteInsti = root.get(Institution_.id)
+			.in(ConstantsUtil.ALL_UNKNOWN_BE_INSTITUTION_IDS)
+			.not();
+
+		if (afterId != null) {
+			Predicate afterIdPredicate = cb.greaterThan(root.get(Institution_.sequenceId), afterId);
+			query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, unbekannteInsti, afterIdPredicate);
+		} else {
+			query.where(betreuungArtPredicate, statusPredicate, mandantPredicate, unbekannteInsti);
+		}
+
+		query.orderBy(cb.asc(root.get(Institution_.sequenceId)));
+
+		Set<BetreuungsangebotTyp> dashboardSet =
+			EnumSet.of(BetreuungsangebotTyp.KITA, BetreuungsangebotTyp.TAGESFAMILIEN);
+
+		TypedQuery<Institution> q = em.createQuery(query);
+
+		if (limit != null) {
+			q.setMaxResults(limit);
+		}
+
+		return q.setParameter(betreuungsArtParam, dashboardSet)
+			.setParameter(statusParam, InstitutionStatus.AKTIV)
+			.getResultList();
+
 	}
 }
