@@ -34,7 +34,6 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
-import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeinde.GemeindeDTO;
 import ch.dvbern.kibon.exchange.commons.gemeinde.GemeindeEventDTO;
 import ch.dvbern.kibon.exchange.commons.types.Mandant;
