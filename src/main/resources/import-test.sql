@@ -717,10 +717,10 @@ VALUES (2, '5', '21.000142.064.1.1', '2021-08-01', '2022-07-31',
            "tarifeDefinitivAkzeptiert": true
        }');
 
-INSERT INTO gemeinde (sequenceid, name, bfsnummer, betreuungsgutscheineanbietenab, gueltigbis, mandant)
-VALUES (1, 'Paris', 99998, '2016-01-01', '9999-12-31', 'BERN');
+INSERT INTO gemeinde (sequenceid, gemeindeuuid, name, bfsnummer, betreuungsgutscheineanbietenab, gueltigbis, mandant)
+VALUES (1, 'ea02b313-e7c3-4b26-9ef7-e413f4046db2', 'Paris', 99998, '2016-01-01', '9999-12-31', 'BERN');
 
-INSERT INTO public.gemeindekennzahlen (sequenceid, bfsnummer, gesuchsperiodestart, gesuchsperiodestop, kontingentierung, kontingentierungausgeschoepft, anzahlkinderwarteliste, dauerwarteliste, erwerbspensumzuschlag, limitierungtfo, limitierungkita, mandant)
-VALUES (1, 99998, '2021-08-01', '2022-07-31', null, null, null, null, 20.00, 'VORSCHULALTER', 'KINDERGARTEN2', 'BERN');
+INSERT INTO public.gemeindekennzahlen (sequenceid, gemeindeuuid, bfsnummer, gesuchsperiodestart, gesuchsperiodestop, kontingentierung, kontingentierungausgeschoepft, anzahlkinderwarteliste, dauerwarteliste, erwerbspensumzuschlag, limitierungtfo, limitierungkita, mandant)
+VALUES (1, 'ea02b313-e7c3-4b26-9ef7-e413f4046db2', 99998, '2021-08-01', '2022-07-31', null, null, null, null, 20.00, 'VORSCHULALTER', 'KINDERGARTEN2', 'BERN');
 
 -- endregion
