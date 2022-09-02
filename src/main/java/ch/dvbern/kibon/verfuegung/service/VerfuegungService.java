@@ -20,6 +20,7 @@ package ch.dvbern.kibon.verfuegung.service;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -27,10 +28,12 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
 import ch.dvbern.kibon.shared.filter.FilterController;
 import ch.dvbern.kibon.shared.model.AbstractClientEntity_;
@@ -111,5 +114,29 @@ public class VerfuegungService {
 		List<ClientVerfuegungDTO> resultList = q.getResultList();
 
 		return resultList;
+	}
+
+	public List<Verfuegung> getAllForDashboard(@Nullable Long afterId,@Nullable Integer limit,@Nonnull Mandant mandant) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Verfuegung> query = cb.createQuery(Verfuegung.class);
+		Root<Verfuegung> root = query.from(Verfuegung.class);
+		Predicate mandantPredicate = cb.equal(root.get(Verfuegung_.mandant), mandant);
+
+		if (afterId != null) {
+			Predicate afterIdPredicate = cb.greaterThan(root.get(Verfuegung_.id), afterId);
+			query.where(mandantPredicate, afterIdPredicate);
+		} else {
+			query.where(mandantPredicate);
+		}
+
+		query.orderBy(cb.asc(root.get(Verfuegung_.id)));
+
+		TypedQuery<Verfuegung> q = em.createQuery(query);
+
+		if (limit != null) {
+			q.setMaxResults(limit);
+		}
+
+		return q.getResultList();
 	}
 }

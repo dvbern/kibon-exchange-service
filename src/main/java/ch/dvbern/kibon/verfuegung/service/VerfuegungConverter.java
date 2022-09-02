@@ -58,6 +58,7 @@ public class VerfuegungConverter {
 		verfuegung.setGemeindeName(dto.getGemeindeName());
 
 		verfuegung.setAuszahlungAnEltern(dto.getAuszahlungAnEltern());
+		verfuegung.setMandant(dto.getMandant());
 
 		verfuegung.setKind(toKind(dto.getKind()));
 		verfuegung.setGesuchsteller(toGesuchsteller(dto.getGesuchsteller()));
@@ -72,7 +73,12 @@ public class VerfuegungConverter {
 		return mapper.createObjectNode()
 			.put("vorname", kind.getVorname())
 			.put("nachname", kind.getNachname())
-			.put("geburtsdatum", kind.getGeburtsdatum().toString());
+			.put("geburtsdatum", kind.getGeburtsdatum().toString())
+			.put("stufe", kind.getStufe().name())
+			.put("hatSozialeIndikation", kind.getHatSozialeIndikation())
+			.put("hatSprachlicheIndikation", kind.getHatSprachlicheIndikation())
+			.put("sprichtMuttersprache", kind.getSprichtMuttersprache())
+			.put("ausserordentlicherAnspruch", kind.getAusserordentlicherAnspruch());
 	}
 
 	@Nonnull
@@ -115,6 +121,9 @@ public class VerfuegungConverter {
 			.put("zeiteinheit", zeitabschnitt.getZeiteinheit().name())
 			.put("regelwerk", zeitabschnitt.getRegelwerk().name())
 			.put("auszahlungAnEltern", zeitabschnitt.getAuszahlungAnEltern())
-			.put("anElternUeberwiesenerBetrag", zeitabschnitt.getAuszahlungAnEltern() ? zeitabschnitt.getBetreuungsgutschein() : BigDecimal.ZERO);
+			.put("anElternUeberwiesenerBetrag", zeitabschnitt.getAuszahlungAnEltern() ? zeitabschnitt.getBetreuungsgutschein() : BigDecimal.ZERO)
+			.put("besondereBeduerfnisse", zeitabschnitt.getBesondereBeduerfnisse())
+			.put("massgebendesEinkommen", zeitabschnitt.getMassgebendesEinkommen())
+			.put("betreuungsgutscheinKanton", zeitabschnitt.getBetreuungsgutscheinKanton());
 	}
 }

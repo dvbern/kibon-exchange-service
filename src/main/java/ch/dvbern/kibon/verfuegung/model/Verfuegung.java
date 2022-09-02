@@ -33,12 +33,17 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
+import ch.dvbern.kibon.util.ConstantsUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkiverse.hibernate.types.json.JsonTypes;
 import org.hibernate.annotations.Type;
 
-@Table(indexes = @Index(name = "verfuegung_idx1", columnList = "institutionId, verfuegtAm"))
+@Table(indexes = {
+	@Index(name = "verfuegung_idx1", columnList = "institutionId, verfuegtAm"),
+	@Index(name = "verfuegung_mandant_idx", columnList = "mandant")
+})
 @Entity
 public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 
@@ -86,6 +91,11 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 	@Type(type = JsonTypes.JSON_OBJECT_BIN)
 	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
 	private @NotNull JsonNode ignorierteZeitabschnitte = null;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
+	private Mandant mandant = Mandant.BERN;
 
 	@SuppressWarnings("checkstyle:CyclomaticComplexity")
 	@Override
@@ -209,5 +219,13 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 
 	public void setAuszahlungAnEltern(@Nonnull Boolean auszahlungAnEltern) {
 		this.auszahlungAnEltern = auszahlungAnEltern;
+	}
+
+	public Mandant getMandant() {
+		return mandant;
+	}
+
+	public void setMandant(Mandant mandant) {
+		this.mandant = mandant;
 	}
 }
