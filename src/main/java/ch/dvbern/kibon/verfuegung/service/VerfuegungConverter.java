@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.verfuegung.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.verfuegung.KindDTO;
@@ -35,6 +36,8 @@ import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static java.util.Objects.requireNonNullElse;
 
 @ApplicationScoped
 public class VerfuegungConverter {
@@ -58,7 +61,7 @@ public class VerfuegungConverter {
 		verfuegung.setGemeindeName(dto.getGemeindeName());
 
 		verfuegung.setAuszahlungAnEltern(dto.getAuszahlungAnEltern());
-		verfuegung.setMandant(dto.getMandant());
+		verfuegung.setMandant(requireNonNullElse(dto.getMandant(), Mandant.BERN));
 
 		verfuegung.setKind(toKind(dto.getKind()));
 		verfuegung.setGesuchsteller(toGesuchsteller(dto.getGesuchsteller()));
