@@ -60,6 +60,7 @@ import ch.dvbern.kibon.shared.filter.FilterControllerFactory;
 import ch.dvbern.kibon.util.OpenApiTag;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.MetricUnits;
@@ -68,7 +69,7 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.jboss.resteasy.annotations.cache.NoCache;
+import org.jboss.resteasy.reactive.NoCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,6 +170,7 @@ public class BetreuungResource {
 		return objectMapper.convertValue(model, BetreuungAnfrageDTO.class);
 	}
 
+	@Blocking
 	@POST
 	@Operation(summary = "Eine Betreuung-Anfrage in kiBon bestätigen oder Betreuungen mutieren.",
 		description = "Diese Schnittstelle hat zwei Funktionen:\n"
@@ -249,6 +251,7 @@ public class BetreuungResource {
 		return Uni.createFrom().completionStage(acked);
 	}
 
+	@Blocking
 	@POST
 	@Operation(summary = "Eine Betreuung in kiBon stornieren",
 		description = "Diese Schnittstelle ermöglicht eine automatisierte Stornierung einer Betreuung in kiBon")

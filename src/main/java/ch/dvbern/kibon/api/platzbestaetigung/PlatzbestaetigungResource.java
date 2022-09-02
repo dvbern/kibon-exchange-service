@@ -37,6 +37,7 @@ import ch.dvbern.kibon.api.shared.ClientInstitutionFilterParams;
 import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungAnfragenDTO;
 import ch.dvbern.kibon.exchange.api.common.betreuung.BetreuungDTO;
 import ch.dvbern.kibon.util.OpenApiTag;
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Timed;
@@ -44,7 +45,7 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.jboss.resteasy.annotations.cache.NoCache;
+import org.jboss.resteasy.reactive.NoCache;
 
 @Path("/platzbestaetigung")
 @Tag(name = OpenApiTag.BETREUUNGEN)
@@ -75,6 +76,7 @@ public class PlatzbestaetigungResource {
 		return betreuungResource.getAll(filterParams);
 	}
 
+	@Blocking
 	@POST
 	@Operation(deprecated = true, summary = "Siehe /api/v1/betreuung")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")

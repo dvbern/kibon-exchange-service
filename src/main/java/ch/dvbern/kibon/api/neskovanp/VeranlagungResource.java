@@ -37,6 +37,7 @@ import ch.dvbern.kibon.exchange.commons.neskovanp.NeueVeranlagungEventDTO;
 import ch.dvbern.kibon.neskovanp.facade.NeueVeranlagungKafkaEventProducer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.MetricUnits;
@@ -69,6 +70,7 @@ public class VeranlagungResource {
 	@Inject
 	NeueVeranlagungKafkaEventProducer veranlagungProducer;
 
+	@Blocking
 	@POST
 	@Operation(summary = "Eine neue Veranlagung an kiBon melden",
 		description = "Diese Schnittstelle meldet kiBon dass eine neue Steuer-Veranlagung verfügbar ist.")
