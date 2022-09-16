@@ -18,6 +18,7 @@
 package ch.dvbern.kibon.verfuegung.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,6 +29,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
@@ -64,9 +66,40 @@ public class VerfuegungService {
 	 */
 	@Transactional(TxType.MANDATORY)
 	public void onVerfuegungCreated(@Nonnull VerfuegungEventDTO dto) {
-		Verfuegung verfuegung = converter.create(dto);
 
-		em.persist(verfuegung);
+		Optional<Verfuegung> verfuegungOptional =
+			getVerfuegung(dto.getRefnr(), dto.getVersion());
+
+		if (verfuegungOptional.isEmpty()) {
+			Verfuegung verfuegung = converter.create(dto);
+
+			em.persist(verfuegung);
+		} else {
+			Verfuegung verfuegung = verfuegungOptional.get();
+			converter.update(verfuegung, dto);
+			em.merge(verfuegung);
+		}
+	}
+
+	private Optional<Verfuegung> getVerfuegung(@Nonnull String refnr, @Nonnull int version) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Verfuegung> query = cb.createQuery(Verfuegung.class);
+		Root<Verfuegung> root = query.from(Verfuegung.class);
+
+		ParameterExpression<String> refnrParam = cb.parameter(String.class, AbstractInstitutionPeriodeEntity_.REFNR);
+		Predicate refnrPredicate = cb.equal(root.get(AbstractInstitutionPeriodeEntity_.refnr), refnrParam);
+
+		ParameterExpression<Integer> versionParam =	cb.parameter(Integer.class, Verfuegung_.VERSION);
+		Predicate versionPredicate = cb.equal(root.get(Verfuegung_.version), versionParam);
+
+		query.where(refnrPredicate, versionPredicate);
+
+		return em.createQuery(query)
+			.setParameter(refnrParam, refnr)
+			.setParameter(versionParam, version)
+			.setMaxResults(1)
+			.getResultStream()
+			.findFirst();
 	}
 
 	/**
@@ -116,7 +149,10 @@ public class VerfuegungService {
 		return resultList;
 	}
 
-	public List<Verfuegung> getAllForDashboard(@Nullable Long afterId,@Nullable Integer limit,@Nonnull Mandant mandant) {
+	public List<Verfuegung> getAllForDashboard(
+		@Nullable Long afterId,
+		@Nullable Integer limit,
+		@Nonnull Mandant mandant) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Verfuegung> query = cb.createQuery(Verfuegung.class);
 		Root<Verfuegung> root = query.from(Verfuegung.class);

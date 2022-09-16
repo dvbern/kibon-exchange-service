@@ -52,6 +52,13 @@ public class VerfuegungConverter {
 
 		verfuegung.setRefnr(dto.getRefnr());
 		verfuegung.setInstitutionId(dto.getInstitutionId());
+		update(verfuegung, dto);
+
+		return verfuegung;
+	}
+
+	@Nonnull
+	public Verfuegung update(@Nonnull Verfuegung verfuegung, @Nonnull VerfuegungEventDTO dto) {
 		verfuegung.setPeriodeVon(dto.getVon());
 		verfuegung.setPeriodeBis(dto.getBis());
 		verfuegung.setVersion(dto.getVersion());
@@ -81,7 +88,9 @@ public class VerfuegungConverter {
 			.put("hatSozialeIndikation", kind.getHatSozialeIndikation())
 			.put("hatSprachlicheIndikation", kind.getHatSprachlicheIndikation())
 			.put("sprichtMuttersprache", kind.getSprichtMuttersprache())
-			.put("ausserordentlicherAnspruch", kind.getAusserordentlicherAnspruch());
+			.put("ausserordentlicherAnspruch", kind.getAusserordentlicherAnspruch())
+			.put("kindAusAsylwesenAngabeElternGemeinde", kind.getKindAusAsylwesenAngabeElternGemeinde())
+			.put("keinSelbstbehaltDurchGemeinde", kind.getKeinSelbstbehaltDurchGemeinde());
 	}
 
 	@Nonnull

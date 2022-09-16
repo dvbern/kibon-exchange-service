@@ -28,3 +28,7 @@ WHERE gemeindebfsnr >= 2401 AND gemeindebfsnr <= 2622;
 
 CREATE INDEX verfuegung_mandant_idx
     ON verfuegung(mandant);
+
+CREATE INDEX verfuegung_refnr_version_idx
+    ON verfuegung(refnr, version);
+

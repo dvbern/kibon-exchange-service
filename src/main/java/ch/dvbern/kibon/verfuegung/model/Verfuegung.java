@@ -42,7 +42,8 @@ import org.hibernate.annotations.Type;
 
 @Table(indexes = {
 	@Index(name = "verfuegung_idx1", columnList = "institutionId, verfuegtAm"),
-	@Index(name = "verfuegung_mandant_idx", columnList = "mandant")
+	@Index(name = "verfuegung_mandant_idx", columnList = "mandant"),
+	@Index(name = "verfuegung_refnr_version_idx", columnList = "refnr, version")
 })
 @Entity
 public class Verfuegung extends AbstractInstitutionPeriodeEntity {
