@@ -94,6 +94,7 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 	private @NotNull JsonNode ignorierteZeitabschnitte = null;
 
 	@NotNull
+	@Nonnull
 	@Enumerated(EnumType.STRING)
 	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
 	private Mandant mandant = Mandant.BERN;
@@ -222,11 +223,12 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 		this.auszahlungAnEltern = auszahlungAnEltern;
 	}
 
+	@Nonnull
 	public Mandant getMandant() {
 		return mandant;
 	}
 
-	public void setMandant(Mandant mandant) {
+	public void setMandant(@Nonnull Mandant mandant) {
 		this.mandant = mandant;
 	}
 }
