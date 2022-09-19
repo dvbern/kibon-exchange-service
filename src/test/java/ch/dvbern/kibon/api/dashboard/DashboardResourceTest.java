@@ -64,7 +64,7 @@ public class DashboardResourceTest {
 			.body(isJsonStringMatching(jsonObject()
 				.where("gemeinden", is(jsonArray(
 					everyItem(jsonObject()
-						.where("id", is(jsonInt(1)))
+						.where("sequenceId", is(jsonInt(1)))
 					)
 				)))
 			));
@@ -95,7 +95,7 @@ public class DashboardResourceTest {
 			.body(isJsonStringMatching(jsonObject()
 				.where("gemeindenKennzahlen", is(jsonArray(
 					everyItem(jsonObject()
-						.where("id", is(jsonInt(1)))
+						.where("sequenceId", is(jsonInt(1)))
 					)
 				)))
 			));

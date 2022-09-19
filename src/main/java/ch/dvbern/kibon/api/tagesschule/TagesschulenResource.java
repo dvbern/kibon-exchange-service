@@ -68,6 +68,7 @@ import ch.dvbern.kibon.tagesschulen.service.TagesschuleModuleService;
 import ch.dvbern.kibon.util.OpenApiTag;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.MetricUnits;
@@ -79,7 +80,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.jboss.resteasy.annotations.cache.NoCache;
+import org.jboss.resteasy.reactive.NoCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -290,6 +291,7 @@ public class TagesschulenResource {
 		return Uni.createFrom().completionStage(acked);
 	}
 
+	@Blocking
 	@POST
 	@Path("/anmeldungen/refnr/{refnr}")
 	@Operation(

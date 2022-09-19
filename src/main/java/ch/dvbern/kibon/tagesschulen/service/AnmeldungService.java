@@ -77,7 +77,7 @@ public class AnmeldungService {
 			last.setTarife(newAnmeldung.getTarife());
 			em.merge(last);
 		} else {
-			// some essential data in anmelung changed -> re-export
+			// some essential data in anmeldung changed -> re-export
 			em.persist(newAnmeldung);
 		}
 	}
