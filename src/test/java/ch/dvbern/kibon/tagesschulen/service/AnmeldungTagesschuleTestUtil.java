@@ -38,7 +38,7 @@ import ch.dvbern.kibon.exchange.commons.types.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.types.Intervall;
 import ch.dvbern.kibon.exchange.commons.types.KindDTO;
 import ch.dvbern.kibon.exchange.commons.types.Wochentag;
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 
 public final class AnmeldungTagesschuleTestUtil {
 

@@ -17,7 +17,10 @@
 
 package ch.dvbern.kibon.api.dashboard;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,6 +46,7 @@ import ch.dvbern.kibon.exchange.api.common.dashboard.institution.AdresseInstitut
 import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionenDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.lastenausgleich.LastenausgleicheDTO;
+import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungenDTO;
 import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.gemeinde.service.GemeindeService;
@@ -52,6 +56,9 @@ import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.service.InstitutionService;
 import ch.dvbern.kibon.util.OpenApiTag;
+import ch.dvbern.kibon.verfuegung.model.Verfuegung;
+import ch.dvbern.kibon.verfuegung.service.VerfuegungService;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -63,6 +70,8 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.NoCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.Objects.requireNonNull;
 
 @Path("/dashboard")
 @Tag(name = OpenApiTag.DASHBOARD)
@@ -85,6 +94,10 @@ public class DashboardResource {
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
 	InstitutionService institutionService;
+
+	@SuppressWarnings("checkstyle:VisibilityModifier")
+	@Inject
+	VerfuegungService verfuegungService;
 
 	@SuppressWarnings({ "checkstyle:VisibilityModifier", "CdiInjectionPointsInspection" })
 	@Inject
@@ -155,8 +168,8 @@ public class DashboardResource {
 	@RolesAllowed("dashboard")
 	@Valid
 	public GemeindenKennzahlenDTO getAllGemeindeKennzahlen(
-		@Parameter(description = "Erlaubt es, nur GemeindeKennzahlen zu laden, mit einer grösseren sequenceId.\n\nJede "
-			+ "GemeindeKennzahlen hat eine monoton steigende sequenceId.")
+		@Parameter(description = "Erlaubt es, nur GemeindeKennzahlen zu laden, mit einer grösseren sequenceId.\n\nJede"
+			+ " GemeindeKennzahlen hat eine monoton steigende sequenceId.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit) {
@@ -247,8 +260,9 @@ public class DashboardResource {
 	@RolesAllowed("dashboard")
 	@Valid
 	public LastenausgleicheDTO getAllLats(
-		@Parameter(description = "Erlaubt es, nur Lastenausgleichdaten zu laden, mit einer grösseren sequenceId.\n\nJede "
-			+ "Lastenausgleiche hat eine monoton steigende sequenceId.")
+		@Parameter(description =
+			"Erlaubt es, nur Lastenausgleichdaten zu laden, mit einer grösseren sequenceId.\n\nJede "
+				+ "Lastenausgleiche hat eine monoton steigende sequenceId.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
 		@Min(0) @QueryParam("limit") @Nullable Integer limit) {
@@ -295,6 +309,8 @@ public class DashboardResource {
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
 
+		Mandant mandant = Mandant.BERN;
+
 		LOG.info(
 			"Verfuegung Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id "
 				+ "'{}'",
@@ -303,7 +319,16 @@ public class DashboardResource {
 			groups,
 			limit,
 			afterId);
-		return new VerfuegungenDTO();
+		List<Verfuegung> verfuegungen = verfuegungService.getAllForDashboard(afterId, limit, mandant);
+
+		List<VerfuegungDTO> verfuegungDTOS = verfuegungen.stream()
+			.map(this::convertVerfuegung)
+			.collect(Collectors.toList());
+
+		VerfuegungenDTO result = new VerfuegungenDTO();
+		result.setVerfuegungen(verfuegungDTOS);
+
+		return result;
 	}
 
 	@Nonnull
@@ -324,5 +349,30 @@ public class DashboardResource {
 		}
 
 		return institutionDTO;
+	}
+
+	@Nonnull
+	private VerfuegungDTO convertVerfuegung(@Nonnull Verfuegung model) {
+		VerfuegungDTO verfuegungDTO = objectMapper.convertValue(model, VerfuegungDTO.class);
+		verfuegungDTO.getZeitabschnitte().forEach(zeitabschnittDTO -> {
+			BigDecimal gutschein = requireNonNull(zeitabschnittDTO.getBetreuungsgutschein());
+			BigDecimal gutscheinGemeinde = gutschein.subtract(zeitabschnittDTO.getBetreuungsgutscheinKanton())
+				.setScale(2, RoundingMode.HALF_UP);
+			zeitabschnittDTO.setBetreuungsgutscheinGemeinde(gutscheinGemeinde);
+		});
+
+		verfuegungDTO.getKind().setKindHash(hashKind(requireNonNull(model.getKind())));
+
+		return verfuegungDTO;
+	}
+
+	@Nonnull
+	private String hashKind(@Nonnull JsonNode kind) {
+		return String.valueOf(
+			Objects.hash(
+				kind.get("vorname").asText(),
+				kind.get("nachname").asText(),
+				kind.get("geburtsdatum").asText()
+			));
 	}
 }

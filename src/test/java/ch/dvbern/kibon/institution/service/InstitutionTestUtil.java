@@ -44,7 +44,7 @@ import ch.dvbern.kibon.institution.model.Gemeinde;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 
 import static ch.dvbern.kibon.exchange.commons.types.Wochentag.FRIDAY;
 import static ch.dvbern.kibon.exchange.commons.types.Wochentag.MONDAY;
