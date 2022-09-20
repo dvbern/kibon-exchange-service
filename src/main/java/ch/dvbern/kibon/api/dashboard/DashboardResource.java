@@ -19,6 +19,7 @@ package ch.dvbern.kibon.api.dashboard;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -362,6 +363,10 @@ public class DashboardResource {
 		});
 
 		verfuegungDTO.getKind().setKindHash(hashKind(requireNonNull(model.getKind())));
+
+		// anonymisieren das Geburtsdatum bis man sicher sind ob es kann exportiert werden
+		LocalDate geburtsdatumAnonymisiert = verfuegungDTO.getKind().getGeburtsdatum().withDayOfMonth(1).withMonth(1);
+		verfuegungDTO.getKind().setGeburtsdatum(geburtsdatumAnonymisiert);
 
 		return verfuegungDTO;
 	}
