@@ -81,7 +81,7 @@ public class VerfuegungConverter {
 			.put("vorname", kind.getVorname())
 			.put("nachname", kind.getNachname())
 			.put("geburtsdatum", kind.getGeburtsdatum().toString())
-			.put("einschulungTyp", kind.getEinschulungTyp().name())
+			.put("einschulungTyp", kind.getEinschulungTyp() == null ? null : kind.getEinschulungTyp().name())
 			.put("sozialeIndikation", kind.getSozialeIndikation())
 			.put("sprachlicheIndikation", kind.getSprachlicheIndikation())
 			.put("sprichtMuttersprache", kind.getSprichtMuttersprache())
