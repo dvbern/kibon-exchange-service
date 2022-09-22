@@ -17,9 +17,12 @@
 
 package ch.dvbern.kibon.verfuegung.service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -27,10 +30,13 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
 import ch.dvbern.kibon.shared.filter.FilterController;
 import ch.dvbern.kibon.shared.model.AbstractClientEntity_;
@@ -40,6 +46,8 @@ import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung_;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service responsible for {@link Verfuegung} handling.<br>
@@ -47,6 +55,8 @@ import ch.dvbern.kibon.verfuegung.model.Verfuegung_;
  */
 @ApplicationScoped
 public class VerfuegungService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(VerfuegungService.class);
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
@@ -61,15 +71,63 @@ public class VerfuegungService {
 	 */
 	@Transactional(TxType.MANDATORY)
 	public void onVerfuegungCreated(@Nonnull VerfuegungEventDTO dto) {
+
+		findVerfuegung(dto.getRefnr(), dto.getVersion())
+			.ifPresentOrElse(
+				existing -> this.updateVerfuegung(dto, existing),
+				() -> this.createVerfuegung(dto)
+			);
+	}
+
+	private void createVerfuegung(@Nonnull VerfuegungEventDTO dto) {
 		Verfuegung verfuegung = converter.create(dto);
 
 		em.persist(verfuegung);
+	}
+
+	private void updateVerfuegung(@Nonnull VerfuegungEventDTO dto, @Nonnull Verfuegung existingVerfuegung) {
+		converter.update(existingVerfuegung, dto);
+
+		em.merge(existingVerfuegung);
+	}
+
+	@Nonnull
+	private Optional<Verfuegung> findVerfuegung(@Nonnull String refnr, int version) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Verfuegung> query = cb.createQuery(Verfuegung.class);
+		Root<Verfuegung> root = query.from(Verfuegung.class);
+
+		ParameterExpression<String> refnrParam = cb.parameter(String.class, AbstractInstitutionPeriodeEntity_.REFNR);
+		Predicate refnrPredicate = cb.equal(root.get(AbstractInstitutionPeriodeEntity_.refnr), refnrParam);
+
+		ParameterExpression<Integer> versionParam = cb.parameter(Integer.class, Verfuegung_.VERSION);
+		Predicate versionPredicate = cb.equal(root.get(Verfuegung_.version), versionParam);
+
+		query.where(refnrPredicate, versionPredicate);
+
+		List<Verfuegung> verfuegungen = em.createQuery(query)
+			.setParameter(refnrParam, refnr)
+			.setParameter(versionParam, version)
+			.getResultList();
+
+		if (verfuegungen.isEmpty()) {
+			return Optional.empty();
+		}
+
+		int count = verfuegungen.size();
+		if (count > 1) {
+			LOG.warn("Found {} Verfuegungen instead of 1 with refnr {} and version {}", count, refnr, version);
+			verfuegungen.sort(Comparator.comparing(Verfuegung::getId).reversed());
+		}
+
+		return Optional.of(verfuegungen.get(0));
 	}
 
 	/**
 	 * Delivers all {@link ClientVerfuegungDTO} for the given filter.
 	 */
 	@Transactional(TxType.MANDATORY)
+	@Nonnull
 	public List<ClientVerfuegungDTO> getAllForClient(
 		@Nonnull FilterController<ClientVerfuegung, ClientVerfuegungDTO> filter) {
 
@@ -111,5 +169,34 @@ public class VerfuegungService {
 		List<ClientVerfuegungDTO> resultList = q.getResultList();
 
 		return resultList;
+	}
+
+	@Nonnull
+	public List<Verfuegung> getAllForDashboard(
+		@Nullable Long afterId,
+		@Nullable Integer limit,
+		@Nonnull Mandant mandant) {
+
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Verfuegung> query = cb.createQuery(Verfuegung.class);
+		Root<Verfuegung> root = query.from(Verfuegung.class);
+		Predicate mandantPredicate = cb.equal(root.get(Verfuegung_.mandant), mandant);
+
+		if (afterId != null) {
+			Predicate afterIdPredicate = cb.greaterThan(root.get(AbstractInstitutionPeriodeEntity_.id), afterId);
+			query.where(mandantPredicate, afterIdPredicate);
+		} else {
+			query.where(mandantPredicate);
+		}
+
+		query.orderBy(cb.asc(root.get(AbstractInstitutionPeriodeEntity_.id)));
+
+		TypedQuery<Verfuegung> q = em.createQuery(query);
+
+		if (limit != null) {
+			q.setMaxResults(limit);
+		}
+
+		return q.getResultList();
 	}
 }

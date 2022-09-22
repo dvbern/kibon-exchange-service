@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.verfuegung.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.verfuegung.KindDTO;
@@ -35,6 +36,8 @@ import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static java.util.Objects.requireNonNullElse;
 
 @ApplicationScoped
 public class VerfuegungConverter {
@@ -49,6 +52,12 @@ public class VerfuegungConverter {
 
 		verfuegung.setRefnr(dto.getRefnr());
 		verfuegung.setInstitutionId(dto.getInstitutionId());
+		update(verfuegung, dto);
+
+		return verfuegung;
+	}
+
+	public void update(@Nonnull Verfuegung verfuegung, @Nonnull VerfuegungEventDTO dto) {
 		verfuegung.setPeriodeVon(dto.getVon());
 		verfuegung.setPeriodeBis(dto.getBis());
 		verfuegung.setVersion(dto.getVersion());
@@ -58,13 +67,12 @@ public class VerfuegungConverter {
 		verfuegung.setGemeindeName(dto.getGemeindeName());
 
 		verfuegung.setAuszahlungAnEltern(dto.getAuszahlungAnEltern());
+		verfuegung.setMandant(requireNonNullElse(dto.getMandant(), Mandant.BERN));
 
 		verfuegung.setKind(toKind(dto.getKind()));
 		verfuegung.setGesuchsteller(toGesuchsteller(dto.getGesuchsteller()));
 		verfuegung.setZeitabschnitte(toZeitabschnitte(dto.getZeitabschnitte()));
 		verfuegung.setIgnorierteZeitabschnitte(toZeitabschnitte(dto.getIgnorierteZeitabschnitte()));
-
-		return verfuegung;
 	}
 
 	@Nonnull
@@ -72,7 +80,14 @@ public class VerfuegungConverter {
 		return mapper.createObjectNode()
 			.put("vorname", kind.getVorname())
 			.put("nachname", kind.getNachname())
-			.put("geburtsdatum", kind.getGeburtsdatum().toString());
+			.put("geburtsdatum", kind.getGeburtsdatum().toString())
+			.put("einschulungTyp", kind.getEinschulungTyp().name())
+			.put("sozialeIndikation", kind.getSozialeIndikation())
+			.put("sprachlicheIndikation", kind.getSprachlicheIndikation())
+			.put("sprichtMuttersprache", kind.getSprichtMuttersprache())
+			.put("ausserordentlicherAnspruch", kind.getAusserordentlicherAnspruch())
+			.put("kindAusAsylwesenAngabeElternGemeinde", kind.getKindAusAsylwesenAngabeElternGemeinde())
+			.put("keinSelbstbehaltDurchGemeinde", kind.getKeinSelbstbehaltDurchGemeinde());
 	}
 
 	@Nonnull
@@ -107,7 +122,7 @@ public class VerfuegungConverter {
 			.put("anspruchPct", zeitabschnitt.getAnspruchPct())
 			.put("verguenstigtPct", zeitabschnitt.getVerguenstigtPct())
 			.put("vollkosten", zeitabschnitt.getVollkosten())
-			.put("betreuungsgutschein", zeitabschnitt.getAuszahlungAnEltern() ? BigDecimal.ZERO : zeitabschnitt.getBetreuungsgutschein())
+			.put("betreuungsgutschein", toBetreuungsgutschein(zeitabschnitt))
 			.put("minimalerElternbeitrag", zeitabschnitt.getMinimalerElternbeitrag())
 			.put("verguenstigung", zeitabschnitt.getVerguenstigung())
 			.put("verfuegteAnzahlZeiteinheiten", zeitabschnitt.getVerfuegteAnzahlZeiteinheiten())
@@ -115,6 +130,19 @@ public class VerfuegungConverter {
 			.put("zeiteinheit", zeitabschnitt.getZeiteinheit().name())
 			.put("regelwerk", zeitabschnitt.getRegelwerk().name())
 			.put("auszahlungAnEltern", zeitabschnitt.getAuszahlungAnEltern())
-			.put("anElternUeberwiesenerBetrag", zeitabschnitt.getAuszahlungAnEltern() ? zeitabschnitt.getBetreuungsgutschein() : BigDecimal.ZERO);
+			.put("anElternUeberwiesenerBetrag", toAnElternUeberwiesenerBetrag(zeitabschnitt))
+			.put("besondereBeduerfnisse", zeitabschnitt.getBesondereBeduerfnisse())
+			.put("massgebendesEinkommen", zeitabschnitt.getMassgebendesEinkommen())
+			.put("betreuungsgutscheinKanton", zeitabschnitt.getBetreuungsgutscheinKanton());
+	}
+
+	@Nonnull
+	private static BigDecimal toBetreuungsgutschein(@Nonnull ZeitabschnittDTO zeitabschnitt) {
+		return zeitabschnitt.getAuszahlungAnEltern() ? BigDecimal.ZERO : zeitabschnitt.getBetreuungsgutschein();
+	}
+
+	@Nonnull
+	private static BigDecimal toAnElternUeberwiesenerBetrag(@Nonnull ZeitabschnittDTO zeitabschnitt) {
+		return zeitabschnitt.getAuszahlungAnEltern() ? zeitabschnitt.getBetreuungsgutschein() : BigDecimal.ZERO;
 	}
 }

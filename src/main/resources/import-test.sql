@@ -177,20 +177,21 @@ VALUES ('1', 'DV Kids', 'DV Bern AG', NULL, 'Nussbaumstrasse', '21', NULL, '3006
  		'TAGESSCHULE', NULL, NULL, NULL, NULL, NULL, '[]', '[]', '07:00', '19:00', NULL, '[]', FALSE, NULL, NULL,
  		now(), 'AKTIV', NULL, NULL, 5, NULL, 'BERN');
 
-INSERT INTO verfuegung (betreuungsart, periodebis, gesuchsteller, ignoriertezeitabschnitte, institutionid,
+INSERT INTO verfuegung (betreuungsart, periodebis, gesuchsteller, ignoriertezeitabschnitte, institutionid, mandant,
 						gemeindebfsnr, gemeindename, auszahlunganeltern, kind, refnr, verfuegtam, version, periodevon, zeitabschnitte)
 SELECT t.*
 FROM generate_series(1, 100) i
 	 CROSS JOIN LATERAL (
-	VALUES ('KITA', '2020-07-31'::DATE, '{}'::JSONB, '[]'::JSONB, '1', 0, 'Gemeinde', FALSE, '{}'::JSONB, '1.1.1.1',
+	VALUES ('KITA', '2020-07-31'::DATE, '{}'::JSONB, '[]'::JSONB, '1', 'BERN', 0, 'Gemeinde', FALSE, '{}'::JSONB, '1.1.1.1',
 			now(), 0, '2019-08-01'::DATE, '[]'::JSONB),
-		   ('KITA', '2020-07-31'::DATE, '{}'::JSONB, '[]'::JSONB, '1', 0, 'Gemeinde', FALSE, '{}'::JSONB, '1.1.1.1',
+		   ('KITA', '2020-07-31'::DATE, '{}'::JSONB, '[]'::JSONB, '1', 'BERN', 0, 'Gemeinde', FALSE, '{}'::JSONB, '1.1.1.1',
 			now() - INTERVAL '5 days', 0, '2019-08-01'::DATE, '[]'::JSONB),
 	       -- adding a default test case from kiBon test: period 2020/2021, 80% pensum until 2021-01-31, then 0%
 		   ('KITA', '2021-07-31'::DATE,
 		    '{"email": "test@mailbucket.dvbern.ch", "vorname": "Dagmar", "nachname": "Wälti"}'::JSONB,
 		    '[]'::JSONB,
 		    '2',
+		    'BERN',
 		    0,
 		    'Gemeinde',
 		    FALSE,
@@ -200,7 +201,7 @@ FROM generate_series(1, 100) i
 		    0,
 		    '2020-08-01'::DATE,
 		    '[{"bis": "2020-08-31", "von": "2020-08-01", "regelwerk": "ASIV", "vollkosten": 2000.0, "anspruchPct": 100, "zeiteinheit": "DAYS", "verfuegungNr": 0, "verguenstigung": 1451.3, "verguenstigtPct": 80.0, "betreuungsgutschein": 1451.3, "effektiveBetreuungPct": 80.0, "minimalerElternbeitrag": 0, "verfuegteAnzahlZeiteinheiten": 16, "anspruchsberechtigteAnzahlZeiteinheiten": 20.0}, {"bis": "2020-09-30", "von": "2020-09-01", "regelwerk": "ASIV", "vollkosten": 2000.0, "anspruchPct": 100, "zeiteinheit": "DAYS", "verfuegungNr": 0, "verguenstigung": 1451.3, "verguenstigtPct": 80.0, "betreuungsgutschein": 1451.3, "effektiveBetreuungPct": 80.0, "minimalerElternbeitrag": 0, "verfuegteAnzahlZeiteinheiten": 16, "anspruchsberechtigteAnzahlZeiteinheiten": 20.0}, {"bis": "2020-10-31", "von": "2020-10-01", "regelwerk": "ASIV", "vollkosten": 2000.0, "anspruchPct": 100, "zeiteinheit": "DAYS", "verfuegungNr": 0, "verguenstigung": 1451.3, "verguenstigtPct": 80.0, "betreuungsgutschein": 1451.3, "effektiveBetreuungPct": 80.0, "minimalerElternbeitrag": 0, "verfuegteAnzahlZeiteinheiten": 16, "anspruchsberechtigteAnzahlZeiteinheiten": 20.0}, {"bis": "2020-11-30", "von": "2020-11-01", "regelwerk": "ASIV", "vollkosten": 2000.0, "anspruchPct": 100, "zeiteinheit": "DAYS", "verfuegungNr": 0, "verguenstigung": 1451.3, "verguenstigtPct": 80.0, "betreuungsgutschein": 1451.3, "effektiveBetreuungPct": 80.0, "minimalerElternbeitrag": 0, "verfuegteAnzahlZeiteinheiten": 16, "anspruchsberechtigteAnzahlZeiteinheiten": 20.0}, {"bis": "2020-12-31", "von": "2020-12-01", "regelwerk": "ASIV", "vollkosten": 2000.0, "anspruchPct": 100, "zeiteinheit": "DAYS", "verfuegungNr": 0, "verguenstigung": 1451.3, "verguenstigtPct": 80.0, "betreuungsgutschein": 1451.3, "effektiveBetreuungPct": 80.0, "minimalerElternbeitrag": 0, "verfuegteAnzahlZeiteinheiten": 16, "anspruchsberechtigteAnzahlZeiteinheiten": 20.0}, {"bis": "2021-01-31", "von": "2021-01-01", "regelwerk": "ASIV", "vollkosten": 2000.0, "anspruchPct": 100, "zeiteinheit": "DAYS", "verfuegungNr": 0, "verguenstigung": 1451.3, "verguenstigtPct": 80.0, "betreuungsgutschein": 1451.3, "effektiveBetreuungPct": 80.0, "minimalerElternbeitrag": 0, "verfuegteAnzahlZeiteinheiten": 16, "anspruchsberechtigteAnzahlZeiteinheiten": 20.0}, {"bis": "2021-02-28", "von": "2021-02-01", "regelwerk": "ASIV", "vollkosten": 0, "anspruchPct": 100, "zeiteinheit": "DAYS", "verfuegungNr": 0, "verguenstigung": 0, "verguenstigtPct": 0, "betreuungsgutschein": 0, "effektiveBetreuungPct": 0, "minimalerElternbeitrag": 0, "verfuegteAnzahlZeiteinheiten": 0, "anspruchsberechtigteAnzahlZeiteinheiten": 20.0}, {"bis": "2021-03-31", "von": "2021-03-01", "regelwerk": "ASIV", "vollkosten": 0, "anspruchPct": 100, "zeiteinheit": "DAYS", "verfuegungNr": 0, "verguenstigung": 0, "verguenstigtPct": 0, "betreuungsgutschein": 0, "effektiveBetreuungPct": 0, "minimalerElternbeitrag": 0, "verfuegteAnzahlZeiteinheiten": 0, "anspruchsberechtigteAnzahlZeiteinheiten": 20.0}, {"bis": "2021-04-30", "von": "2021-04-01", "regelwerk": "ASIV", "vollkosten": 0, "anspruchPct": 100, "zeiteinheit": "DAYS", "verfuegungNr": 0, "verguenstigung": 0, "verguenstigtPct": 0, "betreuungsgutschein": 0, "effektiveBetreuungPct": 0, "minimalerElternbeitrag": 0, "verfuegteAnzahlZeiteinheiten": 0, "anspruchsberechtigteAnzahlZeiteinheiten": 20.0}, {"bis": "2021-05-31", "von": "2021-05-01", "regelwerk": "ASIV", "vollkosten": 0, "anspruchPct": 100, "zeiteinheit": "DAYS", "verfuegungNr": 0, "verguenstigung": 0, "verguenstigtPct": 0, "betreuungsgutschein": 0, "effektiveBetreuungPct": 0, "minimalerElternbeitrag": 0, "verfuegteAnzahlZeiteinheiten": 0, "anspruchsberechtigteAnzahlZeiteinheiten": 20.0}, {"bis": "2021-06-30", "von": "2021-06-01", "regelwerk": "ASIV", "vollkosten": 0, "anspruchPct": 100, "zeiteinheit": "DAYS", "verfuegungNr": 0, "verguenstigung": 0, "verguenstigtPct": 0, "betreuungsgutschein": 0, "effektiveBetreuungPct": 0, "minimalerElternbeitrag": 0, "verfuegteAnzahlZeiteinheiten": 0, "anspruchsberechtigteAnzahlZeiteinheiten": 20.0}, {"bis": "2021-07-31", "von": "2021-07-01", "regelwerk": "ASIV", "vollkosten": 0, "anspruchPct": 100, "zeiteinheit": "DAYS", "verfuegungNr": 0, "verguenstigung": 0, "verguenstigtPct": 0, "betreuungsgutschein": 0, "effektiveBetreuungPct": 0, "minimalerElternbeitrag": 0, "verfuegteAnzahlZeiteinheiten": 0, "anspruchsberechtigteAnzahlZeiteinheiten": 20.0}]'::JSONB),
-		   ('KITA', '2020-07-31'::DATE, '{}'::JSONB, '[]'::JSONB, '1', 0, 'Gemeinde', FALSE, '{}'::JSONB, '1.1.1.1',
+		   ('KITA', '2020-07-31'::DATE, '{}'::JSONB, '[]'::JSONB, '1', 'BERN', 0, 'Gemeinde', FALSE, '{}'::JSONB, '1.1.1.1',
 			now() - INTERVAL '7 days', 0, '2019-08-01'::DATE, '[]'::JSONB)
 	) t;
 
@@ -717,10 +718,10 @@ VALUES (2, '5', '21.000142.064.1.1', '2021-08-01', '2022-07-31',
            "tarifeDefinitivAkzeptiert": true
        }');
 
-INSERT INTO gemeinde (sequenceid, name, bfsnummer, betreuungsgutscheineanbietenab, gueltigbis, mandant)
-VALUES (1, 'Paris', 99998, '2016-01-01', '9999-12-31', 'BERN');
+INSERT INTO gemeinde (sequenceid, gemeindeuuid, name, bfsnummer, betreuungsgutscheineanbietenab, gueltigbis, mandant)
+VALUES (1, 'ea02b313-e7c3-4b26-9ef7-e413f4046db2', 'Paris', 99998, '2016-01-01', '9999-12-31', 'BERN');
 
-INSERT INTO public.gemeindekennzahlen (sequenceid, bfsnummer, gesuchsperiodestart, gesuchsperiodestop, kontingentierung, kontingentierungausgeschoepft, anzahlkinderwarteliste, dauerwarteliste, erwerbspensumzuschlag, limitierungtfo, limitierungkita, mandant)
-VALUES (1, 99998, '2021-08-01', '2022-07-31', null, null, null, null, 20.00, 'VORSCHULALTER', 'KINDERGARTEN2', 'BERN');
+INSERT INTO public.gemeindekennzahlen (sequenceid, gemeindeuuid, bfsnummer, gesuchsperiodestart, gesuchsperiodestop, kontingentierung, kontingentierungausgeschoepft, anzahlkinderwarteliste, dauerwarteliste, erwerbspensumzuschlag, limitierungtfo, limitierungkita, mandant)
+VALUES (1, 'ea02b313-e7c3-4b26-9ef7-e413f4046db2', 99998, '2021-08-01', '2022-07-31', null, null, null, null, 20.00, 'VORSCHULALTER', 'KINDERGARTEN2', 'BERN');
 
 -- endregion
