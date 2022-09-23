@@ -31,8 +31,10 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -72,6 +74,8 @@ import org.jboss.resteasy.reactive.NoCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static ch.dvbern.kibon.util.ConstantsUtil.DEFAULT_LIMIT;
+import static ch.dvbern.kibon.util.ConstantsUtil.MAX_LIMIT;
 import static java.util.Objects.requireNonNull;
 
 @Path("/dashboard")
@@ -130,7 +134,7 @@ public class DashboardResource {
 			+ "Gemeinde hat eine monoton steigende sequenceId.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
-		@Min(0) @QueryParam("limit") @Nullable Integer limit) {
+		@Min(0) @Max(MAX_LIMIT) @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) @Nullable Integer limit) {
 
 		String clientName = jsonWebToken.getClaim(CLIENT_ID);
 		Set<String> groups = identity.getRoles();
@@ -173,7 +177,7 @@ public class DashboardResource {
 			+ " GemeindeKennzahlen hat eine monoton steigende sequenceId.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
-		@Min(0) @QueryParam("limit") @Nullable Integer limit) {
+		@Min(0) @Max(MAX_LIMIT) @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) @Nullable Integer limit) {
 
 		String clientName = jsonWebToken.getClaim(CLIENT_ID);
 		Set<String> groups = identity.getRoles();
@@ -218,7 +222,7 @@ public class DashboardResource {
 			+ "Institution hat eine monoton steigende sequenceId.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
-		@Min(0) @QueryParam("limit") @Nullable Integer limit) {
+		@Min(0) @Max(MAX_LIMIT) @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) @Nullable Integer limit) {
 
 		String clientName = jsonWebToken.getClaim(CLIENT_ID);
 		Set<String> groups = identity.getRoles();
@@ -266,7 +270,7 @@ public class DashboardResource {
 				+ "Lastenausgleiche hat eine monoton steigende sequenceId.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
-		@Min(0) @QueryParam("limit") @Nullable Integer limit) {
+		@Min(0) @Max(MAX_LIMIT) @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) @Nullable Integer limit) {
 
 		String clientName = jsonWebToken.getClaim(CLIENT_ID);
 		Set<String> groups = identity.getRoles();
@@ -304,7 +308,7 @@ public class DashboardResource {
 			+ "monoton steigende ID.")
 		@QueryParam("after_id") @Nullable Long afterId,
 		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
-		@Min(0) @QueryParam("limit") @Nullable Integer limit) {
+		@Min(0) @Max(MAX_LIMIT) @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) @Nullable Integer limit) {
 
 		String clientName = jsonWebToken.getClaim(CLIENT_ID);
 		Set<String> groups = identity.getRoles();

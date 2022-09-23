@@ -30,6 +30,9 @@ public final class ConstantsUtil {
 	public static final String ID_UNKNOWN_INSTITUTION_STAMMDATEN_TAGESSCHULE_BE =
 		"00000000-0000-0000-0000-000000000002";
 
+	public static final int MAX_LIMIT = 10000;
+	public static final String DEFAULT_LIMIT = "10000";
+
 	private ConstantsUtil() {
 	}
 
