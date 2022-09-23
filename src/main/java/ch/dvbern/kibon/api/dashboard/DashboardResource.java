@@ -128,7 +128,6 @@ public class DashboardResource {
 	@NoCache
 	@Nonnull
 	@RolesAllowed("dashboard")
-	@Valid
 	public GemeindenDTO getAllGemeinden(
 		@Parameter(description = "Erlaubt es, nur Gemeinden zu laden, mit einer grösseren sequenceId.\n\nJede "
 			+ "Gemeinde hat eine monoton steigende sequenceId.")
@@ -171,7 +170,6 @@ public class DashboardResource {
 	@NoCache
 	@Nonnull
 	@RolesAllowed("dashboard")
-	@Valid
 	public GemeindenKennzahlenDTO getAllGemeindeKennzahlen(
 		@Parameter(description = "Erlaubt es, nur GemeindeKennzahlen zu laden, mit einer grösseren sequenceId.\n\nJede"
 			+ " GemeindeKennzahlen hat eine monoton steigende sequenceId.")
@@ -216,7 +214,6 @@ public class DashboardResource {
 	@NoCache
 	@Nonnull
 	@RolesAllowed("dashboard")
-	@Valid
 	public InstitutionenDTO getAllInstitutionen(
 		@Parameter(description = "Erlaubt es, nur Instutionen zu laden, mit einer grösseren sequenceId.\n\nJede "
 			+ "Institution hat eine monoton steigende sequenceId.")
@@ -263,7 +260,6 @@ public class DashboardResource {
 	@NoCache
 	@Nonnull
 	@RolesAllowed("dashboard")
-	@Valid
 	public LastenausgleicheDTO getAllLats(
 		@Parameter(description =
 			"Erlaubt es, nur Lastenausgleichdaten zu laden, mit einer grösseren sequenceId.\n\nJede "
@@ -302,7 +298,6 @@ public class DashboardResource {
 	@NoCache
 	@Nonnull
 	@RolesAllowed("dashboard")
-	@Valid
 	public VerfuegungenDTO getAllVerfuegungen(
 		@Parameter(description = "Erlaubt es, nach diesem ID Verfuegungen zu laden.\n\nJede Verfuegung hat eine "
 			+ "monoton steigende ID.")
