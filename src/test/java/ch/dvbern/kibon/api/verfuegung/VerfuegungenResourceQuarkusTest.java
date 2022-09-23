@@ -20,6 +20,7 @@ package ch.dvbern.kibon.api.verfuegung;
 import javax.ws.rs.core.Response.Status;
 
 import ch.dvbern.kibon.testutils.TestcontainersEnvironment;
+import ch.dvbern.kibon.util.ConstantsUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
@@ -102,6 +103,18 @@ class VerfuegungenResourceQuarkusTest {
 			.contentType(ContentType.JSON)
 			.when()
 			.get("/verfuegungen?limit=-1")
+			.then()
+			.assertThat()
+			.statusCode(Status.BAD_REQUEST.getStatusCode());
+	}
+
+		@Test
+	public void testGetAllEndpointMustNotBeLargerThanMaxLimit() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.get("/verfuegungen?limit=" + (ConstantsUtil.MAX_LIMIT + 1))
 			.then()
 			.assertThat()
 			.statusCode(Status.BAD_REQUEST.getStatusCode());

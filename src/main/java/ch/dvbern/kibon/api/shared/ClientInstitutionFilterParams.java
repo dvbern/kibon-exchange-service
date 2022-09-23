@@ -20,10 +20,15 @@ package ch.dvbern.kibon.api.shared;
 import java.util.StringJoiner;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+
+import static ch.dvbern.kibon.util.ConstantsUtil.DEFAULT_LIMIT;
+import static ch.dvbern.kibon.util.ConstantsUtil.MAX_LIMIT;
 
 public class ClientInstitutionFilterParams {
 
@@ -36,7 +41,9 @@ public class ClientInstitutionFilterParams {
 
 	@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
 	@Min(0)
+	@Max(MAX_LIMIT)
 	@QueryParam("limit")
+	@DefaultValue(DEFAULT_LIMIT)
 	@Nullable
 	private Integer limit = null;
 
