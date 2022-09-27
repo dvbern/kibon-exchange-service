@@ -256,7 +256,7 @@ public class BetreuungResource {
 	@Operation(summary = "Eine Betreuung in kiBon stornieren",
 		description = "Diese Schnittstelle ermöglicht eine automatisierte Stornierung einer Betreuung in kiBon")
 	@SecurityRequirement(name = "OAuth2", scopes = "user")
-	@APIResponse(responseCode = "201", content = {})
+	@APIResponse(responseCode = "200", content = {})
 	@APIResponse(responseCode = "401", ref = "#components/responses/Unauthorized")
 	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
 	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
