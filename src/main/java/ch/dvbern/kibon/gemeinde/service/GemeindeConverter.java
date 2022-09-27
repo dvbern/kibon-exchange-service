@@ -41,5 +41,8 @@ public class GemeindeConverter {
 		gemeinde.setBfsNummer(dto.getBfsNummer());
 		gemeinde.setBetreuungsgutscheineAnbietenAb(dto.getBetreuungsgutscheineAnbietenAb());
 		gemeinde.setGueltigBis(dto.getGueltigBis());
+		gemeinde.setAngebotBG(dto.getAngebotBG());
+		gemeinde.setAngebotTS(dto.getAngebotTS());
+		gemeinde.setAngebotFI(dto.getAngebotFI());
 	}
 }
