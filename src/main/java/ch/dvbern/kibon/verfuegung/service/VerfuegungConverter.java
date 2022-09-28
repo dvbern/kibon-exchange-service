@@ -133,7 +133,8 @@ public class VerfuegungConverter {
 			.put("anElternUeberwiesenerBetrag", toAnElternUeberwiesenerBetrag(zeitabschnitt))
 			.put("besondereBeduerfnisse", zeitabschnitt.getBesondereBeduerfnisse())
 			.put("massgebendesEinkommen", zeitabschnitt.getMassgebendesEinkommen())
-			.put("betreuungsgutscheinKanton", zeitabschnitt.getBetreuungsgutscheinKanton());
+			.put("betreuungsgutscheinKanton", zeitabschnitt.getBetreuungsgutscheinKanton())
+			.put("babyTarif", zeitabschnitt.getBabyTarif());
 	}
 
 	@Nonnull

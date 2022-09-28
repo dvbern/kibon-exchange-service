@@ -47,7 +47,6 @@ import ch.dvbern.kibon.exchange.api.common.dashboard.gemeindekennzahlen.Gemeinde
 import ch.dvbern.kibon.exchange.api.common.dashboard.institution.AdresseInstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionenDTO;
-import ch.dvbern.kibon.exchange.api.common.dashboard.lastenausgleich.LastenausgleicheDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungenDTO;
 import ch.dvbern.kibon.exchange.commons.types.Mandant;
@@ -86,6 +85,7 @@ public class DashboardResource {
 	private static final Logger LOG = LoggerFactory.getLogger(DashboardResource.class);
 
 	private static final String CLIENT_ID = "clientId";
+	private static final String GEBURTSDATUM_KIND_PROPERTY = "geburtsdatum";
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
@@ -248,41 +248,6 @@ public class DashboardResource {
 	}
 
 	@GET
-	@Path("/lastenausgleiche")
-	@Operation(summary = "Returniert alle Lastenausgleiche.")
-	@SecurityRequirement(name = "OAuth2", scopes = "dashboard")
-	@APIResponse(responseCode = "200")
-	@APIResponse(responseCode = "401", ref = "#/components/responses/Unauthorized")
-	@APIResponse(responseCode = "403", ref = "#/components/responses/Forbidden")
-	@APIResponse(responseCode = "500", ref = "#/components/responses/ServerError")
-	@Transactional
-	@NoCache
-	@Nonnull
-	@RolesAllowed("dashboard")
-	public LastenausgleicheDTO getAllLats(
-		@Parameter(description =
-			"Erlaubt es, nur Lastenausgleichdaten zu laden, mit einer grösseren sequenceId.\n\nJede "
-				+ "Lastenausgleiche hat eine monoton steigende sequenceId.")
-		@QueryParam("after_id") @Nullable Long afterId,
-		@Parameter(description = "Beschränkt die maximale Anzahl Resultate auf den angeforderten Wert.")
-		@Min(0) @Max(MAX_LIMIT) @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) @Nullable Integer limit) {
-
-		String clientName = jsonWebToken.getClaim(CLIENT_ID);
-		Set<String> groups = identity.getRoles();
-		String userName = identity.getPrincipal().getName();
-
-		LOG.info(
-			"Lastenausgleich Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and "
-				+ "after_id '{}'",
-			userName,
-			clientName,
-			groups,
-			limit,
-			afterId);
-		return new LastenausgleicheDTO();
-	}
-
-	@GET
 	@Path("/verfuegungen")
 	@Operation(
 		summary = "Returniert alle Verfuegungen.",
@@ -321,6 +286,7 @@ public class DashboardResource {
 		List<Verfuegung> verfuegungen = verfuegungService.getAllForDashboard(afterId, limit, mandant);
 
 		List<VerfuegungDTO> verfuegungDTOS = verfuegungen.stream()
+			.filter(verfuegung -> requireNonNull(verfuegung.getKind()).get(GEBURTSDATUM_KIND_PROPERTY) != null)
 			.map(this::convertVerfuegung)
 			.collect(Collectors.toList());
 
@@ -355,7 +321,9 @@ public class DashboardResource {
 		VerfuegungDTO verfuegungDTO = objectMapper.convertValue(model, VerfuegungDTO.class);
 		verfuegungDTO.getZeitabschnitte().forEach(zeitabschnittDTO -> {
 			BigDecimal gutschein = requireNonNull(zeitabschnittDTO.getBetreuungsgutschein());
-			BigDecimal gutscheinGemeinde = gutschein.subtract(zeitabschnittDTO.getBetreuungsgutscheinKanton())
+			BigDecimal gutscheinGemeinde = gutschein.subtract(zeitabschnittDTO.getBetreuungsgutscheinKanton() != null ?
+				zeitabschnittDTO.getBetreuungsgutscheinKanton() :
+				BigDecimal.ZERO)
 				.setScale(2, RoundingMode.HALF_UP);
 			zeitabschnittDTO.setBetreuungsgutscheinGemeinde(gutscheinGemeinde);
 		});
@@ -375,7 +343,7 @@ public class DashboardResource {
 			Objects.hash(
 				kind.get("vorname").asText(),
 				kind.get("nachname").asText(),
-				kind.get("geburtsdatum").asText()
+				kind.get(GEBURTSDATUM_KIND_PROPERTY).asText()
 			));
 	}
 }

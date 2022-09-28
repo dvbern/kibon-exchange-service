@@ -76,6 +76,13 @@ public class Gemeinde extends BaseEntity {
 	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE, updatable = false)
 	private Mandant mandant;
 
+	private boolean angebotBG;
+
+	private boolean angebotTS;
+
+	private boolean angebotFI;
+
+	@SuppressWarnings("checkstyle:CyclomaticComplexity")
 	@Override
 	public boolean equals(@Nullable Object o) {
 		if (this == o) {
@@ -94,7 +101,10 @@ public class Gemeinde extends BaseEntity {
 			getBfsNummer().equals(that.getBfsNummer()) &&
 			getMandant() == that.getMandant() &&
 			getBetreuungsgutscheineAnbietenAb().equals(that.getBetreuungsgutscheineAnbietenAb()) &&
-			getGueltigBis().equals(that.getGueltigBis());
+			getGueltigBis().equals(that.getGueltigBis()) &&
+			isAngebotBG() == that.isAngebotBG() &&
+			isAngebotTS() == that.isAngebotTS() &&
+			isAngebotFI() == that.isAngebotFI();
 	}
 
 	@Override
@@ -104,7 +114,10 @@ public class Gemeinde extends BaseEntity {
 			getName(),
 			getBfsNummer(),
 			getMandant(),getBetreuungsgutscheineAnbietenAb(),
-			getGueltigBis());
+			getGueltigBis(),
+			isAngebotBG(),
+			isAngebotTS(),
+			isAngebotFI());
 	}
 
 	@Nonnull
@@ -168,5 +181,29 @@ public class Gemeinde extends BaseEntity {
 
 	public void setGemeindeUUID(@Nonnull String gemeindeUUID) {
 		this.gemeindeUUID = gemeindeUUID;
+	}
+
+	public boolean isAngebotBG() {
+		return angebotBG;
+	}
+
+	public void setAngebotBG(boolean angebotBG) {
+		this.angebotBG = angebotBG;
+	}
+
+	public boolean isAngebotTS() {
+		return angebotTS;
+	}
+
+	public void setAngebotTS(boolean angebotTS) {
+		this.angebotTS = angebotTS;
+	}
+
+	public boolean isAngebotFI() {
+		return angebotFI;
+	}
+
+	public void setAngebotFI(boolean angebotFI) {
+		this.angebotFI = angebotFI;
 	}
 }
