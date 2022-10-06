@@ -80,6 +80,9 @@ public class ClientAnmeldungDTO {
 	@Nonnull
 	private JsonNode module;
 
+	@Nullable
+	private JsonNode tarife;
+
 	private boolean anmeldungZurueckgezogen;
 
 	public ClientAnmeldungDTO(
@@ -100,7 +103,8 @@ public class ClientAnmeldungDTO {
 		@Nullable String bemerkung,
 		@Nonnull Boolean anmeldungZurueckgezogen,
 		@Nonnull LocalDate eintrittsdatum,
-		@Nonnull JsonNode module) {
+		@Nonnull JsonNode module,
+		@Nullable JsonNode tarife) {
 		this.id = id;
 		this.institutionId = institutionId;
 		this.refnr = refnr;
@@ -119,6 +123,7 @@ public class ClientAnmeldungDTO {
 		this.anmeldungZurueckgezogen = anmeldungZurueckgezogen;
 		this.eintrittsdatum = eintrittsdatum;
 		this.module = module;
+		this.tarife = tarife;
 	}
 
 	@Nonnull
@@ -236,5 +241,14 @@ public class ClientAnmeldungDTO {
 
 	public void setModule(@Nonnull JsonNode module) {
 		this.module = module;
+	}
+
+	@Nullable
+	public JsonNode getTarife() {
+		return tarife;
+	}
+
+	public void setTarife(@Nullable JsonNode tarife) {
+		this.tarife = tarife;
 	}
 }
