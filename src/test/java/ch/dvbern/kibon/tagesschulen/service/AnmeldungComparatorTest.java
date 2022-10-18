@@ -122,7 +122,7 @@ public class AnmeldungComparatorTest {
 		anmeldung.setTarife(tarif1);
 
 		Anmeldung anmeldung2 = converter.create(dto, LocalDateTime.now());
-		anmeldung.setTarife(tarif2);
+		anmeldung2.setTarife(tarif2);
 
 		assertThat(anmeldung, not(comparedBy(Anmeldung.COMPARATOR).comparesEqualTo(anmeldung2)));
 	}
