@@ -64,7 +64,8 @@ public class Anmeldung extends AbstractInstitutionPeriodeEntity {
 		.thenComparing(Anmeldung::getKind, JsonNodeComparator.INSTANCE)
 		.thenComparing(Anmeldung::getGesuchsteller, JsonNodeComparator.INSTANCE)
 		.thenComparing(Anmeldung::getGesuchsteller2, Comparator.nullsLast(JsonNodeComparator.INSTANCE))
-		.thenComparing(Anmeldung::getModule, JsonNodeComparator.INSTANCE);
+		.thenComparing(Anmeldung::getModule, JsonNodeComparator.INSTANCE)
+		.thenComparing(Anmeldung::getTarife, Comparator.nullsLast(JsonNodeComparator.INSTANCE));
 
 	@Nonnull
 	@Type(type = JsonTypes.JSON_OBJECT_BIN)

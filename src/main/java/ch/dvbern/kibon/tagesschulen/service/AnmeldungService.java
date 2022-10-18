@@ -71,10 +71,9 @@ public class AnmeldungService {
 
 		Anmeldung last = lastExistingAnmeldung.get();
 		if (Anmeldung.COMPARATOR.compare(last, newAnmeldung) == 0) {
-			// don't trigger a new entry in ClientAnmeldung table: just update status & tarife of lastExistingAnmeldung
+			// don't trigger a new entry in ClientAnmeldung table: just update status of lastExistingAnmeldung
 			last.setStatus(newAnmeldung.getStatus());
 			last.setEventTimestamp(eventTime);
-			last.setTarife(newAnmeldung.getTarife());
 			em.merge(last);
 		} else {
 			// some essential data in anmeldung changed -> re-export
@@ -185,7 +184,8 @@ public class AnmeldungService {
 			anmeldungJoin.get(Anmeldung_.bemerkung),
 			anmeldungJoin.get(Anmeldung_.anmeldungZurueckgezogen),
 			anmeldungJoin.get(Anmeldung_.eintrittsdatum),
-			anmeldungJoin.get(Anmeldung_.module)
+			anmeldungJoin.get(Anmeldung_.module),
+			anmeldungJoin.get(Anmeldung_.tarife)
 		));
 	}
 }
