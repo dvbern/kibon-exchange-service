@@ -62,11 +62,11 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 	private @NotNull BetreuungsangebotTyp betreuungsArt = BetreuungsangebotTyp.KITA;
 
 	@Nonnull
-	@Column(nullable = false, updatable = false)
+	@Column(nullable = false)
 	private @NotNull Long gemeindeBfsNr = -1L;
 
 	@Nonnull
-	@Column(nullable = false, updatable = false)
+	@Column(nullable = false)
 	private @NotNull String gemeindeName = "";
 
 	@Nonnull
@@ -75,22 +75,22 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 
 	@Nullable
 	@Type(type = JsonTypes.JSON_OBJECT_BIN)
-	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false)
 	private @NotNull JsonNode kind = null;
 
 	@Nullable
 	@Type(type = JsonTypes.JSON_OBJECT_BIN)
-	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false)
 	private @NotNull JsonNode gesuchsteller = null;
 
 	@Nullable
 	@Type(type = JsonTypes.JSON_OBJECT_BIN)
-	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false)
 	private @NotNull JsonNode zeitabschnitte = null;
 
 	@Nullable
 	@Type(type = JsonTypes.JSON_OBJECT_BIN)
-	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false, updatable = false)
+	@Column(columnDefinition = JsonTypes.JSON_BIN, nullable = false)
 	private @NotNull JsonNode ignorierteZeitabschnitte = null;
 
 	@NotNull
