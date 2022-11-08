@@ -179,7 +179,8 @@ public class InstitutionService {
 			adresse.get(KontaktAngaben_.adresszusatz),
 			adresse.get(KontaktAngaben_.plz),
 			adresse.get(KontaktAngaben_.ort),
-			adresse.get(KontaktAngaben_.land)
+			adresse.get(KontaktAngaben_.land),
+			root.get(Institution_.mandant)
 		));
 
 		ParameterExpression<String> idParam = cb.parameter(String.class, Institution_.ID);

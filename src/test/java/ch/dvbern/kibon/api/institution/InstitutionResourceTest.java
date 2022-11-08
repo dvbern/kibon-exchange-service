@@ -57,6 +57,21 @@ class InstitutionResourceTest {
 	}
 
 	@Test
+	void testGetInstitutionByIdWithKibonMandant() {
+		given()
+			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
+			.contentType(ContentType.JSON)
+			.when()
+			.get("/institutions/1")
+			.then()
+			.assertThat()
+			.statusCode(Status.OK.getStatusCode())
+			.body(isJsonStringMatching(jsonObject()
+				.where("mandant", is(jsonText(equalTo("BERN"))))
+			));
+	}
+
+	@Test
 	void testGetInstitutionByIdWithUnknownID() {
 		given()
 			.auth().oauth2(TestcontainersEnvironment.getAccessToken())
