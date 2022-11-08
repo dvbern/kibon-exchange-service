@@ -134,7 +134,9 @@ public class VerfuegungConverter {
 			.put("besondereBeduerfnisse", zeitabschnitt.getBesondereBeduerfnisse())
 			.put("massgebendesEinkommen", zeitabschnitt.getMassgebendesEinkommen())
 			.put("betreuungsgutscheinKanton", zeitabschnitt.getBetreuungsgutscheinKanton())
-			.put("babyTarif", zeitabschnitt.getBabyTarif());
+			.put("babyTarif", zeitabschnitt.getBabyTarif())
+			.put("betreuungspensumZeiteinheit", zeitabschnitt.getBetreuungspensumZeiteinheit())
+			.put("elternbeitrag", zeitabschnitt.getElternbeitrag());
 	}
 
 	@Nonnull
