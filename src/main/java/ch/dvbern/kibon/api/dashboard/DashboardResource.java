@@ -49,7 +49,7 @@ import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionenDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungenDTO;
-import ch.dvbern.kibon.exchange.commons.types.Mandant;
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.gemeinde.service.GemeindeService;
 import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen;
 import ch.dvbern.kibon.gemeindekennzahlen.service.GemeindeKennzahlenService;
@@ -138,7 +138,7 @@ public class DashboardResource {
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
 
-		Mandant mandant = Mandant.BERN;
+		KibonMandant mandant = KibonMandant.BERN;
 
 		LOG.info(
 			"Gemeinde Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id "
@@ -189,7 +189,7 @@ public class DashboardResource {
 			limit,
 			afterId);
 
-		Mandant mandant = Mandant.BERN;
+		KibonMandant mandant = KibonMandant.BERN;
 
 		List<GemeindeKennzahlen> gemeindeKennzahlen = gemeindeKennzahlenService.getAll(afterId, limit, mandant);
 		List<GemeindeKennzahlenDTO> gemeindeKennzahlenDTOs = gemeindeKennzahlen.stream()
@@ -224,7 +224,7 @@ public class DashboardResource {
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
 
-		Mandant mandant = Mandant.BERN;
+		KibonMandant mandant = KibonMandant.BERN;
 
 		LOG.info(
 			"Institution Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id"
@@ -273,7 +273,7 @@ public class DashboardResource {
 		Set<String> groups = identity.getRoles();
 		String userName = identity.getPrincipal().getName();
 
-		Mandant mandant = Mandant.BERN;
+		KibonMandant mandant = KibonMandant.BERN;
 
 		LOG.info(
 			"Verfuegung Dashboard Resource accessed by '{}' with clientName '{}', roles '{}', limit '{}' and after_id "

@@ -27,11 +27,11 @@ import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.KontaktAngabenDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.ModulDTO;
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleModuleDTO;
-import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.exchange.commons.util.TimeConverter;
 import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.institution.model.Gemeinde;
@@ -86,7 +86,7 @@ public class InstitutionConverter {
 		institution.setAnzahlPlaetze(dto.getAnzahlPlaetze());
 		institution.setAnzahlPlaetzeFirmen(dto.getAnzahlPlaetzeFirmen());
 		institution.setAuslastungPct(dto.getAuslastungPct());
-		institution.setMandant(requireNonNullElse(dto.getMandant(), Mandant.BERN));
+		institution.setMandant(requireNonNullElse(KibonMandant.valueOf(dto.getMandant().name()), KibonMandant.BERN));
 		if (dto.getTimestampMutiert() != null) {
 			institution.setTimestampMutiert(TimestampConverter.toLocalDateTime(dto.getTimestampMutiert()));
 		}

@@ -41,10 +41,10 @@ import javax.transaction.Transactional.TxType;
 import ch.dvbern.kibon.clients.model.Client;
 import ch.dvbern.kibon.exchange.api.common.institution.ClientInstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.institution.InstitutionDTO;
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
-import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.Institution_;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
@@ -95,7 +95,7 @@ public class InstitutionService {
 
 		ParameterExpression<InstitutionStatus> statusParam = cb.parameter(InstitutionStatus.class, "statusParam");
 		Predicate statusPredicate = cb.equal(root.get(Institution_.status), statusParam);
-		Predicate mandantPredicate = cb.equal(root.get(Institution_.mandant), Mandant.BERN);
+		Predicate mandantPredicate = cb.equal(root.get(Institution_.mandant), KibonMandant.BERN);
 		Predicate unbekannteInsti = root.get(Institution_.id)
 			.in(ConstantsUtil.ALL_UNKNOWN_BE_INSTITUTION_IDS)
 			.not();
@@ -141,7 +141,8 @@ public class InstitutionService {
 			adresse.get(KontaktAngaben_.adresszusatz),
 			adresse.get(KontaktAngaben_.plz),
 			adresse.get(KontaktAngaben_.ort),
-			adresse.get(KontaktAngaben_.land)
+			adresse.get(KontaktAngaben_.land),
+			root.get(Institution_.mandant)
 		));
 
 		//noinspection rawtypes
@@ -205,7 +206,7 @@ public class InstitutionService {
 	public List<Institution> getAllForDashboard(
 		@Nullable Long afterId,
 		@Nullable Integer limit,
-		@Nonnull Mandant mandant) {
+		@Nonnull KibonMandant mandant) {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Institution> query = cb.createQuery(Institution.class);

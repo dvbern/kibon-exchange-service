@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.exchange.commons.institution.AltersKategorie;
 import ch.dvbern.kibon.exchange.commons.institution.GemeindeDTO;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionEventDTO;

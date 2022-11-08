@@ -36,8 +36,8 @@ import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
 import ch.dvbern.kibon.betreuung.model.ClientBetreuungAnfrageDTO;
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.exchange.commons.gemeindekennzahlen.GemeindeKennzahlenEventDTO;
-import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen;
 import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen_;
 
@@ -84,7 +84,10 @@ public class GemeindeKennzahlenService {
 	 * Delivers all {@link ClientBetreuungAnfrageDTO} for the given filter.
 	 */
 	@Transactional(TxType.MANDATORY)
-	public List<GemeindeKennzahlen> getAll(@Nullable Long afterId, @Nullable Integer limit, @Nonnull Mandant mandant) {
+	public List<GemeindeKennzahlen> getAll(
+		@Nullable Long afterId,
+		@Nullable Integer limit,
+		@Nonnull KibonMandant mandant) {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<GemeindeKennzahlen> query = cb.createQuery(GemeindeKennzahlen.class);
@@ -112,7 +115,8 @@ public class GemeindeKennzahlenService {
 		return resultList;
 	}
 
-	// TODO bfsNummer und gesuchsperiodeStart ist nicht zwingend eindeutisch in Mandanten-fähigem System. Auch nach Mandant oder einer globalen ID filtern.
+	// TODO bfsNummer und gesuchsperiodeStart ist nicht zwingend eindeutisch in Mandanten-fähigem System. Auch nach
+	//  Mandant oder einer globalen ID filtern.
 	@Nonnull
 	public Optional<GemeindeKennzahlen> getGemeindeKennzahlen(
 		@Nonnull String gemeindeUUID,

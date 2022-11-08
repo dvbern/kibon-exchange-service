@@ -20,6 +20,7 @@ package ch.dvbern.kibon.gemeinde.service;
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.exchange.commons.gemeinde.GemeindeEventDTO;
 import ch.dvbern.kibon.gemeinde.model.Gemeinde;
 
@@ -30,7 +31,7 @@ public class GemeindeConverter {
 	public Gemeinde create(@Nonnull GemeindeEventDTO dto) {
 		Gemeinde gemeinde = new Gemeinde();
 		gemeinde.setGemeindeUUID(dto.getGemeindeUUID());
-		gemeinde.setMandant(dto.getMandant());
+		gemeinde.setMandant(KibonMandant.valueOf(dto.getMandant().name()));
 		update(gemeinde, dto);
 
 		return gemeinde;
