@@ -41,9 +41,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.exchange.commons.institution.InstitutionStatus;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
-import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.persistence.BaseEntity;
 import ch.dvbern.kibon.tagesschulen.model.TagesschuleModule;
 import ch.dvbern.kibon.util.ConstantsUtil;
@@ -150,9 +150,10 @@ public class Institution extends BaseEntity {
 	private Long sequenceId;
 
 	@NotNull
+	@Nonnull
 	@Enumerated(EnumType.STRING)
 	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
-	private Mandant mandant = Mandant.BERN;
+	private KibonMandant mandant = KibonMandant.BERN;
 
 	@Nonnull
 	private @NotNull LocalDateTime timestampMutiert = LocalDateTime.now();
@@ -373,11 +374,12 @@ public class Institution extends BaseEntity {
 		this.sequenceId = sequenceId;
 	}
 
-	public Mandant getMandant() {
+	@Nonnull
+	public KibonMandant getMandant() {
 		return mandant;
 	}
 
-	public void setMandant(Mandant mandant) {
+	public void setMandant(@Nonnull KibonMandant mandant) {
 		this.mandant = mandant;
 	}
 }

@@ -35,8 +35,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.exchange.commons.types.EinschulungTyp;
-import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.persistence.BaseEntity;
 import ch.dvbern.kibon.util.ConstantsUtil;
 
@@ -103,7 +103,7 @@ public class GemeindeKennzahlen extends BaseEntity {
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
-	private Mandant mandant = Mandant.BERN;
+	private KibonMandant mandant = KibonMandant.BERN;
 
 	@Override
 	public boolean equals(@Nullable Object o) {
@@ -118,7 +118,7 @@ public class GemeindeKennzahlen extends BaseEntity {
 		GemeindeKennzahlen that = (GemeindeKennzahlen) o;
 
 		return getSequenceId().equals(that.getSequenceId()) &&
-			getGemeindeUUID().equals(that.gemeindeUUID) &&
+			getGemeindeUUID().equals(that.getGemeindeUUID()) &&
 			getBfsNummer().equals(that.getBfsNummer()) &&
 			getGesuchsperiodeStart().equals(that.getGesuchsperiodeStart()) &&
 			getGesuchsperiodeStop().equals(that.getGesuchsperiodeStop());
@@ -228,11 +228,11 @@ public class GemeindeKennzahlen extends BaseEntity {
 		this.limitierungKita = limitierungKita;
 	}
 
-	public Mandant getMandant() {
+	public KibonMandant getMandant() {
 		return mandant;
 	}
 
-	public void setMandant(Mandant mandant) {
+	public void setMandant(KibonMandant mandant) {
 		this.mandant = mandant;
 	}
 

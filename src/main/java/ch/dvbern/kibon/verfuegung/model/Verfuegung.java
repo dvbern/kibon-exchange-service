@@ -32,8 +32,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.exchange.commons.types.BetreuungsangebotTyp;
-import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import ch.dvbern.kibon.util.ConstantsUtil;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -97,7 +97,7 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 	@Nonnull
 	@Enumerated(EnumType.STRING)
 	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE)
-	private Mandant mandant = Mandant.BERN;
+	private KibonMandant mandant = KibonMandant.BERN;
 
 	@SuppressWarnings("checkstyle:CyclomaticComplexity")
 	@Override
@@ -224,11 +224,11 @@ public class Verfuegung extends AbstractInstitutionPeriodeEntity {
 	}
 
 	@Nonnull
-	public Mandant getMandant() {
+	public KibonMandant getMandant() {
 		return mandant;
 	}
 
-	public void setMandant(@Nonnull Mandant mandant) {
+	public void setMandant(@Nonnull KibonMandant mandant) {
 		this.mandant = mandant;
 	}
 }

@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import ch.dvbern.kibon.exchange.commons.types.Mandant;
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.exchange.commons.util.TimestampConverter;
 import ch.dvbern.kibon.exchange.commons.verfuegung.GesuchstellerDTO;
 import ch.dvbern.kibon.exchange.commons.verfuegung.KindDTO;
@@ -67,7 +67,7 @@ public class VerfuegungConverter {
 		verfuegung.setGemeindeName(dto.getGemeindeName());
 
 		verfuegung.setAuszahlungAnEltern(dto.getAuszahlungAnEltern());
-		verfuegung.setMandant(requireNonNullElse(dto.getMandant(), Mandant.BERN));
+		verfuegung.setMandant(requireNonNullElse(KibonMandant.valueOf(dto.getMandant().name()), KibonMandant.BERN));
 
 		verfuegung.setKind(toKind(dto.getKind()));
 		verfuegung.setGesuchsteller(toGesuchsteller(dto.getGesuchsteller()));

@@ -36,7 +36,7 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
-import ch.dvbern.kibon.exchange.commons.types.Mandant;
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
 import ch.dvbern.kibon.shared.filter.FilterController;
 import ch.dvbern.kibon.shared.model.AbstractClientEntity_;
@@ -175,7 +175,7 @@ public class VerfuegungService {
 	public List<Verfuegung> getAllForDashboard(
 		@Nullable Long afterId,
 		@Nullable Integer limit,
-		@Nonnull Mandant mandant) {
+		@Nonnull KibonMandant mandant) {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Verfuegung> query = cb.createQuery(Verfuegung.class);

@@ -35,8 +35,8 @@ import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
 import ch.dvbern.kibon.exchange.api.common.dashboard.gemeinde.GemeindeDTO;
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.exchange.commons.gemeinde.GemeindeEventDTO;
-import ch.dvbern.kibon.exchange.commons.types.Mandant;
 import ch.dvbern.kibon.gemeinde.model.Gemeinde;
 import ch.dvbern.kibon.gemeinde.model.Gemeinde_;
 
@@ -70,7 +70,7 @@ public class GemeindeService {
 	}
 
 	@Transactional(TxType.MANDATORY)
-	public List<GemeindeDTO> getAll(@Nullable Long afterId, @Nullable Integer limit, @Nonnull Mandant mandant) {
+	public List<GemeindeDTO> getAll(@Nullable Long afterId, @Nullable Integer limit, @Nonnull KibonMandant mandant) {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<GemeindeDTO> query = cb.createQuery(GemeindeDTO.class);
@@ -92,8 +92,7 @@ public class GemeindeService {
 		if (afterId != null) {
 			Predicate afterIdPredicate = cb.greaterThan(root.get(Gemeinde_.sequenceId), afterId);
 			query.where(nurBGAngebot, mandantPredicate, afterIdPredicate);
-		}
-		else {
+		} else {
 			query.where(nurBGAngebot, mandantPredicate);
 		}
 
@@ -114,7 +113,7 @@ public class GemeindeService {
 		CriteriaQuery<Gemeinde> query = cb.createQuery(Gemeinde.class);
 		Root<Gemeinde> root = query.from(Gemeinde.class);
 
-		ParameterExpression<String> gemeindeUUIDParam = cb.parameter(String.class,Gemeinde_.GEMEINDE_UU_ID);
+		ParameterExpression<String> gemeindeUUIDParam = cb.parameter(String.class, Gemeinde_.GEMEINDE_UU_ID);
 
 		Predicate gemeindeUUIDPredicate = cb.equal(root.get(Gemeinde_.gemeindeUUID), gemeindeUUIDParam);
 

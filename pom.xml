@@ -8,13 +8,13 @@
     </parent>
     <groupId>ch.dvbern.kibon</groupId>
     <artifactId>kibon-exchange-service</artifactId>
-    <version>1.11.8</version>
+    <version>1.12.0</version>
     <properties>
         <compiler-plugin.version>3.10.1</compiler-plugin.version>
         <docker.tag.latest>latest-snapshot</docker.tag.latest>
         <hamcrest.version>2.2</hamcrest.version>
         <kibon.exchange.api.commons.version>5.5.3</kibon.exchange.api.commons.version>
-        <kibon.exchange.api.version>5.4.5</kibon.exchange.api.version>
+        <kibon.exchange.api.version>5.4.6</kibon.exchange.api.version>
         <maven-compiler-plugin.source>${maven.compiler.target}</maven-compiler-plugin.source>
         <maven-compiler-plugin.target>${maven.compiler.source}</maven-compiler-plugin.target>
         <maven-compiler-plugin.version>${compiler-plugin.version}</maven-compiler-plugin.version>
@@ -23,10 +23,10 @@
         <maven.compiler.target>11</maven.compiler.target>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>2.12.3.Final</quarkus.platform.version>
+        <quarkus.platform.version>2.14.2.Final</quarkus.platform.version>
         <spotify.hamcrest.version>1.2.0</spotify.hamcrest.version>
-        <surefire-plugin.version>3.0.0-M6</surefire-plugin.version>
-        <testcontainers.version>1.17.3</testcontainers.version>
+        <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -133,7 +133,7 @@
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.11.0</version>
+            <version>1.11.1</version>
         </dependency>
         <dependency>
             <groupId>ch.dvbern.kibon</groupId>
@@ -214,7 +214,7 @@
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
-            <version>4.3</version>
+            <version>5.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -293,7 +293,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.39.1</version>
+                <version>0.40.2</version>
                 <configuration>
                     <imagePullPolicy>always</imagePullPolicy>
                     <skipPush>false</skipPush>

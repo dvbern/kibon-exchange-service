@@ -34,7 +34,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import ch.dvbern.kibon.exchange.commons.types.Mandant;
+import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.persistence.BaseEntity;
 import ch.dvbern.kibon.util.ConstantsUtil;
 
@@ -74,7 +74,7 @@ public class Gemeinde extends BaseEntity {
 	@Nonnull
 	@Enumerated(EnumType.STRING)
 	@Column(length = ConstantsUtil.SHORT_COLUMN_SIZE, updatable = false)
-	private Mandant mandant;
+	private KibonMandant mandant;
 
 	private boolean angebotBG;
 
@@ -96,7 +96,7 @@ public class Gemeinde extends BaseEntity {
 		Gemeinde that = (Gemeinde) o;
 
 		return getSequenceId().equals(that.getSequenceId()) &&
-			getGemeindeUUID().equals(that.gemeindeUUID) &&
+			getGemeindeUUID().equals(that.getGemeindeUUID()) &&
 			getName().equals(that.getName()) &&
 			getBfsNummer().equals(that.getBfsNummer()) &&
 			getMandant() == that.getMandant() &&
@@ -166,11 +166,11 @@ public class Gemeinde extends BaseEntity {
 	}
 
 	@Nonnull
-	public Mandant getMandant() {
+	public KibonMandant getMandant() {
 		return mandant;
 	}
 
-	public void setMandant(@Nonnull Mandant mandant) {
+	public void setMandant(@Nonnull KibonMandant mandant) {
 		this.mandant = mandant;
 	}
 
