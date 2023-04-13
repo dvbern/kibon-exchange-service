@@ -13,8 +13,8 @@
         <compiler-plugin.version>3.10.1</compiler-plugin.version>
         <docker.tag.latest>latest-snapshot</docker.tag.latest>
         <hamcrest.version>2.2</hamcrest.version>
-        <kibon.exchange.api.commons.version>5.5.3</kibon.exchange.api.commons.version>
-        <kibon.exchange.api.version>5.4.6</kibon.exchange.api.version>
+        <kibon.exchange.api.commons.version>5.5.5</kibon.exchange.api.commons.version>
+        <kibon.exchange.api.version>5.4.7</kibon.exchange.api.version>
         <maven-compiler-plugin.source>${maven.compiler.target}</maven-compiler-plugin.source>
         <maven-compiler-plugin.target>${maven.compiler.source}</maven-compiler-plugin.target>
         <maven-compiler-plugin.version>${compiler-plugin.version}</maven-compiler-plugin.version>
