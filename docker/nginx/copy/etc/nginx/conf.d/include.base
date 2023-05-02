@@ -44,6 +44,20 @@ location / {
        return 301 /api/v1/openapi;
     }
 
+    location /schema/ {
+        # make sure only authorized users access the schema-registry
+        include /etc/nginx/conf.d/include.basic_auth;
+
+        proxy_pass                         http://schema-registry/;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Host   "";
+
+        break;
+    }
+
     # Reverse proxy for API
     location /api/v1/ {
         proxy_pass https://apiserver;
