@@ -89,9 +89,16 @@ services:
       - kibon_exchange_backbone
     depends_on:
       - kafka
+      - keycloak
     volumes:
       - ${CONF_DIR}/service/certs/key.pem:/key.pem:ro
       - ${CONF_DIR}/service/certs/cert.pem:/cert.pem:ro
+    logging:
+      driver: "local"
+      options:
+        max-file: "10"
+        max-size: "100m"
+
     environment:
       TZ: "Europe/Zurich"
       KAFKA_GROUP_ID: ${KAFKA_GROUP_ID}
@@ -119,6 +126,11 @@ services:
     volumes:
       - ${CONF_DIR}/nginx/certs/key.pem:/etc/nginx/certs/key.pem:ro
       - ${CONF_DIR}/nginx/certs/cert.pem:/etc/nginx/certs/cert.pem:ro
+    logging:
+      driver: "local"
+      options:
+        max-file: "10"
+        max-size: "100m"
 
 networks:
   kibon_exchange_backbone:
