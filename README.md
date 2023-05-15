@@ -121,6 +121,7 @@ docker-compose -f docker-compose.prod.yml -p kibon-exchange-prod "$@"
 ```
 
 Usage:
+
 | Command | Explanation |
 | --- | --- |
 | `./my-wrapper-script.sh up -d` | to start in background |

@@ -17,11 +17,11 @@
 
 package ch.dvbern.kibon.persistence;
 
-import javax.persistence.MappedSuperclass;
-
-import io.quarkiverse.hibernate.types.jackson.JsonNodeBinaryType;
+import io.quarkiverse.hibernate.types.json.JsonNodeBinaryType;
 import io.quarkiverse.hibernate.types.json.JsonTypes;
 import org.hibernate.annotations.TypeDef;
+
+import javax.persistence.MappedSuperclass;
 
 @SuppressWarnings("EmptyClass")
 @TypeDef(name = JsonTypes.JSON_OBJECT_BIN, typeClass = JsonNodeBinaryType.class)
