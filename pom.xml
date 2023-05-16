@@ -19,11 +19,11 @@
         <maven-compiler-plugin.target>${maven.compiler.source}</maven-compiler-plugin.target>
         <maven-compiler-plugin.version>${compiler-plugin.version}</maven-compiler-plugin.version>
         <maven.compiler.parameters>true</maven.compiler.parameters>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>2.16.6.Final</quarkus.platform.version>
+        <quarkus.platform.version>2.16.7.Final</quarkus.platform.version>
         <surefire-plugin.version>3.0.0</surefire-plugin.version>
         <spotify.hamcrest.version>1.3.1</spotify.hamcrest.version>
         <testcontainers.version>1.17.6</testcontainers.version>
@@ -282,8 +282,6 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <testSource>17</testSource>
-                    <testTarget>17</testTarget>
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
@@ -326,6 +324,13 @@
                         </image>
                     </images>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>run-java-sh</artifactId>
+                        <version>1.3.8</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
