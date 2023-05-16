@@ -17,6 +17,18 @@
 
 package ch.dvbern.kibon.api.verfuegung;
 
+import ch.dvbern.kibon.clients.model.Client;
+import ch.dvbern.kibon.clients.model.ClientId;
+import ch.dvbern.kibon.clients.service.ClientService;
+import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungDTO;
+import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungenDTO;
+import ch.dvbern.kibon.exchange.api.common.verfuegung.ZeitabschnittDTO;
+import org.easymock.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -24,35 +36,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import ch.dvbern.kibon.clients.model.Client;
-import ch.dvbern.kibon.clients.model.ClientId;
-import ch.dvbern.kibon.clients.service.ClientService;
-import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungDTO;
-import ch.dvbern.kibon.exchange.api.common.verfuegung.VerfuegungenDTO;
-import ch.dvbern.kibon.exchange.api.common.verfuegung.ZeitabschnittDTO;
-import org.easymock.EasyMockExtension;
-import org.easymock.EasyMockSupport;
-import org.easymock.Mock;
-import org.easymock.MockType;
-import org.easymock.TestSubject;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 
 @ExtendWith(EasyMockExtension.class)
 class VerfuegungenResourceTest extends EasyMockSupport {
 
-	private final String institutionId = "1";
-	private final String clientName = "fake-client";
+	private static final String INSTITUTION_ID = "1";
+	private static final String CLIENT_NAME = "fake-client";
 
 	@TestSubject
 	private final VerfuegungenResource resource = new VerfuegungenResource();
@@ -78,7 +70,7 @@ class VerfuegungenResourceTest extends EasyMockSupport {
 
 		replayAll();
 
-		resource.removeZeitabschnitteOutsideGueltigkeit(clientName, dto, Collections.singleton(institutionId));
+		resource.removeZeitabschnitteOutsideGueltigkeit(CLIENT_NAME, dto, Collections.singleton(INSTITUTION_ID));
 
 		assertThat(verfuegung.getZeitabschnitte(), is(zeitabschnitte));
 
@@ -102,7 +94,7 @@ class VerfuegungenResourceTest extends EasyMockSupport {
 
 		replayAll();
 
-		resource.removeZeitabschnitteOutsideGueltigkeit(clientName, dto, Collections.singleton(institutionId));
+		resource.removeZeitabschnitteOutsideGueltigkeit(CLIENT_NAME, dto, Collections.singleton(INSTITUTION_ID));
 
 		assertThat(verfuegung.getZeitabschnitte(), contains(z2));
 
@@ -126,7 +118,7 @@ class VerfuegungenResourceTest extends EasyMockSupport {
 
 		replayAll();
 
-		resource.removeZeitabschnitteOutsideGueltigkeit(clientName, dto, Collections.singleton(institutionId));
+		resource.removeZeitabschnitteOutsideGueltigkeit(CLIENT_NAME, dto, Collections.singleton(INSTITUTION_ID));
 
 		assertThat(verfuegung.getZeitabschnitte(), contains(z1));
 
@@ -152,7 +144,7 @@ class VerfuegungenResourceTest extends EasyMockSupport {
 
 		replayAll();
 
-		resource.removeZeitabschnitteOutsideGueltigkeit(clientName, dto, Collections.singleton(institutionId));
+		resource.removeZeitabschnitteOutsideGueltigkeit(CLIENT_NAME, dto, Collections.singleton(INSTITUTION_ID));
 
 		assertThat(verfuegung.getIgnorierteZeitabschnitte(), contains(z2));
 
@@ -174,7 +166,7 @@ class VerfuegungenResourceTest extends EasyMockSupport {
 
 		replayAll();
 
-		resource.removeZeitabschnitteOutsideGueltigkeit(clientName, dto, Collections.singleton(institutionId));
+		resource.removeZeitabschnitteOutsideGueltigkeit(CLIENT_NAME, dto, Collections.singleton(INSTITUTION_ID));
 
 		assertThat(dto.getVerfuegungen(), not(hasItem(verfuegung)));
 
@@ -185,7 +177,7 @@ class VerfuegungenResourceTest extends EasyMockSupport {
 	private VerfuegungenDTO createDTO() {
 		VerfuegungenDTO verfuegungenDTO = new VerfuegungenDTO();
 		VerfuegungDTO dto = new VerfuegungDTO();
-		dto.setInstitutionId(institutionId);
+		dto.setInstitutionId(INSTITUTION_ID);
 
 		verfuegungenDTO.getVerfuegungen().add(dto);
 
@@ -203,7 +195,7 @@ class VerfuegungenResourceTest extends EasyMockSupport {
 
 	@Nonnull
 	private Client createClient(@Nullable LocalDate gueltigAb, @Nullable LocalDate gueltigBis) {
-		ClientId id = new ClientId(clientName, institutionId);
+		ClientId id = new ClientId(CLIENT_NAME, INSTITUTION_ID);
 
 		return new Client(id, LocalDateTime.now(), gueltigAb, gueltigBis);
 	}
