@@ -19,6 +19,7 @@ package ch.dvbern.kibon.verfuegung.service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -38,6 +39,7 @@ import javax.transaction.Transactional.TxType;
 
 import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.exchange.commons.verfuegung.VerfuegungEventDTO;
+import ch.dvbern.kibon.exchange.commons.verfuegungselbstbehaltgemeinde.GemeindeSelbstbehaltEventDTO;
 import ch.dvbern.kibon.shared.filter.FilterController;
 import ch.dvbern.kibon.shared.model.AbstractClientEntity_;
 import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity_;
@@ -46,6 +48,7 @@ import ch.dvbern.kibon.verfuegung.model.ClientVerfuegungDTO;
 import ch.dvbern.kibon.verfuegung.model.ClientVerfuegung_;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung;
 import ch.dvbern.kibon.verfuegung.model.Verfuegung_;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +60,7 @@ import org.slf4j.LoggerFactory;
 public class VerfuegungService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(VerfuegungService.class);
+	static final String SELBSTBEHALT_DURCH_GEMEINDE_PROPERTY = "keinSelbstbehaltDurchGemeinde";
 
 	@SuppressWarnings("checkstyle:VisibilityModifier")
 	@Inject
@@ -91,6 +95,31 @@ public class VerfuegungService {
 		em.merge(existingVerfuegung);
 	}
 
+	public void onGemeindeSelbstbehaltChanged(GemeindeSelbstbehaltEventDTO dto) {
+		List<Verfuegung> verfuegungenToUpdate = findVerfuegungen(dto.getRefnr());
+		verfuegungenToUpdate.forEach(verfuegung -> {
+			ObjectNode kindNode = (ObjectNode) verfuegung.getKind();
+			Objects.requireNonNull(kindNode);
+			kindNode.put(SELBSTBEHALT_DURCH_GEMEINDE_PROPERTY, dto.getKeinSelbstbehaltDurchGemeinde());
+			em.merge(verfuegung);
+		});
+	}
+
+	@Nonnull
+	private List<Verfuegung> findVerfuegungen(@Nonnull String refnr) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Verfuegung> query = cb.createQuery(Verfuegung.class);
+		Root<Verfuegung> root = query.from(Verfuegung.class);
+
+		ParameterExpression<String> refnrParam = cb.parameter(String.class, AbstractInstitutionPeriodeEntity_.REFNR);
+		Predicate refnrPredicate = cb.equal(root.get(AbstractInstitutionPeriodeEntity_.refnr), refnrParam);
+
+		query.where(refnrPredicate);
+
+		return em.createQuery(query)
+			.setParameter(refnrParam, refnr)
+			.getResultList();
+	}
 	@Nonnull
 	private Optional<Verfuegung> findVerfuegung(@Nonnull String refnr, int version) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();

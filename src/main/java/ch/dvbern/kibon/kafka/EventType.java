@@ -34,7 +34,8 @@ public enum EventType {
 	ANMELDUNG_TAGESSCHULE("AnmeldungTagesschule"),
 	GEMEINDE_CHANGED("GemeindeChanged"),
 	GEMEINDE_KENNZAHLEN_CHANGED("GemeindeKennzahlenChanged"),
-	GEMEINDE_KENNZAHLEN_REMOVED("GemeindeKennzahlenRemoved");
+	GEMEINDE_KENNZAHLEN_REMOVED("GemeindeKennzahlenRemoved"),
+	GEMEINDE_SELBSTBEHALT_CHANGED("GemeindeSelbstbehaltChanged");
 
 	@Nonnull
 	private final String name;
