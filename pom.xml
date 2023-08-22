@@ -8,12 +8,12 @@
     </parent>
     <groupId>ch.dvbern.kibon</groupId>
     <artifactId>kibon-exchange-service</artifactId>
-    <version>1.13.3</version>
+    <version>1.13.4</version>
     <properties>
         <compiler-plugin.version>3.11.0</compiler-plugin.version>
         <docker.tag.latest>latest-snapshot</docker.tag.latest>
         <hamcrest.version>2.2</hamcrest.version>
-        <kibon.exchange.api.commons.version>6.0.0</kibon.exchange.api.commons.version>
+        <kibon.exchange.api.commons.version>6.0.1</kibon.exchange.api.commons.version>
         <kibon.exchange.api.version>5.4.7</kibon.exchange.api.version>
         <maven-compiler-plugin.source>${maven.compiler.target}</maven-compiler-plugin.source>
         <maven-compiler-plugin.target>${maven.compiler.source}</maven-compiler-plugin.target>
