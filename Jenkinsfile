@@ -106,7 +106,7 @@ if (params.performRelease) {
                             usernameVariable: 'DOCKER_USERNAME')
                     ]) {
                         dvbUtil.genericSh(
-                            './mvnw -U -B -Pdvbern.oss -Dmaven.test.failure.ignore=true clean ' + branchSpecificGoal()
+                            './mvnw -U -B -Pdvbern.oss -Dmaven.test.failure.ignore=true clean -Dquarkus.http.test-port=0 ' + branchSpecificGoal()
                         )
                     }
                 }
