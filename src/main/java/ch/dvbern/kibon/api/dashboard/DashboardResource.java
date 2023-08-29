@@ -20,6 +20,7 @@ package ch.dvbern.kibon.api.dashboard;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -49,6 +50,7 @@ import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.institution.InstitutionenDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungDTO;
 import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.VerfuegungenDTO;
+import ch.dvbern.kibon.exchange.api.common.dashboard.verfuegung.ZeitabschnittDTO;
 import ch.dvbern.kibon.exchange.api.common.institution.KibonMandant;
 import ch.dvbern.kibon.gemeinde.service.GemeindeService;
 import ch.dvbern.kibon.gemeindekennzahlen.model.GemeindeKennzahlen;
@@ -319,6 +321,9 @@ public class DashboardResource {
 	@Nonnull
 	private VerfuegungDTO convertVerfuegung(@Nonnull Verfuegung model) {
 		VerfuegungDTO verfuegungDTO = objectMapper.convertValue(model, VerfuegungDTO.class);
+
+		replaceZeitabschnitteWithIgnorierteZeitabschnitte(verfuegungDTO, model);
+
 		verfuegungDTO.getZeitabschnitte().forEach(zeitabschnittDTO -> {
 			BigDecimal gutschein = requireNonNull(zeitabschnittDTO.getBetreuungsgutschein());
 			BigDecimal gutscheinGemeinde = gutschein.subtract(zeitabschnittDTO.getBetreuungsgutscheinKanton() != null ?
@@ -335,6 +340,20 @@ public class DashboardResource {
 		verfuegungDTO.getKind().setGeburtsdatum(geburtsdatumAnonymisiert);
 
 		return verfuegungDTO;
+	}
+
+	private void replaceZeitabschnitteWithIgnorierteZeitabschnitte(VerfuegungDTO verfuegungDTO, Verfuegung model) {
+		List<ZeitabschnittDTO> ignorierteZeitabschnitte =
+			Arrays.asList(objectMapper.convertValue(model.getIgnorierteZeitabschnitte(), ZeitabschnittDTO[].class));
+
+		//Es können alle Zeitabschnitte aus der Liste entfernt werden, wenn es einen ignorierten Zeitabschnitt im selben
+		//Monat gibt, da immer nur ein ganzer Monat ignoriert werden kann
+		ignorierteZeitabschnitte.forEach(ignorierteZa -> {
+			verfuegungDTO.getZeitabschnitte().removeIf(zeitabschnittDTO ->
+				zeitabschnittDTO.getVon().getMonth() == ignorierteZa.getVon().getMonth());
+		});
+
+		verfuegungDTO.getZeitabschnitte().addAll(ignorierteZeitabschnitte);
 	}
 
 	@Nonnull
