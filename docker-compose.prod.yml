@@ -1,4 +1,4 @@
-version: '2'
+version: '3.8'
 
 services:
 
@@ -7,6 +7,12 @@ services:
     user: ${HOST_USER}
     networks:
       - kibon_exchange_backbone
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     ports:
       - "2181:2181"
     volumes:
@@ -24,6 +30,12 @@ services:
       - kibon_exchange_backbone
     depends_on:
       - zookeeper
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     ports:
       - "9092:9092"
     volumes:
@@ -47,6 +59,12 @@ services:
     depends_on:
       - zookeeper
       - kafka
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     ports:
       - "8081:8081"
     environment:
@@ -61,6 +79,12 @@ services:
     user: ${HOST_USER}
     networks:
       - kibon_exchange_backbone
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     volumes:
       - ${CONF_DIR}/keycloak/kibon_realm.json:/tmp/kibon_realm.json:ro
       - ${CONF_DIR}/keycloak/set-secrets.sh:/opt/jboss/startup-scripts/set-secrets.sh:ro
@@ -90,6 +114,12 @@ services:
     depends_on:
       - kafka
       - keycloak
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     volumes:
       - ${CONF_DIR}/service/certs/key.pem:/key.pem:ro
       - ${CONF_DIR}/service/certs/cert.pem:/cert.pem:ro
@@ -121,6 +151,12 @@ services:
       - service
       - keycloak
       - schema-registry
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     ports:
       - "443:443"
     volumes:
