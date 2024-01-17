@@ -82,7 +82,6 @@ public class InstitutionConverter {
 		institution.setOeffnungsAbweichungen(dto.getOeffnungsAbweichungen());
 
 		institution.setAltersKategorien(mapper.valueToTree(dto.getAltersKategorien()));
-		institution.setSubventioniertePlaetze(dto.getSubventioniertePlaetze());
 		institution.setAnzahlPlaetze(dto.getAnzahlPlaetze());
 		institution.setAnzahlPlaetzeFirmen(dto.getAnzahlPlaetzeFirmen());
 		institution.setAuslastungPct(dto.getAuslastungPct());

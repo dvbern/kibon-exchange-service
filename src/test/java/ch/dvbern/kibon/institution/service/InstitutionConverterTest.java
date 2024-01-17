@@ -117,7 +117,6 @@ class InstitutionConverterTest {
 			.where(Institution::getOffenBis, is(TimeConverter.deserialize(dto.getOffenBis())))
 			.where(Institution::getOeffnungsAbweichungen, is(dto.getOeffnungsAbweichungen()))
 			.where(Institution::getAltersKategorien, matchesAlterskategorien(dto))
-			.where(Institution::isSubventioniertePlaetze, is(dto.getSubventioniertePlaetze()))
 			.where(Institution::getAnzahlPlaetze, comparesEqualTo(dto.getAnzahlPlaetze()))
 			.where(Institution::getAnzahlPlaetzeFirmen, comparesEqualTo(dto.getAnzahlPlaetzeFirmen()))
 			.where(Institution::getTimestampMutiert, is(TimestampConverter.toLocalDateTime(dto.getTimestampMutiert())))
