@@ -15,3 +15,6 @@ indent_style = tab
 # Kompatibility zu maven-dependency-plugin/maven-release-plugin... und damit zu jgitflow
 [pom.xml]
 indent_style = space
+
+[*.yml]
+indent_size = 2

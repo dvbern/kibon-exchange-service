@@ -132,9 +132,6 @@ public class Institution extends BaseEntity {
 	@Column(columnDefinition = JsonTypes.JSON_BIN)
 	private JsonNode altersKategorien = null;
 
-	@Column(nullable = true)
-	private boolean subventioniertePlaetze = false;
-
 	@Nullable
 	private BigDecimal anzahlPlaetze = null;
 
@@ -301,14 +298,6 @@ public class Institution extends BaseEntity {
 
 	public void setAltersKategorien(@Nullable JsonNode altersKategorien) {
 		this.altersKategorien = altersKategorien;
-	}
-
-	public boolean isSubventioniertePlaetze() {
-		return subventioniertePlaetze;
-	}
-
-	public void setSubventioniertePlaetze(boolean subventioniertePlaetze) {
-		this.subventioniertePlaetze = subventioniertePlaetze;
 	}
 
 	@Nullable

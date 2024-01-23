@@ -101,7 +101,6 @@ public final class InstitutionTestUtil {
 			TimeConverter.serialize(LocalTime.of(19, 0)),
 			null,
 			Collections.singletonList(AltersKategorie.VORSCHULE),
-			true,
 			BigDecimal.valueOf(13.23),
 			BigDecimal.valueOf(7.13),
 			TimestampConverter.fromLocalDateTime(LocalDateTime.now()),

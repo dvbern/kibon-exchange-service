@@ -96,6 +96,7 @@ public class FamilyPortalInstitutionDTO implements Serializable {
 	@NotNull
 	private List<AltersKategorie> altersKategorien = new ArrayList<>();
 
+	//Dieses Propery wird nicht mehr verwendet, wir geben hier immer false zurück, damit sich die API nicht ändert
 	@Schema(description = "TRUE, falls einige Plätze nach dem bisherigen Gebührensystem verrechnet werden")
 	private boolean subventioniertePlaetze = false;
 
@@ -230,10 +231,6 @@ public class FamilyPortalInstitutionDTO implements Serializable {
 
 	public boolean isSubventioniertePlaetze() {
 		return subventioniertePlaetze;
-	}
-
-	public void setSubventioniertePlaetze(boolean subventioniertePlaetze) {
-		this.subventioniertePlaetze = subventioniertePlaetze;
 	}
 
 	@Nullable

@@ -115,7 +115,6 @@ public class InstitutionResource {
 		FamilyPortalDTO dto = new FamilyPortalDTO();
 
 		dto.setInstitutionen(Arrays.asList(objectMapper.convertValue(all, FamilyPortalInstitutionDTO[].class)));
-
 		return dto;
 	}
 

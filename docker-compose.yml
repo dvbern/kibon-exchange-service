@@ -1,11 +1,16 @@
-version: '2'
+version: '3.8'
 
 services:
-
   zookeeper:
     image: docker-registry.dvbern.ch/dockerhub/confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION}
     networks:
       - kibon-exchange
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     ports:
       - "2181:2181"
     environment:
@@ -18,6 +23,12 @@ services:
       - kibon-exchange
     depends_on:
       - zookeeper
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     ports:
       - "9092:9092"
     environment:
@@ -38,6 +49,12 @@ services:
     depends_on:
       - zookeeper
       - kafka
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     ports:
       - "8081:8081"
     environment:
@@ -51,6 +68,12 @@ services:
     image: docker-registry.dvbern.ch/dockerhub/library/postgres:11-alpine
     networks:
       - kibon-exchange
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     ports:
       - "${DB_PORT}:5432"
     environment:
@@ -63,6 +86,12 @@ services:
     image: docker-registry.dvbern.ch/dockerhub/jboss/keycloak:${KEYCLOAK_VERSION}
     networks:
       - kibon-exchange
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     ports:
       - "8180:8080"
       - "8543:8443"
