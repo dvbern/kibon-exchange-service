@@ -66,6 +66,16 @@ Swagger-ui is integrated under /api/v1/swagger-ui. To interact with the REST end
 authorization is required. Thus, a full development stack should be started (see above). Additionally,
 read in ./dev-proxy/README.md how to create and start a proxy.
 
+Swagger-ui is accessible locally und the next url => http://local.kibon.ch/api/v1/q/swagger-ui/#/
+You need to add local.kibon.ch to your local host file:
+127.0.0.1       local.kibon.ch
+
+Or you can directly access it through the localhost URL if your docker compose was startet on your local network
+=> http://localhost/api/v1/q/swagger-ui/#
+
+You should never access swagger-ui with the quarkus port otherwise the authentication with keycloak will fail as
+the proxy will keep the port of quarkus for the redirect to keycloak.
+
 ## Debugging the Quarkus Application
 
 Quarkus allows remote debugging on default Port 5005. When another application like a WildFly application server is running in
