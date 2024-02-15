@@ -8,7 +8,7 @@
     </parent>
     <groupId>ch.dvbern.kibon</groupId>
     <artifactId>kibon-exchange-service</artifactId>
-    <version>1.13.8-SNAPSHOT</version>
+    <version>1.13.9-SNAPSHOT</version>
     <properties>
         <compiler-plugin.version>3.11.0</compiler-plugin.version>
         <docker.tag.latest>latest-snapshot</docker.tag.latest>
