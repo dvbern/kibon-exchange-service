@@ -82,7 +82,7 @@ public class AnmeldungService {
 	}
 
 	@Nonnull
-	public Optional<Anmeldung> getLatestAnmeldung(@Nonnull String refnr) {
+	private Optional<Anmeldung> getLatestAnmeldung(@Nonnull String refnr) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Anmeldung> query = cb.createQuery(Anmeldung.class);
 		Root<Anmeldung> root = query.from(Anmeldung.class);
