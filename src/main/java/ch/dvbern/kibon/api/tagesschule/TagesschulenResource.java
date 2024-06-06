@@ -57,10 +57,8 @@ import ch.dvbern.kibon.exchange.api.common.tagesschule.tarife.TagesschuleTarifeD
 import ch.dvbern.kibon.exchange.commons.tagesschulen.TagesschuleBestaetigungEventDTO;
 import ch.dvbern.kibon.shared.filter.FilterController;
 import ch.dvbern.kibon.shared.filter.FilterControllerFactory;
-import ch.dvbern.kibon.shared.model.AbstractInstitutionPeriodeEntity;
 import ch.dvbern.kibon.tagesschulen.facade.AblehnenAnmeldungKafkaEventProducer;
 import ch.dvbern.kibon.tagesschulen.facade.AnmeldungKafkaEventProducer;
-import ch.dvbern.kibon.tagesschulen.model.Anmeldung;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldung;
 import ch.dvbern.kibon.tagesschulen.model.ClientAnmeldungDTO;
 import ch.dvbern.kibon.tagesschulen.service.AnmeldungService;
@@ -262,13 +260,14 @@ public class TagesschulenResource {
 			refnr);
 
 		//Find institution linked with refnummer
-		Optional<Anmeldung> anmeldung = anmeldungService.getLatestAnmeldung(refnr);
+		Optional<String> institutionId = anmeldungService.getLatestClientAnmeldung(clientName, refnr)
+			.map(ClientAnmeldungDTO::getInstitutionId);
 
-		if (anmeldung.isEmpty()) {
+		if (institutionId.isEmpty()) {
 			return Uni.createFrom().item(Response.status(Status.NOT_FOUND).build());
 		}
 
-		ClientId clientId = new ClientId(clientName, anmeldung.get().getInstitutionId());
+		ClientId clientId = new ClientId(clientName, institutionId.get());
 		Optional<Client> client = clientService.findActive(clientId);
 
 		if (client.isEmpty()) {
@@ -333,8 +332,8 @@ public class TagesschulenResource {
 			}
 		}
 
-		Optional<String> institutionId = anmeldungService.getLatestAnmeldung(refnr)
-			.map(AbstractInstitutionPeriodeEntity::getInstitutionId);
+		Optional<String> institutionId = anmeldungService.getLatestClientAnmeldung(clientName, refnr)
+			.map(ClientAnmeldungDTO::getInstitutionId);
 
 		if (institutionId.isEmpty()) {
 			return Uni.createFrom().item(Response.status(Status.NOT_FOUND).build());
@@ -400,17 +399,10 @@ public class TagesschulenResource {
 			groups,
 			refnr);
 
-		Optional<Anmeldung> anmeldung = anmeldungService.getLatestAnmeldung(refnr);
+		Optional<ClientAnmeldungDTO> anmeldung = anmeldungService.getLatestClientAnmeldung(clientName, refnr);
 
 		if (anmeldung.isEmpty()) {
 			return Response.status(Status.NOT_FOUND).build();
-		}
-
-		ClientId clientId = new ClientId(clientName, anmeldung.get().getInstitutionId());
-		Optional<Client> client = clientService.findActive(clientId);
-
-		if (client.isEmpty()) {
-			return Response.status(Status.FORBIDDEN).build();
 		}
 
 		return Response.ok(convertToTagesschuleTarifeDTO(anmeldung.get())).build();
@@ -466,15 +458,14 @@ public class TagesschulenResource {
 		LocalDate periodeVon = LocalDate.of(periodeVonJahr, Month.AUGUST, 1);
 		LocalDate periodeBis = periodeVon.plusYears(1).minusDays(1);
 
-		Optional<TagesschuleModuleDTO> tagesschuleModuleDTO = tagesschuleModuleService.find(client, periodeVon, periodeBis);
-
-		return tagesschuleModuleDTO.map(Response::ok)
+		return tagesschuleModuleService.find(client, periodeVon, periodeBis)
+			.map(Response::ok)
 			.orElseGet(() -> Response.status(Status.NOT_FOUND))
 			.build();
 	}
 
 	@Nonnull
-	private TagesschuleTarifeDTO convertToTagesschuleTarifeDTO(@Nonnull Anmeldung anmeldung) {
+	private TagesschuleTarifeDTO convertToTagesschuleTarifeDTO(@Nonnull ClientAnmeldungDTO anmeldung) {
 		if (anmeldung.getTarife() == null) {
 			return new TagesschuleTarifeDTO(anmeldung.getRefnr(), Collections.emptyList(), false);
 		}
