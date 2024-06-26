@@ -135,12 +135,16 @@ if (params.performRelease) {
 						'kibon-exchange-uat' :
 						'kibon-exchange-dev'
 
+                def command = branch.startsWith(masterBranchName) ?
+						'/opt/kibon-exchange-service/restart.sh' :
+						'/opt/kibon-dev-exchange/restart.sh'
+
                 sshPublisher(publishers: [sshPublisherDesc(
                     configName: deploymentConfig,
                     transfers: [sshTransfer(
                         cleanRemote: false,
                         excludes: '',
-                        execCommand: '/opt/kibon-exchange-service/restart.sh',
+                        execCommand: command,
                         execTimeout: 120000,
                         flatten: false,
                         makeEmptyDirs: false,
