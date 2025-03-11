@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -39,9 +38,7 @@ import ch.dvbern.kibon.institution.model.Institution;
 import ch.dvbern.kibon.institution.model.KontaktAngaben;
 import ch.dvbern.kibon.tagesschulen.model.Modul;
 import ch.dvbern.kibon.tagesschulen.model.TagesschuleModule;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import static java.util.Objects.requireNonNullElse;
 
@@ -74,7 +71,6 @@ public class InstitutionConverter {
 		institution.setBetreuungsGutscheineBis(dto.getBetreuungsGutscheineBis());
 
 		update(institution.getKontaktAdresse(), dto.getAdresse());
-		institution.setBetreuungsAdressen(toBetreuungsStandorte(dto.getBetreuungsAdressen()));
 
 		institution.setOeffnungsTage(mapper.valueToTree(dto.getOeffnungsTage()));
 		institution.setOffenVon(TimeConverter.deserialize(dto.getOffenVon()));
@@ -116,41 +112,6 @@ public class InstitutionConverter {
 		gemeinde.setBfsNummer(dto.getGemeinde().getBfsNummer());
 
 		return gemeinde;
-	}
-
-	@Nonnull
-	private JsonNode toBetreuungsStandorte(@Nullable List<KontaktAngabenDTO> kontaktAngaben) {
-		if (kontaktAngaben == null) {
-			return mapper.createArrayNode();
-		}
-
-		List<ObjectNode> mapped = kontaktAngaben.stream()
-			.map(this::toKontaktAngaben)
-			.collect(Collectors.toList());
-
-		return mapper.createArrayNode()
-			.addAll(mapped);
-	}
-
-	@Nonnull
-	private ObjectNode toKontaktAngaben(@Nonnull KontaktAngabenDTO dto) {
-		ObjectNode result = mapper.createObjectNode()
-			.put("anschrift", dto.getAnschrift())
-			.put("strasse", dto.getStrasse())
-			.put("hausnummer", dto.getHausnummer())
-			.put("adresszusatz", dto.getAdresszusatz())
-			.put("plz", dto.getPlz())
-			.put("ort", dto.getOrt())
-			.put("land", dto.getLand())
-			.put("email", dto.getEmail())
-			.put("telefon", dto.getTelefon())
-			.put("webseite", dto.getWebseite());
-
-		result.putObject("gemeinde")
-			.put("name", dto.getGemeinde().getName())
-			.put("bfsNummer", dto.getGemeinde().getBfsNummer());
-
-		return result;
 	}
 
 	private void update(@Nonnull Institution institution, @Nonnull List<TagesschuleModuleDTO> tagesschuleModule) {

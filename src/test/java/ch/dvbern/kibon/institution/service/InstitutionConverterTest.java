@@ -111,7 +111,6 @@ class InstitutionConverterTest {
 			.where(Institution::getBetreuungsGutscheineAb, is(dto.getBetreuungsGutscheineAb()))
 			.where(Institution::getBetreuungsGutscheineBis, is(dto.getBetreuungsGutscheineBis()))
 			.where(Institution::getKontaktAdresse, matchesKontaktAngaben(dto.getAdresse()))
-			.where(Institution::getBetreuungsAdressen, matchesBetreuungsAdressen(dto))
 			.where(Institution::getOeffnungsTage, matchesOeffnungsTage(dto))
 			.where(Institution::getOffenVon, is(TimeConverter.deserialize(dto.getOffenVon())))
 			.where(Institution::getOffenBis, is(TimeConverter.deserialize(dto.getOffenBis())))
@@ -140,13 +139,6 @@ class InstitutionConverterTest {
 			.where(KontaktAngaben::getEmail, is(dto.getEmail()))
 			.where(KontaktAngaben::getTelefon, is(dto.getTelefon()))
 			.where(KontaktAngaben::getWebseite, is(dto.getWebseite()));
-	}
-
-	@Nonnull
-	private Matcher<JsonNode> matchesBetreuungsAdressen(@Nonnull InstitutionEventDTO dto) {
-		return is(jsonArray(contains(dto.getBetreuungsAdressen().stream()
-			.map(this::matchesKontaktAngabenNode)
-			.collect(Collectors.toList()))));
 	}
 
 	@Nonnull

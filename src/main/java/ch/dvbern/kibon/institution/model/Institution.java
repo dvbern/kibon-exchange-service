@@ -93,18 +93,6 @@ public class Institution extends BaseEntity {
 	private @NotNull @Valid KontaktAngaben kontaktAdresse = new KontaktAngaben();
 
 	/**
-	 * A {@link java.util.List<KontaktAngaben>}, but since {@link KontaktAngaben} is an embeddable, we cannot use it
-	 * in a List.
-	 * To avoid more refactoring, we simply store the entire data set as a JsonNode and hope the no schema migrations
-	 * are necessary.
-	 */
-	@SuppressWarnings("UnnecessaryFullyQualifiedName")
-	@Nullable
-	@Type(type = JsonTypes.JSON_OBJECT_BIN)
-	@Column(columnDefinition = JsonTypes.JSON_BIN)
-	private JsonNode betreuungsAdressen = null;
-
-	/**
 	 * A {@link java.util.List<ch.dvbern.kibon.exchange.commons.types.Wochentag>}
 	 */
 	@SuppressWarnings("UnnecessaryFullyQualifiedName")
@@ -244,15 +232,6 @@ public class Institution extends BaseEntity {
 
 	public void setKontaktAdresse(@Nonnull KontaktAngaben adresse) {
 		this.kontaktAdresse = adresse;
-	}
-
-	@Nullable
-	public JsonNode getBetreuungsAdressen() {
-		return betreuungsAdressen;
-	}
-
-	public void setBetreuungsAdressen(@Nullable JsonNode betreuungsAdressen) {
-		this.betreuungsAdressen = betreuungsAdressen;
 	}
 
 	@Nullable

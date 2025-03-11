@@ -62,10 +62,11 @@ public class FamilyPortalInstitutionDTO implements Serializable {
 	@Valid
 	private KontaktAngabenDTO kontaktAdresse = new KontaktAngabenDTO();
 
-	@Schema(description = "Betreuungsstandorte - oft identisch mit den Kontaktangaben")
+	@Schema(description = "Betreuungsstandorte - oft identisch mit den Kontaktangaben. Dieser Feld ist nicht mehr verwendet und bleibt damit leer.")
 	@Nonnull
 	@NotNull
 	@Valid
+	@Deprecated
 	private List<KontaktAngabenDTO> betreuungsAdressen = new ArrayList<>();
 
 	@Schema(description = "Beginn des Betreuungsgutschein Angebots")
