@@ -5,7 +5,8 @@
 ### Prepare the Environment
 
 There are several services which must be running before the Quarkus application is started:
-Postgres, Kafka, Schema Registry, Zookeeper and Keycloak.
+Postgres, Kafka, Schema Registry, Zookeeper and Keycloak. These services will be created
+and started via the `docker-compose.yml`.
 
 Copy the `.env-template` file to the proejct root with filename `.env`. Go through the environment variables in the
 created file and set credentials (replacing CHANGE_ME).
@@ -28,6 +29,10 @@ Sometimes Kafka fails at startup, in that case just try again.
 Quarkus runs best from a terminal:
 
 `./mvnw compile quarkus:dev -Dquarkus.profile=dev-with-data -Pdevelopment-mode`
+
+or on windows:
+
+`./mvnw  "-Dquarkus.profile=dev-with-data" compile quarkus:dev`
 
 This will start Quarkus in hot replace mode and apply the FlyWay migrations.
 
@@ -66,9 +71,12 @@ Swagger-ui is integrated under /api/v1/swagger-ui. To interact with the REST end
 authorization is required. Thus, a full development stack should be started (see above). Additionally,
 read in ./dev-proxy/README.md how to create and start a proxy.
 
-Swagger-ui is accessible locally und the next url => http://local.kibon.ch/api/v1/q/swagger-ui/#/
+If you don't use the kiBon setup with the load balancer, Swagger-ui is accessible locally under the url => http://local.kibon.ch/api/v1/q/swagger-ui/#/
 You need to add local.kibon.ch to your local host file:
 127.0.0.1       local.kibon.ch
+
+If you use the kiBon setup with the load balancer, Swagger-ui is accessible locally under the  url http://HOST_IP/api/v1/q/swagger-ui/#/ where
+you have to replace the HOST_IP with your host ip (same as in your .env file)
 
 Or you can directly access it through the localhost URL if your docker compose was startet on your local network
 => http://localhost/api/v1/q/swagger-ui/#
